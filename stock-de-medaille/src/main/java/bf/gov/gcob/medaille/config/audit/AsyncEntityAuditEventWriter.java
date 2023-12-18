@@ -26,7 +26,7 @@ public class AsyncEntityAuditEventWriter {
 
     private final KafkaService auditKafkaService;
 
-    private final String module = "casier_judiciaire";
+    private final String module = "stock_medaille";
 
     private final ObjectMapper objectMapper; //Jackson object mapper
 
