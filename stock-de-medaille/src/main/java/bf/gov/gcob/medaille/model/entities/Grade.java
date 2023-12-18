@@ -7,22 +7,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name="magasins")
-public class Magasin extends AbstractBaseEntity {
+@AllArgsConstructor
+@Entity
+@Table(name="grades")
+public class Grade extends AbstractBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_magasin", nullable = false, unique = true)
-    private Long        idMagasin;
-    private String      nomMagasin;
-    private Integer     capacite;
+    @Column(name = "id_grade", nullable = false, unique = true)
+    private Long        idGrade;
+    private String      typeGrade;
+    private String      libelle;
     private String      description;
-
-    @ManyToOne
-    @JoinColumn(name="depot_id")
-    private Depot depots;
 }
