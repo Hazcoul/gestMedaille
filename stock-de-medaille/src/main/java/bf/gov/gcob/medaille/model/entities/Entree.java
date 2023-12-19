@@ -17,6 +17,11 @@ import java.util.List;
 @Entity
 @Table(name="entrees")
 public class Entree extends AbstractBaseEntity {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_entree", nullable = false, unique = true)

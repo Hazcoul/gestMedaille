@@ -14,6 +14,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "ligne_sorties")
 public class LigneSortie extends AbstractBaseEntity {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_lignesortie", nullable = false, unique = true)

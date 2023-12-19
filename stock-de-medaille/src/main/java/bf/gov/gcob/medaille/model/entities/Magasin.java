@@ -14,7 +14,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name="magasins")
 public class Magasin extends AbstractBaseEntity {
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_magasin", nullable = false, unique = true)
     private Long        idMagasin;

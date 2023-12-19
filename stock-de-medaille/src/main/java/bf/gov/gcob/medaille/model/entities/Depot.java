@@ -11,6 +11,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "depots")
 public class Depot extends AbstractBaseEntity {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_depot", nullable = false, unique = true)

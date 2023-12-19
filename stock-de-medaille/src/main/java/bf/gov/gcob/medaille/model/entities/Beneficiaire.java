@@ -14,6 +14,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "beneficiaires")
 public class Beneficiaire extends AbstractBaseEntity {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_beneficiaire", nullable = false, unique = true)
