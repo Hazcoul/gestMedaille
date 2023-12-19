@@ -1,6 +1,7 @@
 package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.ECivilite;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,8 @@ public class Detenteur extends AbstractBaseEntity {
 	@Column(name = "matricule", nullable = false, unique = true)
 	private String matricule;
 	// enumeration {Monsieur, Madame}
-	private String civilite;
+	@Enumerated(EnumType.ORDINAL)
+    private ECivilite 	civilite;
 	@Column(name = "nom", nullable = false)
 	private String nom;
 	@Column(name = "prenom", nullable = false)

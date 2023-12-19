@@ -2,10 +2,10 @@ package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
 import bf.gov.gcob.medaille.model.enums.ECivilite;
-import bf.gov.gcob.medaille.model.enums.converters.CiviliteConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +34,7 @@ public class Ordonnateur extends AbstractBaseEntity {
     @Column(name="matricule", nullable=false, unique=true)
     private String 	matricule;
     //enumeration {Monsieur, Madame}
-    @Convert(converter = CiviliteConverter.class)
+    @Enumerated(EnumType.ORDINAL)
     private ECivilite 	civilite;
     @Column(name="nom", nullable=false)
     private String 	nom;

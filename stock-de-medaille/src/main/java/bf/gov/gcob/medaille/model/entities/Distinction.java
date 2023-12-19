@@ -4,10 +4,10 @@ import java.util.Date;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
 import bf.gov.gcob.medaille.model.enums.ETypeDistinction;
-import bf.gov.gcob.medaille.model.enums.converters.TypeDistinctionConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,7 +37,7 @@ public class Distinction extends AbstractBaseEntity {
     private String					abreviation;
     private String					libelle;
     @Column(name = "categorie_distinction", nullable = false, length = 1)//ça sera une enumeration (Ordres Nationaux, Ordres Specifiques, Médailles)
-    @Convert(converter = TypeDistinctionConverter.class)
+    @Enumerated(EnumType.STRING)
     private ETypeDistinction		categoryDistinction;
     private String					referenceDecret;
     @Column(name = "date_creation", nullable = true)

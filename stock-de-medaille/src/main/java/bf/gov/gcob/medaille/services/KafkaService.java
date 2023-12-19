@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import bf.gov.gcob.medaille.config.KafkaProperties;
-import bf.gov.gcob.medaille.utils.EntityAuditEventDTO;
+import bf.gov.gcob.medaille.utils.audit.EntityAuditEventDTO;
 
 @Service
 public class KafkaService {

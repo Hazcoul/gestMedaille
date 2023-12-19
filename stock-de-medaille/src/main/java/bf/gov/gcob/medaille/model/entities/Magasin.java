@@ -29,5 +29,5 @@ public class Magasin extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name="depot_id")
-    private Depot depots;
+    private Depot depot;
 }

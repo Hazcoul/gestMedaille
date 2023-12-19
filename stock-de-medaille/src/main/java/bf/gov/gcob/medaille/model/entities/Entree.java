@@ -53,6 +53,6 @@ public class Entree extends AbstractBaseEntity {
     @JoinColumn(name="magasin_id")
     private Magasin magasin;
 
-	@OneToMany(mappedBy = "entrees")
+	@OneToMany(mappedBy = "entree")
     List<LigneEntree> ligneentrees;
 }

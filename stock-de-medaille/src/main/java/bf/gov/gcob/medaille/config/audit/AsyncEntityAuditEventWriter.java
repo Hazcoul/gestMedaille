@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
 import bf.gov.gcob.medaille.services.KafkaService;
-import bf.gov.gcob.medaille.utils.EntityAuditAction;
-import bf.gov.gcob.medaille.utils.EntityAuditEventDTO;
+import bf.gov.gcob.medaille.utils.audit.EntityAuditAction;
+import bf.gov.gcob.medaille.utils.audit.EntityAuditEventDTO;
 
 /**
  * Async Entity Audit Event writer
