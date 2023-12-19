@@ -1,7 +1,7 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import bf.gov.gcob.medaille.mapper.FournisseurMapper;
-import bf.gov.gcob.medaille.model.dto.FournisseurDto;
+import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import bf.gov.gcob.medaille.model.entities.Fournisseur;
 import bf.gov.gcob.medaille.repository.FournisseurRepository;
 import bf.gov.gcob.medaille.services.FournisseurService;
@@ -21,7 +21,7 @@ public class FournisseurServiceImpl implements FournisseurService {
 
 
     @Override
-    public FournisseurDto create(FournisseurDto fournisseurDto) {
+    public FournisseurDTO create(FournisseurDTO fournisseurDto) {
         Fournisseur fournisseur= fournisseurMapper.buildFournisseur(fournisseurDto);
         fournisseur=fournisseurRepository.save(fournisseur);
         fournisseurDto=fournisseurMapper.buildFournisseurDto(fournisseur);
@@ -29,9 +29,9 @@ public class FournisseurServiceImpl implements FournisseurService {
     }
 
     @Override
-    public List<FournisseurDto> find() {
+    public List<FournisseurDTO> find() {
 
-        List<FournisseurDto> fournisseurs=fournisseurRepository.findAll()
+        List<FournisseurDTO> fournisseurs=fournisseurRepository.findAll()
                 .stream()
                 .map(fournisseurMapper::buildFournisseurDto)
                 .collect(Collectors.toList());
@@ -39,14 +39,14 @@ public class FournisseurServiceImpl implements FournisseurService {
     }
 
     @Override
-    public FournisseurDto update(FournisseurDto fournisseurDto) {
+    public FournisseurDTO update(FournisseurDTO fournisseurDto) {
         Fournisseur fournisseur=fournisseurRepository.findById(fournisseurDto.getIdFournisseur()).orElse(null);
         if (fournisseur == null) {
            throw new  RuntimeException("Fournisseur Id " + fournisseurDto.getIdFournisseur() + " inexistant");
         }
         fournisseur=fournisseurMapper.buildFournisseur(fournisseurDto);
         fournisseur=fournisseurRepository.save(fournisseur);
-        FournisseurDto fournisseurNDto=fournisseurMapper.buildFournisseurDto(fournisseur);
+        FournisseurDTO fournisseurNDto=fournisseurMapper.buildFournisseurDto(fournisseur);
         return fournisseurNDto;
     }
 
