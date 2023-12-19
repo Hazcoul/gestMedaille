@@ -2,7 +2,14 @@ package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
 import bf.gov.gcob.medaille.model.enums.ECivilite;
-import jakarta.persistence.*;
+import bf.gov.gcob.medaille.model.enums.converters.CiviliteConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +34,7 @@ public class Ordonnateur extends AbstractBaseEntity {
     @Column(name="matricule", nullable=false, unique=true)
     private String 	matricule;
     //enumeration {Monsieur, Madame}
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = CiviliteConverter.class)
     private ECivilite 	civilite;
     @Column(name="nom", nullable=false)
     private String 	nom;
