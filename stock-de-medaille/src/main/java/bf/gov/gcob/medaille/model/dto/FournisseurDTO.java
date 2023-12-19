@@ -15,7 +15,7 @@ public class FournisseurDTO extends AbstractBaseDTO {
 	private Long         idFournisseur;
     private String       sigle;
     @NotNull
-    private String       raisonSociale;
+    private String       libelle;
     @NotNull
     private String       telephoneFix;
     private String       telephoneMobile;
