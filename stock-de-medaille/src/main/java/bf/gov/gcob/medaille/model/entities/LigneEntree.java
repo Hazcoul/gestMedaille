@@ -32,9 +32,9 @@ public class LigneEntree extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "entree_id")
-    private Entree entrees;
+    private Entree entree;
 
     @ManyToOne
     @JoinColumn(name = "medaille_id")
-    private Medaille medailles;
+    private Medaille medaille;
 }

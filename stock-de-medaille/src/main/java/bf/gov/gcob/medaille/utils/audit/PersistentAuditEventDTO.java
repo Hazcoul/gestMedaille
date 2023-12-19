@@ -1,4 +1,4 @@
-package bf.gov.gcob.medaille.utils;
+package bf.gov.gcob.medaille.utils.audit;
 
 import java.io.Serializable;
 import java.time.Instant;

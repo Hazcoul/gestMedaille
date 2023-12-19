@@ -1,4 +1,4 @@
-package bf.gov.gcob.medaille.utils;
+package bf.gov.gcob.medaille.utils.audit;
 
 /**
  * Enum for the different audit actions

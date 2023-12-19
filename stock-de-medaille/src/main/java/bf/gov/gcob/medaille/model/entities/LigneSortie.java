@@ -32,9 +32,9 @@ public class LigneSortie extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "sortie_id")
-    private Sortie sorties;
+    private Sortie sortie;
 
     @ManyToOne
     @JoinColumn(name="medaille_id")
-    private Medaille medailles;
+    private Medaille medaille;
 }

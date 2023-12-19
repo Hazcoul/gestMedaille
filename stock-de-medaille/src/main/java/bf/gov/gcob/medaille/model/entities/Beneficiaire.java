@@ -25,7 +25,7 @@ public class Beneficiaire extends AbstractBaseEntity {
     private Long         idBeneficiaire;
     private String       sigle;
     @Column(name = "raison_sociale", nullable = false, unique = true)
-    private String       libelle;
+    private String       raisonSociale;
     @Column(name = "tel_fix", nullable = true, unique = true)
     private String       telephoneFix;
     @Column(name = "tel_mobile", nullable = true, unique = true)
