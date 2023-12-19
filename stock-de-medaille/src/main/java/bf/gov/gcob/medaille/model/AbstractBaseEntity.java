@@ -3,6 +3,7 @@ package bf.gov.gcob.medaille.model;
 import java.io.Serializable;
 import java.time.Instant;
 
+import jakarta.persistence.PrePersist;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -77,4 +78,11 @@ public abstract class AbstractBaseEntity implements Serializable {
 	    public static long getSerialversionuid() {
 	        return serialVersionUID;
 	    }
+		@PrePersist
+		public void preInsert() {
+		if(this.createdBy==null) {
+			this.createdBy="Anonymous";
+		}
+	}
+
 }
