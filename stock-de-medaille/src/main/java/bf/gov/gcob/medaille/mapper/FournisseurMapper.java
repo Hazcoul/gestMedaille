@@ -2,11 +2,16 @@ package bf.gov.gcob.medaille.mapper;
 
 import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import bf.gov.gcob.medaille.model.entities.Fournisseur;
+
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 
 @Component
-public class FournisseurMapper {
+public class FournisseurMapper extends AbstractBaseMapper {
     public FournisseurDTO buildFournisseurDto(Fournisseur fournisseur) {
+    	if(Objects.isNull(fournisseur)) return null;
+    	
         FournisseurDTO fournisseurDto = new FournisseurDTO();
 
         fournisseurDto.setIdFournisseur(fournisseur.getIdFournisseur());
@@ -19,6 +24,7 @@ public class FournisseurMapper {
         fournisseurDto.setEmail(fournisseur.getEmail());
         fournisseurDto.setNomCompletPersonneRessource(fournisseur.getNomCompletPersonneRessource());
         fournisseurDto.setTelephonePersonneRessource(fournisseur.getTelephonePersonneRessource());
+        setCommonFieldsFromEntity(fournisseur, fournisseurDto);
         return fournisseurDto;
     }
 
@@ -34,6 +40,7 @@ public class FournisseurMapper {
         fournisseur.setEmail(fournisseurDto.getEmail());
         fournisseur.setNomCompletPersonneRessource(fournisseurDto.getNomCompletPersonneRessource());
         fournisseur.setTelephonePersonneRessource(fournisseurDto.getTelephonePersonneRessource());
+        setCommonFieldsFromDTO(fournisseurDto, fournisseur);
         return fournisseur;
     }
 
