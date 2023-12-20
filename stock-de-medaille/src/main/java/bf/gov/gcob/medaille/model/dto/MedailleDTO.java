@@ -19,5 +19,5 @@ public class MedailleDTO extends AbstractBaseDTO {
     private String      lienImage;
     private String      description;
     @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, DistinctionDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
-    private Object distinctions;
+    private Object distinction;
 }
