@@ -31,5 +31,5 @@ public class Medaille extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name="distinction_id")
-    private Distinction distinctions;
+    private Distinction distinction;
 }

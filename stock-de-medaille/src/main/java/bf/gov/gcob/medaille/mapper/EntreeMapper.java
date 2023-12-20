@@ -12,10 +12,13 @@ public class EntreeMapper extends AbstractBaseMapper {
 	
 	private final FournisseurMapper fournisseurMapper;
 	private final MagasinMapper magasinMapper;
+	private final LigneEntreeMapper ligneEntreeMapper;
 	
-	public EntreeMapper(FournisseurMapper fournisseurMapper, MagasinMapper magasinMapper) {
+	public EntreeMapper(FournisseurMapper fournisseurMapper, MagasinMapper magasinMapper,
+			            LigneEntreeMapper ligneEntreeMapper) {
 		this.fournisseurMapper = fournisseurMapper;
 		this.magasinMapper = magasinMapper;
+		this.ligneEntreeMapper = ligneEntreeMapper;
 	}
     public EntreeDTO toDTO(Entree entity) {
     	if(Objects.isNull(entity)) return null;
@@ -32,6 +35,7 @@ public class EntreeMapper extends AbstractBaseMapper {
     	dto.setValiderPar(entity.getValiderPar());
     	dto.setFournisseur(fournisseurMapper.buildFournisseurDto(entity.getFournisseur()));
     	dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
+    	dto.setLigneEntrees(entity.getLigneentrees().stream().map(le -> ligneEntreeMapper.toDTO(le)).toList());
     	setCommonFieldsFromEntity(entity, dto);
 
         return dto;

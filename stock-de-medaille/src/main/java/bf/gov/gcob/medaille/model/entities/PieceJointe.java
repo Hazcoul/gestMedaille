@@ -30,7 +30,7 @@ public class PieceJointe extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "entree_id")
-    private Entree entrees;
+    private Entree entree;
     @ManyToOne
     @JoinColumn(name = "sortie_id")
     private Sortie sortie;
