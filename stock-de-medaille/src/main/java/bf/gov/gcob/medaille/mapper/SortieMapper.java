@@ -2,6 +2,7 @@ package bf.gov.gcob.medaille.mapper;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
@@ -14,20 +15,24 @@ import bf.gov.gcob.medaille.model.entities.Sortie;
 @Component
 public class SortieMapper extends AbstractBaseMapper {
 	
-	private final BeneficiaireMapper beneficiaireMapper;
-	private final DetenteurMapper detenteurMapper;
-	private final MagasinMapper magasinMapper;
-	private final OrdonnateurMapper ordonnateurMapper;
-	private final LigneSortieMapper ligneSortieMapper;
+	@Autowired
+	private BeneficiaireMapper beneficiaireMapper;
+	@Autowired
+	private DetenteurMapper detenteurMapper;
+	@Autowired
+	private MagasinMapper magasinMapper;
+	@Autowired
+	private OrdonnateurMapper ordonnateurMapper;
+	@Autowired
+	private LigneSortieMapper ligneSortieMapper;
 	
-	public SortieMapper(BeneficiaireMapper beneficiaireMapper, DetenteurMapper detenteurMapper,
-			            MagasinMapper magasinMapper, OrdonnateurMapper ordonnateurMapper, LigneSortieMapper ligneSortieMapper) {
-		this.beneficiaireMapper = beneficiaireMapper;
-		this.detenteurMapper = detenteurMapper;
-		this.magasinMapper = magasinMapper;
-		this.ordonnateurMapper = ordonnateurMapper;
-		this.ligneSortieMapper = ligneSortieMapper;
-	}
+//	public SortieMapper(BeneficiaireMapper beneficiaireMapper, DetenteurMapper detenteurMapper,
+//			            MagasinMapper magasinMapper, OrdonnateurMapper ordonnateurMapper) {
+//		this.beneficiaireMapper = beneficiaireMapper;
+//		this.detenteurMapper = detenteurMapper;
+//		this.magasinMapper = magasinMapper;
+//		this.ordonnateurMapper = ordonnateurMapper;
+//	}
 	
     public SortieDTO toDTO(Sortie entity) {
     	if(Objects.isNull(entity)) return null;

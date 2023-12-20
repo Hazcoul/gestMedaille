@@ -2,6 +2,7 @@ package bf.gov.gcob.medaille.mapper;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
@@ -12,13 +13,12 @@ public class EntreeMapper extends AbstractBaseMapper {
 	
 	private final FournisseurMapper fournisseurMapper;
 	private final MagasinMapper magasinMapper;
-	private final LigneEntreeMapper ligneEntreeMapper;
+	@Autowired
+	private LigneEntreeMapper ligneEntreeMapper;
 	
-	public EntreeMapper(FournisseurMapper fournisseurMapper, MagasinMapper magasinMapper,
-			            LigneEntreeMapper ligneEntreeMapper) {
+	public EntreeMapper(FournisseurMapper fournisseurMapper, MagasinMapper magasinMapper) {
 		this.fournisseurMapper = fournisseurMapper;
 		this.magasinMapper = magasinMapper;
-		this.ligneEntreeMapper = ligneEntreeMapper;
 	}
     public EntreeDTO toDTO(Entree entity) {
     	if(Objects.isNull(entity)) return null;

@@ -1,9 +1,8 @@
 package bf.gov.gcob.medaille.services;
 
-import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
-import bf.gov.gcob.medaille.model.entities.Fournisseur;
-
 import java.util.List;
+
+import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 
 public interface FournisseurService {
     FournisseurDTO create(FournisseurDTO fournisseurDto);
