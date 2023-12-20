@@ -1,0 +1,7 @@
+id;code;libelle
+1;ADMIN;Administrateur
+2;GEST;Gestionnaire
+3;ADD_PARAM;Ajouter une donnée paramètre
+4;VIEW_PARAM;Afficher une donnée paramètre
+5;DELETE_PARAM;Supprimer une donnée paramètre
+6;CONS;Consultant
