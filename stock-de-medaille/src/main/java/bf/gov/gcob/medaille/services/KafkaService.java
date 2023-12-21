@@ -27,14 +27,14 @@ public class KafkaService {
     public void sendNotification(Object message) {
 
         log.info("Sending notification message {}", message);
-        kafkaTemplate.send(kafkaProperties.getTopic().getNotification(), message);
+        kafkaTemplate.send(null != kafkaProperties.getTopic() ? kafkaProperties.getTopic().getNotification() : null, message);
     }
 
     @Async
     public void sendAuditEvent(EntityAuditEventDTO message) {
 
         log.info("Sending audit event {}", message);
-        kafkaTemplate.send(kafkaProperties.getTopic().getAuditEvent(), message);
+        kafkaTemplate.send(null != kafkaProperties.getTopic() ? kafkaProperties.getTopic().getAuditEvent() : null, message);
 
     }
 }

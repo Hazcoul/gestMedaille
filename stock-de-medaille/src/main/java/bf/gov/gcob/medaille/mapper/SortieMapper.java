@@ -11,8 +11,6 @@ import bf.gov.gcob.medaille.model.dto.MagasinDTO;
 import bf.gov.gcob.medaille.model.dto.OrdonnateurDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.entities.Sortie;
-import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class SortieMapper extends AbstractBaseMapper {
@@ -27,14 +25,6 @@ public class SortieMapper extends AbstractBaseMapper {
 	private OrdonnateurMapper ordonnateurMapper;
 	@Autowired
 	private LigneSortieMapper ligneSortieMapper;
-	
-//	public SortieMapper(BeneficiaireMapper beneficiaireMapper, DetenteurMapper detenteurMapper,
-//			            MagasinMapper magasinMapper, OrdonnateurMapper ordonnateurMapper) {
-//		this.beneficiaireMapper = beneficiaireMapper;
-//		this.detenteurMapper = detenteurMapper;
-//		this.magasinMapper = magasinMapper;
-//		this.ordonnateurMapper = ordonnateurMapper;
-//	}
 	
     public SortieDTO toDTO(Sortie entity) {
         if (Objects.isNull(entity)) {
@@ -52,8 +42,7 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setOrdonnateur(ordonnateurMapper.toDTO(entity.getOrdonnateur()));
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
-        //ci-dessous commenté par cani car bug
-        //dto.setLigneSorties(entity.getLigneSorties().stream().map(ls ->ligneSortieMapper.toDTO(ls)).toList());
+        dto.setLigneSorties(entity.getLigneSorties().stream().map(ls ->ligneSortieMapper.toDTO(ls)).toList());
         setCommonFieldsFromEntity(entity, dto);
 
         return dto;

@@ -7,21 +7,17 @@ import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.entities.Entree;
-import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class EntreeMapper extends AbstractBaseMapper {
 	
-	private final FournisseurMapper fournisseurMapper;
-	private final MagasinMapper magasinMapper;
+	@Autowired
+	private FournisseurMapper fournisseurMapper;
+	@Autowired
+	private MagasinMapper magasinMapper;
 	@Autowired
 	private LigneEntreeMapper ligneEntreeMapper;
-	
-	public EntreeMapper(FournisseurMapper fournisseurMapper, MagasinMapper magasinMapper) {
-		this.fournisseurMapper = fournisseurMapper;
-		this.magasinMapper = magasinMapper;
-	}
+
     public EntreeDTO toDTO(Entree entity) {
         if (Objects.isNull(entity)) {
             return null;
