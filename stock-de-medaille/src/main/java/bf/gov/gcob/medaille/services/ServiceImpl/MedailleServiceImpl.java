@@ -8,6 +8,8 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.mapper.MedailleMapper;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
+import bf.gov.gcob.medaille.model.entities.Distinction;
+import bf.gov.gcob.medaille.model.entities.Grade;
 import bf.gov.gcob.medaille.model.entities.Medaille;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
 import bf.gov.gcob.medaille.services.MedailleService;
@@ -18,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,7 +44,7 @@ public class MedailleServiceImpl implements MedailleService {
     @Transactional(rollbackFor = RuntimeException.class)
     public MedailleDTO create(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
         Medaille medaille = mapper.toEntity(medailleDTO);
-        medaille.setNomComplet(medaille.getDistinction().getLibelle() + "_" + medaille.getGrade().getLibelle());
+        medaille.setNomComplet(medaille.getGrade().getLibelle() + "_" + medaille.getDistinction().getLibelle());
         medaille = medailleRepository.save(medaille);
         try {
             this.saveImageMedaille(medaille, imageMedaille);
@@ -92,17 +95,33 @@ public class MedailleServiceImpl implements MedailleService {
 
     @Override
     public MedailleDTO update(MedailleDTO medailleDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
+        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
+        medaille.setGrade((Grade) medailleDTO.getGrade());
+        medaille.setHorsUsage(medailleDTO.isHorsUsage());
+        medaille.setStock(medailleDTO.getStock());
+        medaille.setNomComplet(medaille.getGrade().getLibelle() + "_" + medaille.getDistinction().getLibelle());
+        medaille = medailleRepository.save(medaille);
+
+        return mapper.toDTO(medaille);
+    }
+
+    @Override
+    public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
+        Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante introuvable. "));
+        this.saveImageMedaille(medaille, imageMedaille);
+
+        return mapper.toDTO(medaille);
     }
 
     @Override
     public List<MedailleDTO> findAll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<MedailleDTO> findAllHorsUsageOrNo(boolean isUtilisable) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return medailleRepository.findByHorsUsage(isUtilisable).stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
