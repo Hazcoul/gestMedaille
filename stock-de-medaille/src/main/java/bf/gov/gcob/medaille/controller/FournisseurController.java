@@ -19,12 +19,12 @@ public class FournisseurController {
 
     @PostMapping()
         public ResponseEntity<FournisseurDTO> create(@RequestBody FournisseurDTO request) throws URISyntaxException {
-        if (request.getIdFournisseur() != null) {
-            throw new CreateNewElementException();
+            if (request.getIdFournisseur() != null) {
+                throw new CreateNewElementException();
+            }
+            FournisseurDTO response = fournisseurService.create(request);
+            return ResponseEntity.created(new URI("/api/fournisseurs")).body(response);
         }
-        FournisseurDTO response = fournisseurService.create(request);
-        return ResponseEntity.created(new URI("/api/fournisseurs")).body(response);
-    }
     @GetMapping()
     public ResponseEntity<List<FournisseurDTO>> find() {
         List<FournisseurDTO> fournisseurs = fournisseurService.find();
@@ -37,6 +37,10 @@ public class FournisseurController {
         }
         FournisseurDTO response = fournisseurService.update(request);
         return ResponseEntity.ok().body(response);
+    }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable(name = "id", required = true) Long idFournisseur){
+        fournisseurService.delete(idFournisseur);
     }
 
 }

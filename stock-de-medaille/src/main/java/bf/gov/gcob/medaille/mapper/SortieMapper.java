@@ -10,7 +10,9 @@ import bf.gov.gcob.medaille.model.dto.DetenteurDTO;
 import bf.gov.gcob.medaille.model.dto.MagasinDTO;
 import bf.gov.gcob.medaille.model.dto.OrdonnateurDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
 @Component
 public class SortieMapper extends AbstractBaseMapper {
@@ -42,7 +44,9 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setOrdonnateur(ordonnateurMapper.toDTO(entity.getOrdonnateur()));
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
-        dto.setLigneSorties(entity.getLigneSorties().stream().map(ls ->ligneSortieMapper.toDTO(ls)).toList());
+        dto.setLigneSorties(entity.getLigneSorties().stream().map(ligneSortieMapper::toDTO).toList());
+        dto.setStatus(MvtStatus.valueOf(dto.getStatus().toString()));
+        dto.setNumeroSortie(entity.getNumeroSortie());
         setCommonFieldsFromEntity(entity, dto);
 
         return dto;
@@ -60,6 +64,8 @@ public class SortieMapper extends AbstractBaseMapper {
         entity.setOrdonnateur(ordonnateurMapper.toEntity((OrdonnateurDTO) dto.getOrdonnateur()));
         entity.setValiderLe(dto.getValiderLe());
         entity.setValiderPar(dto.getValiderPar());
+        entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));
+        entity.setNumeroSortie(dto.getNumeroSortie());
         setCommonFieldsFromDTO(dto, entity);
 
         return entity;

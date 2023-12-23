@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import bf.gov.gcob.medaille.model.entities.Sortie;
 
 public interface SortieRepository extends JpaRepository<Sortie, Long> {
-
+	
+	Sortie findFirstByOrderByIdSortieDesc();
 }

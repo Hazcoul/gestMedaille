@@ -1,8 +1,11 @@
 package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -51,7 +54,9 @@ public class Entree extends AbstractBaseEntity {
     //cmd, retour, autre
     private String acquisition;
     //valider ou pas
-    //private EStatusEntree status;
+    @Column(name = "status", nullable = false, length = 1)
+    @Enumerated(EnumType.STRING)
+    private EMvtStatus status;
 
     @ManyToOne
     @JoinColumn(name = "fournisseur_id")
@@ -62,5 +67,5 @@ public class Entree extends AbstractBaseEntity {
     private Magasin magasin;
 
     @OneToMany(mappedBy = "entree")
-    Set<LigneEntree> ligneentrees;
+    private Set<LigneEntree> ligneentrees;
 }

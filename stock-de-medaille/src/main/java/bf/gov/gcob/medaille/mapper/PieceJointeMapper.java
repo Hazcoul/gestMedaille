@@ -1,8 +1,6 @@
 package bf.gov.gcob.medaille.mapper;
 
-import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.PieceJointeDTO;
-import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.entities.PieceJointe;
 import bf.gov.gcob.medaille.model.enums.ETypePiece;
 import java.util.Objects;
@@ -40,11 +38,9 @@ public class PieceJointeMapper extends AbstractBaseMapper {
     public PieceJointe toEntity(PieceJointeDTO dto) {
         PieceJointe entity = new PieceJointe();
         entity.setDescription(dto.getDescription());
-        entity.setEntree(entreeMapper.toEntity((EntreeDTO) dto.getEntree()));
         entity.setIdPiece(dto.getIdPiece());
         entity.setLienPiece(dto.getLienPiece());
         entity.setReferencePiece(dto.getReferencePiece());
-        entity.setSortie(sortieMapper.toEntity((SortieDTO) dto.getSortie()));
         entity.setTypePiece(ETypePiece.getByLibelle(dto.getTypePiece()));
         setCommonFieldsFromDTO(dto, entity);
         
