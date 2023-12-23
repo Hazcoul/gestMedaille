@@ -114,20 +114,6 @@ public class MedailleController {
     }
 
     /**
-     * Liste des medailles via un discriminant binaire(medaille toujours
-     * utilisable ou horsUsage)
-     *
-     * @param isUtilisable : boolean value: true=MedaillehorsUsage,
-     * false=MedailleUtilisable
-     * @return
-     */
-    @GetMapping(path = "/{isUtilisable}")
-    public Mono<ResponseEntity<List<MedailleDTO>>> findUsageOrNo(@PathVariable(name = "isUtilisable", required = true) boolean isUtilisable) {
-        List<MedailleDTO> response = service.findAllHorsUsageOrNo(isUtilisable);
-        return Mono.just(ResponseEntity.ok().body(response));
-    }
-
-    /**
      * Suppression d'une medaille via unID
      *
      * @param id

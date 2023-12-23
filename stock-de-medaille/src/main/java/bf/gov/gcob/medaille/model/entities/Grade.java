@@ -1,6 +1,7 @@
 package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.ETypeGrade;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,18 +13,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="grades")
+@Table(name = "grades")
 public class Grade extends AbstractBaseEntity {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_grade", nullable = false, unique = true)
-    private Long        idGrade;
-    private String      typeGrade;
-    private String      libelle;
-    private String      description;
+    private Long idGrade;
+    @Column(name = "type_grade", nullable = false, length = 1)
+    @Enumerated(EnumType.STRING)
+    private ETypeGrade typeGrade; //GRADE ou DIGNITE
+    private String libelle;
+    private String description;
 }

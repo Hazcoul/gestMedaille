@@ -44,7 +44,7 @@ public class MedailleServiceImpl implements MedailleService {
     @Transactional(rollbackFor = RuntimeException.class)
     public MedailleDTO create(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
         Medaille medaille = mapper.toEntity(medailleDTO);
-        medaille.setNomComplet(medaille.getGrade().getLibelle() + "_" + medaille.getDistinction().getLibelle());
+        medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
         try {
             this.saveImageMedaille(medaille, imageMedaille);
@@ -52,6 +52,48 @@ public class MedailleServiceImpl implements MedailleService {
             log.info("Exception levée lors de l'enregistrement de l'imageMedaille : {}", e);
         }
         return mapper.toDTO(medaille);
+    }
+
+    @Override
+    public MedailleDTO update(MedailleDTO medailleDTO) {
+        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
+        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
+        medaille.setGrade((Grade) medailleDTO.getGrade());
+        medaille.setStock(medailleDTO.getStock());
+        medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
+        medaille = medailleRepository.save(medaille);
+
+        return mapper.toDTO(medaille);
+    }
+
+    @Override
+    public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
+        Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante introuvable. "));
+        this.saveImageMedaille(medaille, imageMedaille);
+
+        return mapper.toDTO(medaille);
+    }
+
+    @Override
+    public List<MedailleDTO> findAll() {
+        return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(Long idMedaille) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+//============================ PRIVATE FUNCTIONS ==============================
+    private String constructNomMedaille(Grade grade, Distinction distinction) {
+        String response = "";
+        if (grade == null || distinction.getLibelle().charAt(0) == 'M') {
+            response += distinction.getLibelle();
+        } else {
+            response += grade.getLibelle() + " de l'" + distinction.getLibelle();
+        }
+
+        return response;
     }
 
     private void saveImageMedaille(Medaille medaille, MultipartFile photoFile) {
@@ -91,42 +133,6 @@ public class MedailleServiceImpl implements MedailleService {
             Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
         }
-    }
-
-    @Override
-    public MedailleDTO update(MedailleDTO medailleDTO) {
-        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
-        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
-        medaille.setGrade((Grade) medailleDTO.getGrade());
-        medaille.setHorsUsage(medailleDTO.isHorsUsage());
-        medaille.setStock(medailleDTO.getStock());
-        medaille.setNomComplet(medaille.getGrade().getLibelle() + "_" + medaille.getDistinction().getLibelle());
-        medaille = medailleRepository.save(medaille);
-
-        return mapper.toDTO(medaille);
-    }
-
-    @Override
-    public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
-        Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante introuvable. "));
-        this.saveImageMedaille(medaille, imageMedaille);
-
-        return mapper.toDTO(medaille);
-    }
-
-    @Override
-    public List<MedailleDTO> findAll() {
-        return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<MedailleDTO> findAllHorsUsageOrNo(boolean isUtilisable) {
-        return medailleRepository.findByHorsUsage(isUtilisable).stream().map(mapper::toDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public void delete(Long idMedaille) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -48,13 +48,6 @@ public interface MedailleService {
     List<MedailleDTO> findAll();
 
     /**
-     * liste les medailles hors usage ou non
-     *
-     * @return
-     */
-    List<MedailleDTO> findAllHorsUsageOrNo(boolean isUtilisable);
-
-    /**
      * supprime une medaille via un ID
      *
      * @param idMedaille

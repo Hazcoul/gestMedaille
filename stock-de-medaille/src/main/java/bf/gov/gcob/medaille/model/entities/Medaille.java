@@ -25,13 +25,13 @@ public class Medaille extends AbstractBaseEntity {
     @Column(name = "id_medaille", nullable = false, unique = true)
     private Long idMedaille;
     private String nomComplet; //concatenation du libelle de la distinction de celui du grade. Le champs sera grisé
+    private String code;
     private Integer stock;
     private String lienImage;
     private String description;
-    private boolean horsUsage = false; //par defaut la medaille est utilisable. addedByCani
 
     @ManyToOne
-    @JoinColumn(name = "distinction_id")
+    @JoinColumn(name = "distinction_id", nullable = false)
     private Distinction distinction;
 
     @ManyToOne

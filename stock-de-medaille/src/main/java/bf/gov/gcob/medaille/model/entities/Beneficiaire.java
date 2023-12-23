@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Structure beneficiare = Ministere, Institution, Gouvernorat
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,22 +17,23 @@ import lombok.Setter;
 @Entity
 @Table(name = "beneficiaires")
 public class Beneficiaire extends AbstractBaseEntity {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_beneficiaire", nullable = false, unique = true)
-    private Long         idBeneficiaire;
-    private String       sigle;
+    private Long idBeneficiaire;
+    private String sigle;
     @Column(name = "raison_sociale", nullable = false, unique = true)
-    private String       raisonSociale;
+    private String raisonSociale;
     @Column(name = "tel_fix", nullable = true, unique = true)
-    private String       telephoneFix;
+    private String telephoneFix;
     @Column(name = "tel_mobile", nullable = true, unique = true)
-    private String       telephoneMobile;
-    private String       email;
-    private String       adresse;
+    private String telephoneMobile;
+    private String email;
+    private String adresse;
 }
