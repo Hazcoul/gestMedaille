@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import bf.gov.gcob.medaille.model.AbstractBaseDTO;
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.validation.constraints.NotNull;
@@ -32,5 +33,7 @@ public class SortieDTO extends AbstractBaseDTO {
     private Object detenteur;
     @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, MagasinDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
     private Object magasin;
-    List<LigneSortieDTO> ligneSorties;
+    private List<LigneSortieDTO> ligneSorties;
+    private MvtStatus status;
+    private String numeroSortie;
 }

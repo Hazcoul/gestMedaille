@@ -6,7 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
+import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
+import bf.gov.gcob.medaille.model.dto.MagasinDTO;
 import bf.gov.gcob.medaille.model.entities.Entree;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
 @Component
 public class EntreeMapper extends AbstractBaseMapper {
@@ -35,7 +39,8 @@ public class EntreeMapper extends AbstractBaseMapper {
         dto.setValiderPar(entity.getValiderPar());
         dto.setFournisseur(fournisseurMapper.buildFournisseurDto(entity.getFournisseur()));
         dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
-        dto.setLigneEntrees(entity.getLigneentrees().stream().map(le -> ligneEntreeMapper.toDTO(le)).toList());
+        dto.setLigneEntrees(entity.getLigneentrees().stream().map(ligneEntreeMapper::toDTO).toList());
+        dto.setStatus(MvtStatus.valueOf(dto.getStatus().toString()));
         setCommonFieldsFromEntity(entity, dto);
 
         return dto;
@@ -52,6 +57,10 @@ public class EntreeMapper extends AbstractBaseMapper {
         entity.setObservation(dto.getObservation());
         entity.setValiderLe(dto.getValiderLe());
         entity.setValiderPar(dto.getValiderPar());
+        entity.setFournisseur(fournisseurMapper.buildFournisseur((FournisseurDTO)  dto.getFournisseur()));
+        entity.setMagasin(magasinMapper.toEntity((MagasinDTO) dto.getMagasin()));
+        entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));
+        setCommonFieldsFromDTO(dto, entity);
         return entity;
     }
 

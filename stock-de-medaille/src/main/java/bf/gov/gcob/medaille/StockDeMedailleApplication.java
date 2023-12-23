@@ -1,11 +1,14 @@
 package bf.gov.gcob.medaille;
 
-import bf.gov.gcob.medaille.services.ServiceImpl.InitalDataServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+
+import bf.gov.gcob.medaille.services.ServiceImpl.InitalDataServiceImpl;
+import bf.gov.gcob.medaille.utils.StockDeMedailleProperties;
 
 @SpringBootApplication
 @EnableCaching
@@ -29,5 +32,10 @@ public class StockDeMedailleApplication implements CommandLineRunner {
         service.saveInitAuthorities();
         service.saveInitProfil();
         service.saveInitUser();
+    }
+    
+    @Bean
+    public StockDeMedailleProperties stockDeMedailleProperties() {
+    	return new StockDeMedailleProperties();
     }
 }

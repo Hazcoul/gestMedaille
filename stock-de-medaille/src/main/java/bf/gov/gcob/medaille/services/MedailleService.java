@@ -32,6 +32,15 @@ public interface MedailleService {
     MedailleDTO update(MedailleDTO medailleDTO);
 
     /**
+     * remplace ou associe une image d'une medaille donnée
+     *
+     * @param medailleId : id de la medaille
+     * @param imageMedaille : fichier image de la medaille
+     * @return
+     */
+    MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille);
+
+    /**
      * liste toutes les medailles
      *
      * @return

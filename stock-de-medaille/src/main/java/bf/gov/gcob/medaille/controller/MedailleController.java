@@ -13,14 +13,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 /**
  *
@@ -34,15 +41,17 @@ public class MedailleController {
     private MedailleService service;
 
     /**
+     * Creation d'une medaille avec upload d'image catalogue
      *
-     * @param jsonRequest : objet dto de la medaille
+     * @param jsonRequest : objet dto stringfied de la medaille
      * @param photo : image de la medaille
      * @return un dto
      * @throws URISyntaxException
      * @throws JsonProcessingException
      */
+    //@PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\",\"" + Constants.GEST + "\")")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<MedailleDTO> create(
+    public Mono<ResponseEntity<MedailleDTO>> create(
             @Valid @RequestPart(value = "data", required = true) String jsonRequest,
             @RequestPart(value = "photo", required = true) MultipartFile photo) throws URISyntaxException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -55,7 +64,81 @@ public class MedailleController {
             throw new RuntimeException("Veuillez charger une image catalogue de la médaille SVP.");
         }
         MedailleDTO response = service.create(medailleDTO, photo);
-        return ResponseEntity.created(new URI("/api/medailles/" + response.getIdMedaille())).body(response);
+        return Mono.just(ResponseEntity.created(new URI("/api/medailles/" + response.getIdMedaille())).body(response));
     }
 
+    /**
+     * Modification de donnés d'une medaille; sans toucher à l'image catalogue
+     *
+     * @param medailleDTO : objet dto de la medaille
+     * @return
+     * @throws URISyntaxException
+     */
+    @PutMapping()
+    public Mono<ResponseEntity<MedailleDTO>> update(@Valid @RequestBody MedailleDTO medailleDTO) throws URISyntaxException {
+        if (medailleDTO.getIdMedaille() == null) {
+            throw new RuntimeException("Veuillez fournir toutes les informations nécessaires(ID) SVP.");
+        }
+        MedailleDTO response = service.update(medailleDTO);
+        return Mono.just(ResponseEntity.ok().body(response));
+    }
+
+    /**
+     * Mise à jour d'une image de medaille
+     *
+     * @param idMedaille : id de la medaille
+     * @param photoFile : fichier image de la medaille
+     * @return
+     * @throws URISyntaxException
+     * @throws JsonProcessingException
+     */
+    @PostMapping(path = "/update-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Mono<ResponseEntity<MedailleDTO>> updateImagecatalogue(@Valid @RequestPart(value = "id", required = true) Long idMedaille,
+            @RequestPart(value = "photoFile", required = true) MultipartFile photoFile) throws URISyntaxException, JsonProcessingException {
+        if (photoFile == null) {
+            throw new RuntimeException("Veuillez joindre l'image catalogue de la medaille SVP.");
+        }
+        MedailleDTO response = service.updateImagecatalogue(idMedaille, photoFile);
+        return Mono.just(ResponseEntity.ok().body(response));
+    }
+
+    /**
+     * Liste de toutes les medailles
+     *
+     * @return
+     */
+    @GetMapping()
+    public Mono<ResponseEntity<List<MedailleDTO>>> findAll() {
+        List<MedailleDTO> response = service.findAll();
+        return Mono.just(ResponseEntity.ok().body(response));
+    }
+
+    /**
+     * Liste des medailles via un discriminant binaire(medaille toujours
+     * utilisable ou horsUsage)
+     *
+     * @param isUtilisable : boolean value: true=MedaillehorsUsage,
+     * false=MedailleUtilisable
+     * @return
+     */
+    @GetMapping(path = "/{isUtilisable}")
+    public Mono<ResponseEntity<List<MedailleDTO>>> findUsageOrNo(@PathVariable(name = "isUtilisable", required = true) boolean isUtilisable) {
+        List<MedailleDTO> response = service.findAllHorsUsageOrNo(isUtilisable);
+        return Mono.just(ResponseEntity.ok().body(response));
+    }
+
+    /**
+     * Suppression d'une medaille via unID
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping(path = "/{id}")
+    public Mono<ResponseEntity<Void>> delete(@PathVariable Long id) {
+        service.delete(id);
+        return Mono.just(ResponseEntity
+                .noContent()
+                .build());
+
+    }
 }

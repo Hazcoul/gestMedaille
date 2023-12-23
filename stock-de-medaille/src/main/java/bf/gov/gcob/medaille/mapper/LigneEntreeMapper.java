@@ -4,9 +4,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
-import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.LigneEntreeDTO;
-import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
 
 @Component
@@ -43,8 +41,6 @@ public class LigneEntreeMapper extends AbstractBaseMapper {
     	entity.setMontantLigne(dto.getMontantLigne());
     	entity.setPrixUnitaire(dto.getPrixUnitaire());
     	entity.setQuantiteLigne(dto.getQuantiteLigne());
-    	entity.setMedaille(medailleMapper.toEntity((MedailleDTO) dto.getMedaille()));
-    	entity.setEntree(entreeMapper.toEntity((EntreeDTO) dto.getEntree()));;
     	setCommonFieldsFromDTO(dto, entity);
     	
         return entity;
