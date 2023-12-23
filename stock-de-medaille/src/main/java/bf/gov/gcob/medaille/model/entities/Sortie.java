@@ -4,8 +4,11 @@ import java.util.Date;
 import java.util.Set;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -58,5 +61,11 @@ public class Sortie extends AbstractBaseEntity {
     private Magasin magasin;
 
 	@OneToMany(mappedBy = "sortie")
-    Set<LigneSortie> ligneSorties;
+    private Set<LigneSortie> ligneSorties;
+	
+	@Column(name = "status", nullable = false, length = 1)
+    @Enumerated(EnumType.STRING)
+    private EMvtStatus status;
+	@Column(name = "numero_sortie", nullable = false, length = 20)
+	private String numeroSortie;
 }

@@ -32,5 +32,10 @@ public class EntreeDTO extends AbstractBaseDTO {
     private Object fournisseur;
     @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, MagasinDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
     private Object magasin;
-    List<LigneEntreeDTO> ligneEntrees;
+    private List<LigneEntreeDTO> ligneEntrees;
+    private MvtStatus status;
+    
+    public enum MvtStatus {
+    	CREATED, VALIDATED, CANCELLED, CLOSED;
+    }
 }
