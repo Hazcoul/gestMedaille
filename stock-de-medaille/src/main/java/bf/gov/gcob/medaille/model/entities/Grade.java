@@ -24,8 +24,8 @@ public class Grade extends AbstractBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_grade", nullable = false, unique = true)
     private Long idGrade;
-    @Column(name = "type_grade", nullable = false, length = 1)
-    @Enumerated(EnumType.STRING)
+    @Column(name = "type_grade", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private ETypeGrade typeGrade; //GRADE ou DIGNITE
     private String libelle;
     private String description;

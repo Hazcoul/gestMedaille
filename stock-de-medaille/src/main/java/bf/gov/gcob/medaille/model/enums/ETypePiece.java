@@ -11,22 +11,22 @@ import lombok.Getter;
 @Getter
 public enum ETypePiece {
 
-    ORDRE_ENTREE('e', "Ordre d'entrée"),
-    ORDRE_SORTIE('s', "Ordre de sortie"),
-    FACTURE('f', "Facture"),
-    PV('p', "Procès verval de reception");
+    ORDRE_ENTREE(0, "Ordre d'entrée"),
+    ORDRE_SORTIE(1, "Ordre de sortie"),
+    FACTURE(2, "Facture"),
+    PV(3, "Procès verval de reception");
 
-    private Character valeur;
+    private Integer valeur;
     private String libelle;
 
-    ETypePiece(Character pValeur,
+    ETypePiece(Integer pValeur,
             String pLibelle
     ) {
         this.valeur = pValeur;
         this.libelle = pLibelle;
     }
 
-    public static ETypePiece getByValeur(Character value) {
+    public static ETypePiece getByValeur(Integer value) {
         return Stream.of(ETypePiece.values()).filter(val -> val.getValeur().equals(value)).findAny().orElse(null);
     }
 
@@ -34,11 +34,11 @@ public enum ETypePiece {
         return Stream.of(ETypePiece.values()).filter(val -> val.getLibelle().equals(label)).findAny().orElse(null);
     }
 
-    public static String getLibelleByValeur(Character value) {
+    public static String getLibelleByValeur(Integer value) {
         return Optional.ofNullable(getByValeur(value)).map(ETypePiece::getLibelle).orElse(null);
     }
 
-    public static Character getValeurByLibelle(String label) {
+    public static Integer getValeurByLibelle(String label) {
         return Optional.ofNullable(getByLibelle(label)).map(ETypePiece::getValeur).orElse(null);
     }
 
