@@ -30,6 +30,7 @@ public class DetenteurServiceImpl implements DetenteurService {
 
     @Override
     public DetenteurDTO create(DetenteurDTO detenteurDTO) {
+        log.info("Creation d'un detenteur {} ", detenteurDTO);
         Detenteur detenteur = mapper.toEntity(detenteurDTO);
         detenteur = detenteurRepository.save(detenteur);
 
@@ -38,6 +39,7 @@ public class DetenteurServiceImpl implements DetenteurService {
 
     @Override
     public DetenteurDTO update(DetenteurDTO detenteurDTO) {
+        log.info("Mise a jour d'un detenteur {} ", detenteurDTO);
         Detenteur detenteur = detenteurRepository.findById(detenteurDTO.getIdDetenteur()).orElseThrow(() -> new RuntimeException("Le detenteur ID [" + detenteurDTO.getIdDetenteur() + "] correspondant est introuvable. "));
         detenteur = mapper.toEntity(detenteurDTO);
         detenteur = detenteurRepository.save(detenteur);
@@ -47,11 +49,13 @@ public class DetenteurServiceImpl implements DetenteurService {
 
     @Override
     public List<DetenteurDTO> findAll() {
+        log.info("Liste des detenteurs");
         return detenteurRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
     public void delete(Long idDetenteur) {
+        log.info("Suppression du detenteur {} ", idDetenteur);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -43,6 +43,7 @@ public class MedailleServiceImpl implements MedailleService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public MedailleDTO create(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
+        log.info("Creation d'une medaille {} avec l'image catalogue {}", medailleDTO, imageMedaille.getOriginalFilename());
         Medaille medaille = mapper.toEntity(medailleDTO);
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
@@ -56,6 +57,7 @@ public class MedailleServiceImpl implements MedailleService {
 
     @Override
     public MedailleDTO update(MedailleDTO medailleDTO) {
+        log.info("Mise à jour d'une medaille {} ", medailleDTO);
         Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
         medaille.setDistinction((Distinction) medailleDTO.getDistinction());
         medaille.setGrade((Grade) medailleDTO.getGrade());
@@ -68,6 +70,7 @@ public class MedailleServiceImpl implements MedailleService {
 
     @Override
     public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
+        log.info("Mise à jour d'une image de la medaille {} ", medailleId);
         Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante introuvable. "));
         this.saveImageMedaille(medaille, imageMedaille);
 
@@ -76,11 +79,13 @@ public class MedailleServiceImpl implements MedailleService {
 
     @Override
     public List<MedailleDTO> findAll() {
+        log.info("Liste des medailles");
         return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
     public void delete(Long idMedaille) {
+        log.info("Suppression de la medaille {} ", idMedaille);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

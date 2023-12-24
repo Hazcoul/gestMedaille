@@ -31,6 +31,7 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
 
     @Override
     public BeneficiaireDTO create(BeneficiaireDTO beneficiaireDTO) {
+        log.info("Creation d'un beneficiaire {} ", beneficiaireDTO);
         Beneficiaire beneficiaire = mapper.toEntity(beneficiaireDTO);
         beneficiaire = beneficiaireRepository.save(beneficiaire);
 
@@ -39,6 +40,7 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
 
     @Override
     public BeneficiaireDTO update(BeneficiaireDTO beneficiaireDTO) {
+        log.info("Mise a jour d'un beneficiaire {} ", beneficiaireDTO);
         Beneficiaire beneficiaire = beneficiaireRepository.findById(beneficiaireDTO.getIdBeneficiaire()).orElseThrow(() -> new RuntimeException("Le beneficiaire ID [" + beneficiaireDTO.getIdBeneficiaire() + "] correspondant est introuvable. "));
         beneficiaire = mapper.toEntity(beneficiaireDTO);
         beneficiaire = beneficiaireRepository.save(beneficiaire);
@@ -48,11 +50,13 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
 
     @Override
     public List<BeneficiaireDTO> findAll() {
+        log.info("Liste des beneficiaires");
         return beneficiaireRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
     public void delete(Long idBeneficiaire) {
+        log.info("Suppression du beneficiaire {} ", idBeneficiaire);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
