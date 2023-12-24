@@ -25,8 +25,8 @@ public class PieceJointe extends AbstractBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_piece", nullable = false, unique = true)
     private Long idPiece;
-    @Column(name = "type_piece", nullable = false, length = 1)
-    @Enumerated(EnumType.STRING)
+    @Column(name = "type_piece", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private ETypePiece typePiece;
     private String lienPiece;
     private String referencePiece;

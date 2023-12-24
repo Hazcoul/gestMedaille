@@ -1,5 +1,7 @@
 package bf.gov.gcob.medaille;
 
+import bf.gov.gcob.medaille.services.ServiceImpl.InitalDataServiceImpl;
+import bf.gov.gcob.medaille.utils.StockDeMedailleProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -7,9 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 
-import bf.gov.gcob.medaille.services.ServiceImpl.InitalDataServiceImpl;
-import bf.gov.gcob.medaille.utils.StockDeMedailleProperties;
-
+//@OpenAPIDefinition(info = @Info(/*CONFIG SWAGGER*/
+//        title = "STOCK-MEDAILLES API REST",
+//        description = "SPINGDOC OF STOCK-MEDAILLES API REST",
+//        version = "1.0",
+//        contact = @Contact(name = "GCOB-DEV-TEAM", email = "infos@gcob.bf", url = "http://www.gcob.bf"),
+//        license = @License(name = "Licence 1.0")))
 @SpringBootApplication
 @EnableCaching
 public class StockDeMedailleApplication implements CommandLineRunner {
@@ -33,9 +38,9 @@ public class StockDeMedailleApplication implements CommandLineRunner {
         service.saveInitProfil();
         service.saveInitUser();
     }
-    
+
     @Bean
     public StockDeMedailleProperties stockDeMedailleProperties() {
-    	return new StockDeMedailleProperties();
+        return new StockDeMedailleProperties();
     }
 }

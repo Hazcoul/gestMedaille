@@ -11,18 +11,18 @@ import lombok.Getter;
 @Getter
 public enum ETypeGrade {
 
-    GRADE('G', "GRADE"),
-    DIGNITE('D', "DIGNITE");
+    GRADE(0, "GRADE"),
+    DIGNITE(1, "DIGNITE");
 
-    private Character valeur;
+    private Integer valeur;
     private String libelle;
 
-    ETypeGrade(Character pValeur, String pLibelle) {
+    ETypeGrade(Integer pValeur, String pLibelle) {
         this.valeur = pValeur;
         this.libelle = pLibelle;
     }
 
-    public static ETypeGrade getByValeur(Character value) {
+    public static ETypeGrade getByValeur(Integer value) {
         return Stream.of(ETypeGrade.values()).filter(val -> val.getValeur().equals(value)).findAny().orElse(null);
     }
 
@@ -30,11 +30,11 @@ public enum ETypeGrade {
         return Stream.of(ETypeGrade.values()).filter(val -> val.getLibelle().equals(label)).findAny().orElse(null);
     }
 
-    public static String getLibelleByValeur(Character value) {
+    public static String getLibelleByValeur(Integer value) {
         return Optional.ofNullable(getByValeur(value)).map(ETypeGrade::getLibelle).orElse(null);
     }
 
-    public static Character getValeurByLibelle(String label) {
+    public static Integer getValeurByLibelle(String label) {
         return Optional.ofNullable(getByLibelle(label)).map(ETypeGrade::getValeur).orElse(null);
     }
 

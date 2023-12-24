@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .authorizeExchange(exchanges -> exchanges
                 .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .pathMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/signin").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/reset-password").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/validate").permitAll()

@@ -54,8 +54,8 @@ public class Entree extends AbstractBaseEntity {
     //cmd, retour, autre
     private String acquisition;
     //valider ou pas
-    @Column(name = "status", nullable = false, length = 1)
-    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private EMvtStatus status;
 
     @ManyToOne
