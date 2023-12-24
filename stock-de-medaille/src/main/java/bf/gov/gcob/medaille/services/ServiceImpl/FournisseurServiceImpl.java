@@ -39,6 +39,14 @@ public class FournisseurServiceImpl implements FournisseurService {
     }
 
     @Override
+    public FournisseurDTO findById(Long idFournisseur) {
+       /* Fournisseur fournisseur=fournisseurRepository.findById(idFournisseur);
+        FournisseurDTO fournisseurDTO=fournisseurMapper.buildFournisseurDto(fournisseur);
+        return fournisseurDTO;*/
+        return null;
+    }
+
+    @Override
     public FournisseurDTO update(FournisseurDTO fournisseurDto) {
         Fournisseur fournisseur=fournisseurRepository.findById(fournisseurDto.getIdFournisseur()).orElse(null);
         if (fournisseur == null) {
