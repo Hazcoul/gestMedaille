@@ -6,8 +6,8 @@
 package bf.gov.gcob.medaille.controller;
 
 import bf.gov.gcob.medaille.exception.CreateNewElementException;
-import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
-import bf.gov.gcob.medaille.services.BeneficiaireService;
+import bf.gov.gcob.medaille.model.dto.DetenteurDTO;
+import bf.gov.gcob.medaille.services.DetenteurService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,56 +30,56 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/api/beneficiaires")
-public class BeneficiaireController {
+@RequestMapping(path = "/api/detenteurs")
+public class DetenteurController {
 
-    private BeneficiaireService service;
+    private DetenteurService service;
 
     /**
-     * Creation d'un beneficiaire
+     * Creation d'un detenteur
      *
      * @param request
      * @return
      * @throws URISyntaxException
      */
     @PostMapping()
-    public Mono<ResponseEntity<BeneficiaireDTO>> create(@Valid @RequestBody BeneficiaireDTO request) throws URISyntaxException {
-        if (request.getIdBeneficiaire() != null) {
+    public Mono<ResponseEntity<DetenteurDTO>> create(@Valid @RequestBody DetenteurDTO request) throws URISyntaxException {
+        if (request.getIdDetenteur() != null) {
             throw new CreateNewElementException();
         }
-        BeneficiaireDTO response = service.create(request);
-        return Mono.just(ResponseEntity.created(new URI("/api/beneficiaires/" + response.getIdBeneficiaire())).body(response));
+        DetenteurDTO response = service.create(request);
+        return Mono.just(ResponseEntity.created(new URI("/api/detenteurs/" + response.getIdDetenteur())).body(response));
     }
 
     /**
-     * Met a jour les info d'unn beneficiaire
+     * Met a jour les info d'un detenteur
      *
-     * @param beneficiaireDTO
+     * @param detenteurDTO
      * @return
      * @throws URISyntaxException
      */
     @PutMapping()
-    public Mono<ResponseEntity<BeneficiaireDTO>> update(@Valid @RequestBody BeneficiaireDTO beneficiaireDTO) throws URISyntaxException {
-        if (beneficiaireDTO.getIdBeneficiaire() == null) {
+    public Mono<ResponseEntity<DetenteurDTO>> update(@Valid @RequestBody DetenteurDTO detenteurDTO) throws URISyntaxException {
+        if (detenteurDTO.getIdDetenteur() == null) {
             throw new RuntimeException("Veuillez fournir toutes les informations nécessaires(ID) SVP.");
         }
-        BeneficiaireDTO response = service.update(beneficiaireDTO);
+        DetenteurDTO response = service.update(detenteurDTO);
         return Mono.just(ResponseEntity.ok().body(response));
     }
 
     /**
-     * Liste de tous les beneficiaires
+     * Liste de tous les detenteurs
      *
      * @return
      */
     @GetMapping()
-    public Mono<ResponseEntity<List<BeneficiaireDTO>>> findAll() {
-        List<BeneficiaireDTO> response = service.findAll();
+    public Mono<ResponseEntity<List<DetenteurDTO>>> findAll() {
+        List<DetenteurDTO> response = service.findAll();
         return Mono.just(ResponseEntity.ok().body(response));
     }
 
     /**
-     * Suppression d'un beneficiaire via unID
+     * Suppression d'un detenteur via unID
      *
      * @param id
      * @return
@@ -92,4 +92,5 @@ public class BeneficiaireController {
                 .build());
 
     }
+
 }

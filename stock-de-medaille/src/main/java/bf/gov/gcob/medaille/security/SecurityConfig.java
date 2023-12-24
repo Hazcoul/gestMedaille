@@ -6,7 +6,6 @@ package bf.gov.gcob.medaille.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -37,11 +36,12 @@ public class SecurityConfig {
         http
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .authorizeExchange(exchanges -> exchanges
-                .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .pathMatchers("/**").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/signin").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/reset-password").permitAll()
                 .pathMatchers("/api/auth/utilisateurs/validate").permitAll()
-                .pathMatchers("/api/**").authenticated())
+                .pathMatchers("/api/**").permitAll())
+                //.pathMatchers("/api/**").authenticated())
                 .csrf(csrf -> csrf.disable());
         return http.build();
     }

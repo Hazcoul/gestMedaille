@@ -39,7 +39,7 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
 
     @Override
     public BeneficiaireDTO update(BeneficiaireDTO beneficiaireDTO) {
-        Beneficiaire beneficiaire = beneficiaireRepository.findById(beneficiaireDTO.getIdBeneficiaire()).orElseThrow(() -> new RuntimeException("Le beneficiaire ID [" + beneficiaireDTO.getIdBeneficiaire() + "] correspondant introuvable. "));
+        Beneficiaire beneficiaire = beneficiaireRepository.findById(beneficiaireDTO.getIdBeneficiaire()).orElseThrow(() -> new RuntimeException("Le beneficiaire ID [" + beneficiaireDTO.getIdBeneficiaire() + "] correspondant est introuvable. "));
         beneficiaire = mapper.toEntity(beneficiaireDTO);
         beneficiaire = beneficiaireRepository.save(beneficiaire);
 
