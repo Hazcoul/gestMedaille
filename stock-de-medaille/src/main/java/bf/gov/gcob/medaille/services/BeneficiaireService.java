@@ -5,8 +5,10 @@
  */
 package bf.gov.gcob.medaille.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
-import java.util.List;
 
 /**
  *
@@ -35,7 +37,7 @@ public interface BeneficiaireService {
      *
      * @return
      */
-    List<BeneficiaireDTO> findAll();
+    Page<BeneficiaireDTO> findAll(Pageable pageable);
 
     /**
      * supprime un Beneficiaire via un ID

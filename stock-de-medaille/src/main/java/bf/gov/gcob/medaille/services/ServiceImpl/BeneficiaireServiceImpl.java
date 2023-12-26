@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,9 +52,9 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
     }
 
     @Override
-    public List<BeneficiaireDTO> findAll() {
+    public Page<BeneficiaireDTO> findAll(Pageable pageable) {
         log.info("Liste des beneficiaires");
-        return beneficiaireRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        return beneficiaireRepository.findAll(pageable).map(mapper::toDTO);
     }
 
     @Override

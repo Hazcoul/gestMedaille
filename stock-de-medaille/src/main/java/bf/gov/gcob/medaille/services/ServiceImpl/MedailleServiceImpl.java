@@ -59,8 +59,8 @@ public class MedailleServiceImpl implements MedailleService {
     public MedailleDTO update(MedailleDTO medailleDTO) {
         log.info("Mise à jour d'une medaille {} ", medailleDTO);
         Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
-        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
-        medaille.setGrade((Grade) medailleDTO.getGrade());
+//        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
+//        medaille.setGrade((Grade) medailleDTO.getGrade());
         medaille.setStock(medailleDTO.getStock());
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
