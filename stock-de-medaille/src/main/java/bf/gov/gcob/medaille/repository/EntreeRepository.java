@@ -7,5 +7,7 @@ import bf.gov.gcob.medaille.model.entities.Entree;
 public interface EntreeRepository extends JpaRepository<Entree, Long> {
 	
 	Entree findFirstByOrderByIdEntreeDesc();
+	//@Query("SELECT COUNT(e) FROM Employeur e WHERE e.deleted=true OR e.deleted =false")
+
 
 }

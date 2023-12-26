@@ -6,6 +6,8 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import bf.gov.gcob.medaille.config.Constants;
+import bf.gov.gcob.medaille.mapper.DistinctionMapper;
+import bf.gov.gcob.medaille.mapper.GradeMapper;
 import bf.gov.gcob.medaille.mapper.MedailleMapper;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.model.entities.Distinction;
@@ -37,6 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class MedailleServiceImpl implements MedailleService {
 
     private MedailleRepository medailleRepository;
+    private DistinctionMapper distinctionMapper;
+    private GradeMapper gradeMapper;
 
     private MedailleMapper mapper;
 
@@ -59,8 +63,8 @@ public class MedailleServiceImpl implements MedailleService {
     public MedailleDTO update(MedailleDTO medailleDTO) {
         log.info("Mise à jour d'une medaille {} ", medailleDTO);
         Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
-//        medaille.setDistinction((Distinction) medailleDTO.getDistinction());
-//        medaille.setGrade((Grade) medailleDTO.getGrade());
+        medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
+        medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
         medaille.setStock(medailleDTO.getStock());
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
