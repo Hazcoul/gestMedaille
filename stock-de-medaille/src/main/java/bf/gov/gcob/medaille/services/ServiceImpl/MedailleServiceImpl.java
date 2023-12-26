@@ -135,7 +135,7 @@ public class MedailleServiceImpl implements MedailleService {
                 Files.createDirectories(filePath);
             }
             //on met a jour notre enregistrement de medaille avec les infos de l'image
-            medaille.setLienImage(photoFile.getOriginalFilename());
+            medaille.setLienImage(filePath.toString());
             medaille.setLastModifiedBy("default");
             medailleRepository.save(medaille);
             //on deplace l'image vers notre repertoire indiqué du server
