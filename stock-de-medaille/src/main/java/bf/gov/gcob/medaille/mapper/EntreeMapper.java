@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
-import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
-import bf.gov.gcob.medaille.model.dto.MagasinDTO;
 import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
@@ -57,8 +55,8 @@ public class EntreeMapper extends AbstractBaseMapper {
         entity.setObservation(dto.getObservation());
         entity.setValiderLe(dto.getValiderLe());
         entity.setValiderPar(dto.getValiderPar());
-        entity.setFournisseur(fournisseurMapper.buildFournisseur((FournisseurDTO)  dto.getFournisseur()));
-        entity.setMagasin(magasinMapper.toEntity((MagasinDTO) dto.getMagasin()));
+        entity.setFournisseur(fournisseurMapper.buildFournisseur(dto.getFournisseur()));
+        entity.setMagasin(magasinMapper.toEntity(dto.getMagasin()));
         entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));
         setCommonFieldsFromDTO(dto, entity);
         return entity;
