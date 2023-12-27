@@ -35,13 +35,13 @@ import reactor.core.publisher.Mono;
 @CrossOrigin("*")
 @RequestMapping("/api/auth/utilisateurs")
 public class UtilisateurController {
-    
+
     private UtilisateurService service;
-    
+
     private JwtAuthenticationManager authenticationManager;
-    
+
     private JwtUtil jwtUtil;
-    
+
     public UtilisateurController(UtilisateurService service,
             JwtAuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.service = service;
@@ -102,7 +102,7 @@ public class UtilisateurController {
         if (!service.isUserGood(authRequest)) {
             throw new RuntimeException("Les informations d'authentification sont erronées!");
         }
-        
+
         if (!service.isUserActif(authRequest)) {
             throw new RuntimeException("Le compte " + authRequest.getLogin() + " n'est pas activé");
         }
@@ -121,7 +121,7 @@ public class UtilisateurController {
     @GetMapping("/confirm")
     public ResponseEntity<String> processConfirmationForm(final @RequestParam("token") String token) {
         return new ResponseEntity<>(service.processConfirmationForm(token), HttpStatus.OK);
-        
+
     }
 
     /**
@@ -133,7 +133,7 @@ public class UtilisateurController {
     @PostMapping("/confirm-user")
     public ResponseEntity<String> processAdminConfirm(final @RequestBody PasswordModif passwordModif) {
         return new ResponseEntity<>(service.processAdminConfirm(passwordModif), HttpStatus.OK);
-        
+
     }
 
     /**
@@ -173,7 +173,7 @@ public class UtilisateurController {
     @PostMapping("/reset-password-token")
     public ResponseEntity<String> resendPasswordToken(@RequestParam("to") String to, ServerHttpRequest request) {
         return new ResponseEntity<>(service.resendPasswordToken(to, request), HttpStatus.CREATED);
-        
+
     }
 
     /**
@@ -211,5 +211,17 @@ public class UtilisateurController {
         List<UtilisateurDTO> response = service.findAll();
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
+    }
+
+    /**
+     * On recherche un utilisateur via un ID
+     *
+     * @param idUser
+     * @return
+     */
+    @GetMapping(path = "/{id}")
+    public Mono<ResponseEntity<UtilisateurDTO>> findById(@PathVariable(name = "id", required = true) Long idUser) {
+        UtilisateurDTO response = service.getById(idUser);
+        return Mono.just(ResponseEntity.ok().body(response));
     }
 }
