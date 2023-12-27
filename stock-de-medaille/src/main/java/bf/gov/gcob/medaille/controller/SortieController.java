@@ -4,17 +4,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.services.SortieService;
@@ -69,6 +65,11 @@ private final Logger log = LoggerFactory.getLogger(SortieController.class);
 	public ResponseEntity<List<SortieDTO>> getAllSorties() {
 		log.debug("REST request to get all sorties");
         return new ResponseEntity<>(sortieService.findAll(), HttpStatus.OK);
+	}
+	@GetMapping("/{annee}")
+	public ResponseEntity<List<SortieDTO>> findByDecoByAn(@PathVariable(name = "annee", required = true) int annee) {
+		List<SortieDTO> sortieDTOS = sortieService.findByDecoByAn(annee);
+		return ResponseEntity.ok().body(sortieDTOS);
 	}
 
 }

@@ -2,6 +2,7 @@ package bf.gov.gcob.medaille.mapper;
 
 import java.util.Objects;
 
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +41,7 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setDetenteur(detenteurMapper.toDTO(entity.getDetenteur()));
         dto.setIdSortie(entity.getIdSortie());
         dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
-        dto.setMotifSortie(entity.getMotifSortie());
+        dto.setMotifSortie(entity.getMotifSortie().getLibelle());
         dto.setOrdonnateur(ordonnateurMapper.toDTO(entity.getOrdonnateur()));
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
@@ -60,7 +61,7 @@ public class SortieMapper extends AbstractBaseMapper {
         entity.setDetenteur(detenteurMapper.toEntity((DetenteurDTO) dto.getDetenteur()));
         entity.setIdSortie(dto.getIdSortie());
         entity.setMagasin(magasinMapper.toEntity((MagasinDTO) dto.getMagasin()));
-        entity.setMotifSortie(dto.getMotifSortie());
+        entity.setMotifSortie(EMotifSortie.valueOf(dto.getMotifSortie()));
         entity.setOrdonnateur(ordonnateurMapper.toEntity((OrdonnateurDTO) dto.getOrdonnateur()));
         entity.setValiderLe(dto.getValiderLe());
         entity.setValiderPar(dto.getValiderPar());

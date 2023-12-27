@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Set;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,15 +39,15 @@ public class Sortie extends AbstractBaseEntity {
     @Column(name = "id_sortie", nullable = false, unique = true)
     private Long		idSortie;
     private Date dateSortie;
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "motif_sortie", nullable = false, unique=false)
-    private String		motifSortie;
+    private EMotifSortie motifSortie;
     @Column(name = "valider_le", nullable = true)
     private Date          validerLe;
     @Column(name = "valider_par", nullable = true, unique=false)
     private String        validerPar;
     @Column(name = "observation", nullable = true)
     private String		description;
-
     @ManyToOne
     @JoinColumn(name="ordonnateur_id")
     private Ordonnateur ordonnateur;

@@ -1,6 +1,7 @@
 package bf.gov.gcob.medaille.controller;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
+import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import bf.gov.gcob.medaille.services.EntreeService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
@@ -13,13 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin("*")
 @RestController
@@ -70,5 +65,9 @@ public class EntreeController {
         log.debug("REST request to get all entrees");
         return new ResponseEntity<>(entreeService.findAll(), HttpStatus.OK);
     }
-
+    @GetMapping("/{annee}")
+    public ResponseEntity<List<EntreeDTO>> findByAn(@PathVariable(name = "annee", required = true) int annee) {
+        List<EntreeDTO> entreeDTOS = entreeService.findByAn(annee);
+        return ResponseEntity.ok().body(entreeDTOS);
+    }
 }

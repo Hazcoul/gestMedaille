@@ -46,5 +46,4 @@ public class FournisseurController {
     public void delete(@PathVariable(name = "id", required = true) Long idFournisseur) {
         fournisseurService.delete(idFournisseur);
     }
-
 }

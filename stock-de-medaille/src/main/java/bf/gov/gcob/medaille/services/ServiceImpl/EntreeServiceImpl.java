@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -85,6 +87,11 @@ public class EntreeServiceImpl implements EntreeService {
 		return entreeRepository.findAll()
 				.stream()
 				.map(entreeMapper::toDTO).toList();
+	}
+	@Override
+	public List<EntreeDTO> findByAn(int annee) {
+		return entreeRepository.findEntreeByYear(annee)
+				.stream().map(entreeMapper::toDTO).collect(Collectors.toList());
 	}
 
 	@Override

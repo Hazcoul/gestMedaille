@@ -2,6 +2,7 @@ package bf.gov.gcob.medaille.mapper;
 
 import java.util.Objects;
 
+import bf.gov.gcob.medaille.model.enums.EMotifEntree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class EntreeMapper extends AbstractBaseMapper {
         }
 
         EntreeDTO dto = new EntreeDTO();
-        dto.setAcquisition(entity.getAcquisition());
+        dto.setAcquisition(entity.getAcquisition().getLibelle());
         dto.setDateEntree(entity.getDateEntree());
         dto.setDateReception(entity.getDateReception());
         dto.setExerciceBudgetaire(entity.getExerciceBudgetaire());
@@ -46,7 +47,7 @@ public class EntreeMapper extends AbstractBaseMapper {
 
     public Entree toEntity(EntreeDTO dto) {
         Entree entity = new Entree();
-        entity.setAcquisition(dto.getAcquisition());
+        entity.setAcquisition(EMotifEntree.valueOf(dto.getAcquisition()));
         entity.setDateEntree(dto.getDateEntree());
         entity.setDateReception(dto.getDateReception());
         entity.setExerciceBudgetaire(dto.getExerciceBudgetaire());

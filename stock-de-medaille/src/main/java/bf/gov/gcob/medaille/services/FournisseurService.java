@@ -10,4 +10,5 @@ public interface FournisseurService {
     FournisseurDTO findById(Long idFournisseur);
     FournisseurDTO update(FournisseurDTO fournisseurDto);
     void delete(Long idFournisseur);
+
 }
