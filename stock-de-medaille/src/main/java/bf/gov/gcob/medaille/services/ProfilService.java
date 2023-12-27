@@ -52,5 +52,5 @@ public interface ProfilService {
      *
      * @param profileDTO
      */
-    void delete(ProfilDTO profileDTO);
+    void delete(Long idProfil);
 }

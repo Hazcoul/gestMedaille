@@ -19,56 +19,62 @@ import org.springframework.web.bind.annotation.RestController;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.services.SortieService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api")
 public class SortieController {
-	
-private final Logger log = LoggerFactory.getLogger(SortieController.class);
-	
-	private static final String ENTITY_NAME = "sortie";
-	
-	@Value("${application.name}")
+
+    private final Logger log = LoggerFactory.getLogger(SortieController.class);
+
+    private static final String ENTITY_NAME = "sortie";
+
+    @Value("${application.name}")
     private String applicationName;
-	
-	private final SortieService sortieService;
-	
-	public SortieController(SortieService sortieService) {
-		this.sortieService = sortieService;
-	}
-	
-	@PostMapping("/sorties")
-	public ResponseEntity<SortieDTO> createSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
-		log.debug("REST request to save Sortie : {}", sortieDTO);
-		if (sortieDTO.getIdSortie() != null) {
+
+    private final SortieService sortieService;
+
+    public SortieController(SortieService sortieService) {
+        this.sortieService = sortieService;
+    }
+
+    @PostMapping("/sorties")
+    public ResponseEntity<SortieDTO> createSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
+        log.debug("REST request to save Sortie : {}", sortieDTO);
+        if (sortieDTO.getIdSortie() != null) {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
-        } 
-		SortieDTO newSortieDTO = sortieService.save(sortieDTO);
-		return ResponseEntity
+        }
+        SortieDTO newSortieDTO = sortieService.save(sortieDTO);
+        return ResponseEntity
                 .created(new URI("/api/sorties/" + newSortieDTO.getIdSortie()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME + ".created", newSortieDTO.getIdSortie().toString()))
                 .body(newSortieDTO);
-	}
-	
-	@PutMapping("/sorties")
-	public ResponseEntity<SortieDTO> updateSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
-		log.debug("REST request to save Sortie : {}", sortieDTO);
-		if (sortieDTO.getIdSortie() == null) {
+    }
+
+    @PutMapping("/sorties")
+    public ResponseEntity<SortieDTO> updateSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
+        log.debug("REST request to save Sortie : {}", sortieDTO);
+        if (sortieDTO.getIdSortie() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
-        } 
-		SortieDTO newSortieDTO = sortieService.save(sortieDTO);
-		return ResponseEntity
+        }
+        SortieDTO newSortieDTO = sortieService.save(sortieDTO);
+        return ResponseEntity
                 .created(new URI("/api/sorties/" + newSortieDTO.getIdSortie()))
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME + ".updated", newSortieDTO.getIdSortie().toString()))
                 .body(newSortieDTO);
-	}
-	
-	@GetMapping("/sorties")
-	public ResponseEntity<List<SortieDTO>> getAllSorties() {
-		log.debug("REST request to get all sorties");
-        return new ResponseEntity<>(sortieService.findAll(), HttpStatus.OK);
-	}
+    }
+
+    @GetMapping("/sorties")
+    public ResponseEntity<List<SortieDTO>> getAllSorties() {
+        log.debug("REST request to get all sorties");
+        List<SortieDTO> response = sortieService.findAll();
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        return new ResponseEntity<>(response, headers, HttpStatus.OK);
+    }
 
 }

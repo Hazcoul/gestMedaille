@@ -47,8 +47,8 @@ public class ProfilController {
      * @param profileDTO
      */
     @DeleteMapping
-    public void delete(@RequestBody ProfilDTO profileDTO) {
-        profilService.delete(profileDTO);
+    public void delete(@RequestBody Long idProfil) {
+        profilService.delete(idProfil);
     }
 
     /**

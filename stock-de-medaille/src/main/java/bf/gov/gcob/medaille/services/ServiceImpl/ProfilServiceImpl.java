@@ -64,13 +64,14 @@ public class ProfilServiceImpl implements ProfilService {
 
     @Override
     @Transactional
-    public void delete(ProfilDTO profileDTO) {
-        log.info("Supprime un profile : {}", profileDTO);
-        if (profileDTO.getId() < 3) {
+    public void delete(Long idProfil) {
+        log.info("Supprime un profile : {}", idProfil);
+        Profil fromDb = profilRepository.findById(idProfil).orElseThrow(() -> new RuntimeException("Le profil " + idProfil + " est introuvable."));
+        if (fromDb.getId() < 3) {
             throw new RuntimeException("Ce profile ne peut être supprimé.");
         }
-        profilRepository.deleteAssociatePrivilege(profileDTO.getId());
-        profilRepository.delete(mapper.toEntity(profileDTO));
+        profilRepository.deleteAssociatePrivilege(fromDb.getId());
+        profilRepository.delete(fromDb);
     }
 
 }
