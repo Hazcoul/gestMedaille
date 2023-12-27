@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.Acquisition;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.entities.Entree;
+import bf.gov.gcob.medaille.model.enums.EAcquisition;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
 @Component
@@ -26,7 +28,7 @@ public class EntreeMapper extends AbstractBaseMapper {
         }
 
         EntreeDTO dto = new EntreeDTO();
-        dto.setAcquisition(entity.getAcquisition());
+        dto.setAcquisition(Acquisition.valueOf(entity.getAcquisition().toString()));
         dto.setDateEntree(entity.getDateEntree());
         dto.setDateReception(entity.getDateReception());
         dto.setExerciceBudgetaire(entity.getExerciceBudgetaire());
@@ -46,7 +48,7 @@ public class EntreeMapper extends AbstractBaseMapper {
 
     public Entree toEntity(EntreeDTO dto) {
         Entree entity = new Entree();
-        entity.setAcquisition(dto.getAcquisition());
+        entity.setAcquisition(EAcquisition.valueOf(dto.getAcquisition().toString()));
         entity.setDateEntree(dto.getDateEntree());
         entity.setDateReception(dto.getDateReception());
         entity.setExerciceBudgetaire(dto.getExerciceBudgetaire());
