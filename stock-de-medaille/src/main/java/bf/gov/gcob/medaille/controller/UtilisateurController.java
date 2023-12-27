@@ -14,12 +14,16 @@ import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
 import bf.gov.gcob.medaille.security.JwtAuthenticationManager;
 import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.UtilisateurService;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,13 +35,13 @@ import reactor.core.publisher.Mono;
 @CrossOrigin("*")
 @RequestMapping("/api/auth/utilisateurs")
 public class UtilisateurController {
-
+    
     private UtilisateurService service;
-
+    
     private JwtAuthenticationManager authenticationManager;
-
+    
     private JwtUtil jwtUtil;
-
+    
     public UtilisateurController(UtilisateurService service,
             JwtAuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.service = service;
@@ -98,7 +102,7 @@ public class UtilisateurController {
         if (!service.isUserGood(authRequest)) {
             throw new RuntimeException("Les informations d'authentification sont erronées!");
         }
-
+        
         if (!service.isUserActif(authRequest)) {
             throw new RuntimeException("Le compte " + authRequest.getLogin() + " n'est pas activé");
         }
@@ -117,7 +121,7 @@ public class UtilisateurController {
     @GetMapping("/confirm")
     public ResponseEntity<String> processConfirmationForm(final @RequestParam("token") String token) {
         return new ResponseEntity<>(service.processConfirmationForm(token), HttpStatus.OK);
-
+        
     }
 
     /**
@@ -129,7 +133,7 @@ public class UtilisateurController {
     @PostMapping("/confirm-user")
     public ResponseEntity<String> processAdminConfirm(final @RequestBody PasswordModif passwordModif) {
         return new ResponseEntity<>(service.processAdminConfirm(passwordModif), HttpStatus.OK);
-
+        
     }
 
     /**
@@ -169,7 +173,7 @@ public class UtilisateurController {
     @PostMapping("/reset-password-token")
     public ResponseEntity<String> resendPasswordToken(@RequestParam("to") String to, ServerHttpRequest request) {
         return new ResponseEntity<>(service.resendPasswordToken(to, request), HttpStatus.CREATED);
-
+        
     }
 
     /**
@@ -204,6 +208,8 @@ public class UtilisateurController {
      */
     @GetMapping(path = "/list")
     public Mono<ResponseEntity<List<UtilisateurDTO>>> findAll() {
-        return Mono.just(ResponseEntity.ok().body(service.findAll()));
+        List<UtilisateurDTO> response = service.findAll();
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 }

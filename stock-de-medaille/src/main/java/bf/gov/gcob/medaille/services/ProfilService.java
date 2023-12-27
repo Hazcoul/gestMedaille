@@ -18,6 +18,14 @@ public interface ProfilService {
     ProfilDTO save(ProfilDTO profileDTO);
 
     /**
+     * Met a jour un profil utilisateur
+     *
+     * @param profileDTO
+     * @return
+     */
+    ProfilDTO update(ProfilDTO profileDTO);
+
+    /**
      * Liste par page les profiles
      *
      * @return
@@ -52,5 +60,5 @@ public interface ProfilService {
      *
      * @param profileDTO
      */
-    void delete(ProfilDTO profileDTO);
+    void delete(Long idProfil);
 }
