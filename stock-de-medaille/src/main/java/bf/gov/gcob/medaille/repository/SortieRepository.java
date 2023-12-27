@@ -9,7 +9,7 @@ import java.util.List;
 public interface SortieRepository extends JpaRepository<Sortie, Long> {
 	
 	Sortie findFirstByOrderByIdSortieDesc();
-	//@Query("select * from Sortie s where YEAR(s.dateEntree)=2010 and s.motifSortie='Décoration'")
+	
 	@Query("select s from Sortie s where YEAR(s.dateSortie)= :annee and s.motifSortie= :motif")
-	List<Sortie> findSortieByDecoByYear(int year, EMotifSortie motif);
+	List<Sortie> findSortieByDecoByYear(int annee, EMotifSortie motif);
 }

@@ -8,12 +8,15 @@ package bf.gov.gcob.medaille.controller;
 import bf.gov.gcob.medaille.exception.CreateNewElementException;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.services.MedailleService;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -94,12 +98,12 @@ public class MedailleController {
      * @throws JsonProcessingException
      */
     @PostMapping(path = "/update-image", consumes = {MediaType.MULTIPART_MIXED_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public Mono<ResponseEntity<MedailleDTO>> updateImagecatalogue(@Valid @RequestPart(value = "id", required = true) Long idMedaille,
+    public Mono<ResponseEntity<MedailleDTO>> updateImagecatalogue(@Valid @RequestPart(value = "id", required = true) String idMedaille,
             @RequestPart(value = "photo", required = true) MultipartFile photoFile) throws URISyntaxException {
         if (photoFile == null) {
             throw new RuntimeException("Veuillez joindre l'image catalogue de la medaille SVP.");
         }
-        MedailleDTO response = service.updateImagecatalogue(idMedaille, photoFile);
+        MedailleDTO response = service.updateImagecatalogue(Long.valueOf(idMedaille), photoFile);
         return Mono.just(ResponseEntity.ok().body(response));
     }
 
@@ -111,7 +115,8 @@ public class MedailleController {
     @GetMapping()
     public Mono<ResponseEntity<List<MedailleDTO>>> findAll() {
         List<MedailleDTO> response = service.findAll();
-        return Mono.just(ResponseEntity.ok().body(response));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 
     /**

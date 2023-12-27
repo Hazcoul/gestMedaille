@@ -1,23 +1,5 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import java.security.Key;
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import bf.gov.gcob.medaille.mapper.UtilisateurMapper;
 import bf.gov.gcob.medaille.model.dto.LoginVM;
 import bf.gov.gcob.medaille.model.dto.PasswordModif;
@@ -34,7 +16,23 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -43,16 +41,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class UtilisateurServiceImpl implements UtilisateurService {
-
+    
     @Autowired
     private UtilisateurRepository utilisateurRepository;
-
+    
     @Autowired
     private ProfilRepository profilRepository;
-
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
     @Autowired
     private JwtUtil jwtUtil;
 //
@@ -61,24 +59,24 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Autowired
     private UtilisateurMapper mapper;
-
+    
     @Autowired
     private CacheManager cacheManager;
-
+    
     @Value("${jwt.token-confirm}")
     private int confirmValidtity;
-
+    
     @Value("${jwt.token-reset}")
     private int resetValidtity;
-
+    
     @Value("${application.domain.url}")
     private String urlConfirm;
-
+    
     @Value("${jwt.base64-secret}")
     private String secret;
-
+    
     private final String DEFAULT_PASSWORD = "S!g@c!L:2023";
-
+    
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public UtilisateurDTO saveUser(UtilisateurDTO utilisateurDTO, ServerHttpRequest request) {
@@ -89,22 +87,22 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         String password = UUID.randomUUID().toString();
         String email = utilisateurDTO.getEmail();
         String username = utilisateurDTO.getLogin();
-
+        
         Utilisateur userWithEmail
                     = utilisateurRepository.findOneByEmailIgnoreCase(utilisateurDTO.getEmail()).orElse(null);
         if (userWithEmail != null) {
             throw new RuntimeException("L'utilisateur avec l'adresse mail " + email + " existe deja.");
         }
-
+        
         Utilisateur userWithUsername
                     = utilisateurRepository.findOneByLogin(utilisateurDTO.getLogin()).orElse(null);
         if (userWithUsername != null) {
             throw new RuntimeException("L'utilisateur avec  le nom d'utilisateur " + username + " existe deja");
         }
-
+        
         LocalDateTime tokenConfirmValidit = LocalDateTime.now().plusSeconds(confirmValidtity);
         LocalDateTime resetTokenConfirm = LocalDateTime.now().plusSeconds(resetValidtity);
-
+        
         utilisateurDTO.setActif(false);
         utilisateurDTO.setActivationKey(token);
         utilisateurDTO.setConfirmationExpireDate(tokenConfirmValidit);
@@ -134,13 +132,13 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         this.clearUsersCaches(utilisateur);
         return mapper.toCustomDto(utilisateur);
     }
-
+    
     @Override
     public UtilisateurDTO updateUser(final Long id, final UtilisateurDTO utilisateurDTO) {
         log.info("Mise à jour d'un utilisateur : {} et {}", id, utilisateurDTO);
         Utilisateur existingUser = utilisateurRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("L'utilisateur avec l'id " + id + " n'existe pas"));
-
+        
         if (utilisateurDTO.getEmail() != null) {
             existingUser.setEmail(utilisateurDTO.getEmail());
         }
@@ -150,18 +148,18 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (utilisateurDTO.getNom() != null) {
             existingUser.setNom(utilisateurDTO.getNom());
         }
-
+        
         if (utilisateurDTO.getPrenom() != null) {
             existingUser.setPrenom(utilisateurDTO.getPrenom());
         }
         if (utilisateurDTO.getContact() != null) {
             existingUser.setContact(utilisateurDTO.getContact());
         }
-
+        
         Utilisateur updatedUser = utilisateurRepository.save(existingUser);
         return mapper.toCustomDto(updatedUser);
     }
-
+    
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public UtilisateurDTO updateUserWithProfils(final Long id, final UtilisateurDTO utilisateurDTO) {
@@ -191,7 +189,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
                 });
         return mapper.toCustomDto(existingUser.get());
     }
-
+    
     private String getConfirmationUrl(ServerHttpRequest request, String token, String url) {
         log.info("Reconstitution de l'uri de confirmation");
         return url + "?token=" + token;
@@ -208,16 +206,16 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         log.info("Init activation de compte utilisateur, token = {}", token);
         Utilisateur optionalUser = utilisateurRepository.findOneByActivationKey(token).orElse(null);
         LocalDateTime confirmTime = LocalDateTime.now();
-
+        
         if (optionalUser == null) {
             throw new RuntimeException("Le lien de confirmation n'est pas valide");
         }
-
+        
         LocalDateTime userConfirmTime = optionalUser.getConfirmationExpireDate();
         if (!confirmTime.isBefore(userConfirmTime)) {
             throw new RuntimeException("Le lien de confirmation a expire");
         }
-
+        
         optionalUser.setActif(true);
         optionalUser.setActivationKey(null);
         String email = optionalUser.getEmail();
@@ -232,22 +230,22 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
         return "Votre compte est activé";
     }
-
+    
     @Override
     public String processAdminConfirm(final PasswordModif passwordModif) {
         log.info("Check et activation par new password du compte utilisateur");
         Utilisateur optionalUser = utilisateurRepository.findOneByActivationKey(passwordModif.getToken()).orElse(null);
         LocalDateTime confirmTime = LocalDateTime.now();
-
+        
         if (optionalUser == null) {
             throw new RuntimeException("Le lien de confirmation n'est pas valide");
         }
-
+        
         LocalDateTime userConfirmTime = optionalUser.getConfirmationExpireDate();
         if (!confirmTime.isBefore(userConfirmTime)) {
             throw new RuntimeException("Le lien de confirmation a expire");
         }
-
+        
         String password = passwordEncoder.encode(passwordModif.getPassword());
         optionalUser.setActif(true);
         optionalUser.setActivationKey(null);
@@ -264,7 +262,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
         return "Votre compte est activé";
     }
-
+    
     @Override
     public String generateToken(String username, boolean rememberMe) {
         log.info("Generation de token pour : {}", username);
@@ -284,15 +282,15 @@ public class UtilisateurServiceImpl implements UtilisateurService {
             token = parts[1];
             // Faites quelque chose avec le jeton d'authentification
         }
-
+        
         byte[] signingKey = Base64.getDecoder().decode(secret.getBytes());
-
+        
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(signingKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
+        
         String username = claims.getSubject();
 
         //Recherche de l'utilisateur correspondant aux infos du token fourni
@@ -301,16 +299,16 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         // Set other user properties from token claims if needed
         return user;
     }
-
+    
     @Override
     public String resendConfirmToken(String to, ServerHttpRequest request) {
         log.info("Renvoi de mail d'activation de compte utilisateur");
         String authorizationHeader = request.getHeaders().getFirst("Authorization");
         String token = UUID.randomUUID().toString();
         Utilisateur optionalUser = utilisateurRepository.findOneByEmailIgnoreCase(to).orElse(null);
-
+        
         String email = optionalUser.getEmail();
-
+        
         String confirmUrl;
         if (authorizationHeader == null) {
             confirmUrl = this.getConfirmationUrl(request, token, urlConfirm.concat("/account/confirme"));
@@ -330,9 +328,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 //            throw new RuntimeException("L'email de l'utilisateur n'est pas valide.");
 //        }
         return "Lien de confirmation renvoyé";
-
+        
     }
-
+    
     @Override
     public String resendPasswordToken(final String to, ServerHttpRequest request) {
         log.info("Renvoi de mail de reset password via : {}", to);
@@ -340,15 +338,15 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         String token = UUID.randomUUID().toString();
         LocalDateTime resetValidity = LocalDateTime.now().plusSeconds(resetValidtity);
         Utilisateur optionalUser = utilisateurRepository.findOneByEmailIgnoreCase(to).orElse(null);
-
+        
         if (optionalUser == null) {
             throw new RuntimeException("Le compte avec l'adresse mail " + to + " n'existe pas");
         }
-
+        
         if (!optionalUser.isActif()) {
             throw new RuntimeException("Le compte avec l'adresse mail " + to + " n'est pas encore validé");
         }
-
+        
         String confirmUrl;
         if (authorizationHeader == null) {
             confirmUrl = this.getConfirmationUrl(request, token, urlConfirm.concat("/account/confirme"));
@@ -367,9 +365,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 //            throw new RuntimeException("L'email de l'utilisateur n'est pas valide.");
 //        }
         return "Lien de réinitialisation de mot de passe envoyé";
-
+        
     }
-
+    
     @Override
     public String processResetPassword(final ResetPaswword resetPaswword) {
         log.info("Reinitialise un compte via le token mailé et le nouveau password : {}", resetPaswword);
@@ -381,7 +379,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (!confirmTime.isBefore(optionalUser.getResetExpireDate())) {
             throw new RuntimeException("Le lien de confirmation a expire");
         }
-
+        
         if (!resetPaswword.getNewPassword().equals(resetPaswword.getConfirmNewPassword())) {
             throw new RuntimeException("Le lien de confirmation n'est pas valide");
         }
@@ -401,12 +399,12 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 //        }
         return "Le mot de passe a été changé";
     }
-
+    
     @Override
     public String processResetConnectPassword(final ResetConnectPaswword resetPaswword, ServerHttpRequest request) {
         log.info("Modifier l'ancien password par un nouveau : {}", resetPaswword);
         Utilisateur optionalUser = this.getCurrentUser(request);
-
+        
         if (optionalUser == null) {
             throw new RuntimeException("Cet utilisateur n'existe pas");
         }
@@ -429,7 +427,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 //        }
         return "Le mot de passe a été changé";
     }
-
+    
     @Override
     public List<UtilisateurDTO> findAll() {
         log.info("Liste tous les utilisateurs");
@@ -438,7 +436,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
                 .map(u -> mapper.toCustomDto(u))
                 .collect(Collectors.toList());
     }
-
+    
     private Utilisateur getCurrentUser(ServerHttpRequest request) {
         log.info("Obtenir l'utilisateur courant");
         String token = request.getHeaders().getFirst("Authorization").substring(7);
@@ -446,18 +444,18 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         Utilisateur utilisateur = utilisateurRepository.findOneByLogin(username).orElse(null);
         return utilisateur;
     }
-
+    
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
+    
     @Override
     public Boolean isUserGood(LoginVM authRequest) {
         Boolean isCorrect = true;
-
+        
         Optional<Utilisateur> optionalUser = utilisateurRepository.findOneByLogin(authRequest.getLogin());
-
+        
         if (optionalUser.isPresent()) {
             String currentEncryptedPassword = optionalUser.get().getPassword();
             if (!passwordEncoder.matches(authRequest.getPassword(), currentEncryptedPassword)) {
@@ -468,7 +466,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         }
         return isCorrect;
     }
-
+    
     @Override
     public Boolean isUserActif(LoginVM authRequest) {
         Optional<Utilisateur> optionalUser = utilisateurRepository.findOneByLogin(authRequest.getLogin());
@@ -478,14 +476,16 @@ public class UtilisateurServiceImpl implements UtilisateurService {
             return false;
         }
     }
-
+    
     private void clearUsersCaches(Utilisateur user) {
         Objects.requireNonNull(cacheManager.getCache(UtilisateurRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
     }
-
+    
     @Override
-    public Optional<Utilisateur> getById(Long id) {
-        return utilisateurRepository.findById(id);
+    public UtilisateurDTO getById(Long id) {
+        log.info("Consulter un utilisateur (avec ses profils et privileges) via l'ID {}", id);
+        Utilisateur utilisateur = utilisateurRepository.findById(id).orElseThrow(() -> new RuntimeException("L'utilisateur " + id + " est introuvable."));
+        return mapper.toCustomDto(utilisateur);
     }
-
+    
 }

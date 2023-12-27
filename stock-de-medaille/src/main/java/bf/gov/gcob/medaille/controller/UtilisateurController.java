@@ -14,12 +14,16 @@ import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
 import bf.gov.gcob.medaille.security.JwtAuthenticationManager;
 import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.UtilisateurService;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -204,6 +208,20 @@ public class UtilisateurController {
      */
     @GetMapping(path = "/list")
     public Mono<ResponseEntity<List<UtilisateurDTO>>> findAll() {
-        return Mono.just(ResponseEntity.ok().body(service.findAll()));
+        List<UtilisateurDTO> response = service.findAll();
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        return Mono.just(ResponseEntity.ok().headers(headers).body(response));
+    }
+
+    /**
+     * On recherche un utilisateur via un ID
+     *
+     * @param idUser
+     * @return
+     */
+    @GetMapping(path = "/{id}")
+    public Mono<ResponseEntity<UtilisateurDTO>> findById(@PathVariable(name = "id", required = true) Long idUser) {
+        UtilisateurDTO response = service.getById(idUser);
+        return Mono.just(ResponseEntity.ok().body(response));
     }
 }

@@ -10,9 +10,7 @@ import bf.gov.gcob.medaille.model.dto.PasswordModif;
 import bf.gov.gcob.medaille.model.dto.ResetConnectPaswword;
 import bf.gov.gcob.medaille.model.dto.ResetPaswword;
 import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
-import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
@@ -49,5 +47,5 @@ public interface UtilisateurService {
 
     List<UtilisateurDTO> findAll();
 
-    Optional<Utilisateur> getById(Long id);
+    UtilisateurDTO getById(Long id);
 }

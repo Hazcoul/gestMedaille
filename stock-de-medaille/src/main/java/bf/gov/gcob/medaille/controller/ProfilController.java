@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author Canisius <canisiushien@gmail.com>
  */
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth/profils")
 public class ProfilController {
@@ -35,6 +36,16 @@ public class ProfilController {
 
     /**
      *
+     * @param profilDTO
+     * @return
+     */
+    @PutMapping("/update")
+    public ResponseEntity<ProfilDTO> update(@Valid @RequestBody ProfilDTO profilDTO) {
+        return new ResponseEntity<>(profilService.update(profilDTO), HttpStatus.OK);
+    }
+
+    /**
+     *
      * @return
      */
     @GetMapping("/list")
@@ -47,8 +58,8 @@ public class ProfilController {
      * @param profileDTO
      */
     @DeleteMapping
-    public void delete(@RequestBody ProfilDTO profileDTO) {
-        profilService.delete(profileDTO);
+    public void delete(@RequestBody Long idProfil) {
+        profilService.delete(idProfil);
     }
 
     /**
