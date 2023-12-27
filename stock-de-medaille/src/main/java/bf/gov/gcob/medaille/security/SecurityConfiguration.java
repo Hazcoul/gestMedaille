@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz
                         -> // prettier-ignore
                         authz
+                        .requestMatchers(mvc.pattern(HttpMethod.OPTIONS, "*/**")).permitAll()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()

@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Canisius <canisiushien@gmail.com>
  */
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/beneficiaires")
