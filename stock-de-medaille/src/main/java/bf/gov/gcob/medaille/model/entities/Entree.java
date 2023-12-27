@@ -1,6 +1,7 @@
 package bf.gov.gcob.medaille.model.entities;
 
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
+import bf.gov.gcob.medaille.model.enums.EAcquisition;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,7 +53,8 @@ public class Entree extends AbstractBaseEntity {
     @Column(name = "exercice_budgetaire", nullable = true, length = 4)
     private Integer exerciceBudgetaire;
     //cmd, retour, autre
-    private String acquisition;
+    @Enumerated(EnumType.ORDINAL)
+    private EAcquisition acquisition;
     //valider ou pas
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)

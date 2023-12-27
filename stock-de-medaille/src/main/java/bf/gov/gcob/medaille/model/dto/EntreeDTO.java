@@ -25,7 +25,7 @@ public class EntreeDTO extends AbstractBaseDTO {
     private String        observation;
     private Date          dateReception;
     private Integer       exerciceBudgetaire;
-    private String        acquisition;
+    private Acquisition        acquisition;
     private FournisseurDTO fournisseur;
     private MagasinDTO magasin;
     private List<LigneEntreeDTO> ligneEntrees;
@@ -33,5 +33,9 @@ public class EntreeDTO extends AbstractBaseDTO {
     
     public enum MvtStatus {
     	CREATED, VALIDATED, CANCELLED, CLOSED;
+    }
+    
+    public enum Acquisition {
+    	COMMANDE, REVERSEMENT, RETOUR;
     }
 }
