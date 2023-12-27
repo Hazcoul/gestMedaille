@@ -37,6 +37,13 @@ public class ProfilServiceImpl implements ProfilService {
     }
 
     @Override
+    public ProfilDTO update(ProfilDTO profilDTO) {
+        log.info("Mis a jour d'un Profile : {}", profilDTO);
+        Profil profile = profilRepository.save(mapper.toEntity(profilDTO));
+        return mapper.toDto(profile);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ProfilDTO> findAll() {
         log.info("Liste de tous les Profiles");

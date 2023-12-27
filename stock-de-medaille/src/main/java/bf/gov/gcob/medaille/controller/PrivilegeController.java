@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author Canisius <canisiushien@gmail.com>
  */
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth/privileges")
 public class PrivilegeController {
