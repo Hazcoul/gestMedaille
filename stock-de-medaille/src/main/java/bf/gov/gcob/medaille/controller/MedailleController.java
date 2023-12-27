@@ -9,7 +9,6 @@ import bf.gov.gcob.medaille.exception.CreateNewElementException;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.services.MedailleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,6 +16,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Canisius <canisiushien@gmail.com>
  */
+@CrossOrigin("*")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/medailles")
@@ -52,10 +53,10 @@ public class MedailleController {
     //@PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\",\"" + Constants.GEST + "\")")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public Mono<ResponseEntity<MedailleDTO>> create(
-            @Valid @RequestPart(value = "data", required = true) String jsonRequest,
+            @Valid @RequestPart(value = "data", required = true) MedailleDTO medailleDTO,
             @RequestPart(value = "photo", required = true) MultipartFile photo) throws URISyntaxException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        MedailleDTO medailleDTO = objectMapper.readValue(jsonRequest, MedailleDTO.class);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        MedailleDTO medailleDTO = objectMapper.readValue(jsonRequest, MedailleDTO.class);
 
         if (medailleDTO.getIdMedaille() != null) {
             throw new CreateNewElementException();
@@ -92,9 +93,9 @@ public class MedailleController {
      * @throws URISyntaxException
      * @throws JsonProcessingException
      */
-    @PostMapping(path = "/update-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(path = "/update-image", consumes = {MediaType.MULTIPART_MIXED_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public Mono<ResponseEntity<MedailleDTO>> updateImagecatalogue(@Valid @RequestPart(value = "id", required = true) Long idMedaille,
-            @RequestPart(value = "photoFile", required = true) MultipartFile photoFile) throws URISyntaxException, JsonProcessingException {
+            @RequestPart(value = "photo", required = true) MultipartFile photoFile) throws URISyntaxException {
         if (photoFile == null) {
             throw new RuntimeException("Veuillez joindre l'image catalogue de la medaille SVP.");
         }

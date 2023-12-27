@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 /**
  * Toutes ressources liées à l'utilisateur
@@ -202,7 +203,7 @@ public class UtilisateurController {
      * @return
      */
     @GetMapping(path = "/list")
-    public ResponseEntity<List<UtilisateurDTO>> findAll() {
-        return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
+    public Mono<ResponseEntity<List<UtilisateurDTO>>> findAll() {
+        return Mono.just(ResponseEntity.ok().body(service.findAll()));
     }
 }
