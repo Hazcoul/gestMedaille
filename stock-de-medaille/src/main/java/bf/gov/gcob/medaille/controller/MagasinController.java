@@ -3,32 +3,36 @@ package bf.gov.gcob.medaille.controller;
 import bf.gov.gcob.medaille.exception.CreateNewElementException;
 import bf.gov.gcob.medaille.model.dto.MagasinDTO;
 import bf.gov.gcob.medaille.services.MagasinService;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
+@CrossOrigin("*")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/magasins")
 public class MagasinController {
+
     private final MagasinService magasinService;
+
     @PostMapping()
     public ResponseEntity<MagasinDTO> create(@RequestBody MagasinDTO magasinDTO) throws URISyntaxException {
-        if(magasinDTO.getIdMagasin()!=null){
+        if (magasinDTO.getIdMagasin() != null) {
             throw new CreateNewElementException();
         }
-        MagasinDTO response=magasinService.create(magasinDTO);
+        MagasinDTO response = magasinService.create(magasinDTO);
         return ResponseEntity.created(new URI("/api/magasins")).body(response);
     }
+
     @GetMapping()
     public ResponseEntity<List<MagasinDTO>> find() {
         List<MagasinDTO> magasinDTOS = magasinService.findAll();
         return ResponseEntity.ok().body(magasinDTOS);
     }
+
     @PutMapping()
     public ResponseEntity<MagasinDTO> update(@RequestBody MagasinDTO request) throws URISyntaxException {
         if (request.getIdMagasin() == null) {
@@ -37,8 +41,9 @@ public class MagasinController {
         MagasinDTO response = magasinService.update(request);
         return ResponseEntity.ok().body(response);
     }
+
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable(name = "id", required = true) Long idMagasin){
+    public void delete(@PathVariable(name = "id", required = true) Long idMagasin) {
         magasinService.delete(idMagasin);
     }
 }

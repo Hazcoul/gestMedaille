@@ -36,7 +36,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
                 .cors(withDefaults())
-                .cors(cors -> cors.disable())/*VOIR SI AVEC CECI LE CROSS-ORIGIN EST REGLE*/
                 .csrf(csrf -> csrf.disable())
                 .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
                 .headers(headers
