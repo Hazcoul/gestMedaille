@@ -5,8 +5,6 @@ import java.util.List;
 
 import bf.gov.gcob.medaille.model.AbstractBaseDTO;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,19 +19,21 @@ public class SortieDTO extends AbstractBaseDTO {
 	private Long		idSortie;
     private Date dateSortie;
     @NotNull
-    private String		motifSortie;
+    private MotifSortie		motifSortie;
     private Date          validerLe;
     private String        validerPar;
     private String		description;
-    @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, OrdonnateurDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
-    private Object ordonnateur;
-    @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, BeneficiaireDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
-    private Object beneficiaire;
-    @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, DetenteurDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
-    private Object detenteur;
-    @Schema(accessMode = AccessMode.READ_ONLY, oneOf = {Long.class, MagasinDTO.class}, description = "Prendre une valeur de type Long en entrée (id). Donne en sortie le DTO")
-    private Object magasin;
+    private OrdonnateurDTO ordonnateur;
+    private BeneficiaireDTO beneficiaire;
+    private DetenteurDTO detenteur;
+    private MagasinDTO magasin;
     private List<LigneSortieDTO> ligneSorties;
     private MvtStatus status;
     private String numeroSortie;
+    
+    public enum MotifSortie {
+    	DECORATION,
+        VENTE,
+        DETERIORE;
+    }
 }
