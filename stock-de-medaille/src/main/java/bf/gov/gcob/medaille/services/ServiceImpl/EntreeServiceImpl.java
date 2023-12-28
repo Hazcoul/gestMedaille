@@ -3,11 +3,9 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -96,10 +94,11 @@ public class EntreeServiceImpl implements EntreeService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<EntreeDTO> findOne(Long id) {
+	public EntreeDTO findOne(Long id) {
 		log.debug("Request to get Entree : {}", id);
-		return entreeRepository.findById(id)
-				.map(entreeMapper::toDTO);
+		Entree entree = entreeRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Entree with ID = " +id + " not found"));
+		return entreeMapper.toDTO(entree);
 	}
 
 	@Override

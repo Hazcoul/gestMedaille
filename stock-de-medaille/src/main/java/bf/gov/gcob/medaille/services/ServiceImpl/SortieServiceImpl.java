@@ -3,11 +3,9 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,6 +18,7 @@ import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
@@ -97,10 +96,11 @@ private final Logger log = LoggerFactory.getLogger(SortieServiceImpl.class);
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<SortieDTO> findOne(Long id) {
+	public SortieDTO findOne(Long id) {
 		log.debug("Request to get Sortie : {}", id);
-		return sortieRepository.findById(id)
-				.map(sortieMapper::toDTO);
+		Sortie sortie =  sortieRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Sortie with ID = " +id + " not found"));
+		return sortieMapper.toDTO(sortie);
 	}
 
 	@Override
