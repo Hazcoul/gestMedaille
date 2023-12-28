@@ -11,6 +11,7 @@ import bf.gov.gcob.medaille.services.MedailleService;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -117,6 +118,18 @@ public class MedailleController {
         List<MedailleDTO> response = service.findAll();
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
+    }
+
+    /**
+     * Lis une image catalogue de medaille depuis le server de stockage
+     *
+     * @param lienImage
+     * @return
+     */
+    @GetMapping("/{lien}")
+    public Mono<ResponseEntity<byte[]>> getImageMedaille(@PathVariable(name = "lien", required = true) String lienImage) throws IOException {
+        byte[] response = service.getImageMedaille(lienImage);
+        return Mono.just(ResponseEntity.ok().body(response));
     }
 
     /**

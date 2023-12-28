@@ -62,7 +62,7 @@ public class MedailleServiceImpl implements MedailleService {
     @Override
     public MedailleDTO update(MedailleDTO medailleDTO) {
         log.info("Mise à jour d'une medaille {} ", medailleDTO);
-        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante introuvable. "));
+        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante est introuvable. "));
         medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
         medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
         medaille.setStock(medailleDTO.getStock());
@@ -75,7 +75,7 @@ public class MedailleServiceImpl implements MedailleService {
     @Override
     public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
         log.info("Mise à jour d'une image de la medaille {} ", medailleId);
-        Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante introuvable. "));
+        Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante est introuvable. "));
         this.saveImageMedaille(medaille, imageMedaille);
 
         return mapper.toDTO(medaille);
@@ -88,9 +88,37 @@ public class MedailleServiceImpl implements MedailleService {
     }
 
     @Override
+    public byte[] getImageMedaille(String lienImage) throws IOException {
+        log.info("Consulter un image catalogue via {}", lienImage);
+        Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");
+        if (!Files.exists(subfolderPath)) {
+            log.info("Le repertoire de stockage est introuvable sur le serveur.");
+        }
+
+        Path path = subfolderPath.resolve(lienImage);
+        return Files.readAllBytes(path);
+    }
+
+    @Override
     public void delete(Long idMedaille) {
         log.info("Suppression de la medaille {} ", idMedaille);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Medaille medaille = medailleRepository.findById(idMedaille).orElseThrow(() -> new RuntimeException("La médaille ID [" + idMedaille + "] correspondante est d'office inexistante. "));
+        //Comme ladaite medaille est retrouvée en bd, 
+        //on supprime d'abord l'image sur le server avant de supprimer l'enregistrement en bd
+        Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");
+        if (!Files.exists(subfolderPath)) {
+            log.info("Le repertoire de stockage est introuvable sur le serveur.");
+        } else {
+            try {
+                Files.walk(subfolderPath.resolve(medaille.getLienImage()))
+                        .filter(Files::isRegularFile)
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (IOException ex) {
+            }
+
+        }
+        medailleRepository.deleteById(medaille.getIdMedaille());
     }
 
 //============================ PRIVATE FUNCTIONS ==============================
@@ -135,7 +163,7 @@ public class MedailleServiceImpl implements MedailleService {
                 Files.createDirectories(filePath);
             }
             //on met a jour notre enregistrement de medaille avec les infos de l'image
-            medaille.setLienImage(filePath.toString());
+            medaille.setLienImage(/*filePath.toString()*/newFileName);
             medaille.setLastModifiedBy("default");
             medailleRepository.save(medaille);
             //on deplace l'image vers notre repertoire indiqué du server

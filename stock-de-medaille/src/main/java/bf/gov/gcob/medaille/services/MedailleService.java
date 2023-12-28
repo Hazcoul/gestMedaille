@@ -6,6 +6,7 @@
 package bf.gov.gcob.medaille.services;
 
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
+import java.io.IOException;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,6 +47,8 @@ public interface MedailleService {
      * @return
      */
     List<MedailleDTO> findAll();
+
+    byte[] getImageMedaille(String lienImage) throws IOException;
 
     /**
      * supprime une medaille via un ID
