@@ -2,17 +2,14 @@ package bf.gov.gcob.medaille.mapper;
 
 import java.util.Objects;
 
-import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
-import bf.gov.gcob.medaille.model.dto.DetenteurDTO;
-import bf.gov.gcob.medaille.model.dto.MagasinDTO;
-import bf.gov.gcob.medaille.model.dto.OrdonnateurDTO;
-import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
+import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.dto.SortieDTO.MotifSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
 @Component
@@ -41,7 +38,7 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setDetenteur(detenteurMapper.toDTO(entity.getDetenteur()));
         dto.setIdSortie(entity.getIdSortie());
         dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
-        dto.setMotifSortie(entity.getMotifSortie().getLibelle());
+        dto.setMotifSortie(MotifSortie.valueOf(entity.getMotifSortie().toString()));
         dto.setOrdonnateur(ordonnateurMapper.toDTO(entity.getOrdonnateur()));
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
@@ -55,14 +52,14 @@ public class SortieMapper extends AbstractBaseMapper {
 
     public Sortie toEntity(SortieDTO dto) {
         Sortie entity = new Sortie();
-        entity.setBeneficiaire(beneficiaireMapper.toEntity((BeneficiaireDTO) dto.getBeneficiaire()));
+        entity.setBeneficiaire(beneficiaireMapper.toEntity(dto.getBeneficiaire()));
         entity.setDateSortie(dto.getDateSortie());
         entity.setDescription(dto.getDescription());
-        entity.setDetenteur(detenteurMapper.toEntity((DetenteurDTO) dto.getDetenteur()));
+        entity.setDetenteur(detenteurMapper.toEntity(dto.getDetenteur()));
         entity.setIdSortie(dto.getIdSortie());
-        entity.setMagasin(magasinMapper.toEntity((MagasinDTO) dto.getMagasin()));
-        entity.setMotifSortie(EMotifSortie.valueOf(dto.getMotifSortie()));
-        entity.setOrdonnateur(ordonnateurMapper.toEntity((OrdonnateurDTO) dto.getOrdonnateur()));
+        entity.setMagasin(magasinMapper.toEntity(dto.getMagasin()));
+        entity.setMotifSortie(EMotifSortie.valueOf(dto.getMotifSortie().toString()));
+        entity.setOrdonnateur(ordonnateurMapper.toEntity(dto.getOrdonnateur()));
         entity.setValiderLe(dto.getValiderLe());
         entity.setValiderPar(dto.getValiderPar());
         entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));

@@ -58,7 +58,8 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
     @Override
     public void delete(Long idBeneficiaire) {
         log.info("Suppression du beneficiaire {} ", idBeneficiaire);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.beneficiaireRepository.deleteById(idBeneficiaire);    
     }
 
 }
