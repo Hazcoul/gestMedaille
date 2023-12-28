@@ -3,6 +3,7 @@ package bf.gov.gcob.medaille.model.entities;
 import bf.gov.gcob.medaille.model.AbstractBaseEntity;
 import bf.gov.gcob.medaille.model.enums.EAcquisition;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,17 +42,17 @@ public class Entree extends AbstractBaseEntity {
     private Long idEntree;
     @Column(name = "date_entree", nullable = false, length = 19)
     private Date dateEntree;
-    @Column(name = "numero_cmd", nullable = false, unique = true)
+    @Column(name = "numero_cmd", /*nullable = false,*/ unique = true)
     private String numeroCmd;
-    @Column(name = "valider_le", nullable = true)
+    @Column(name = "valider_le")
     private Date validerLe;
-    @Column(name = "valider_par", nullable = true, unique = false)
+    @Column(name = "valider_par", unique = false)
     private String validerPar;
-    @Column(name = "observation", nullable = true, unique = false)
+    @Column(name = "observation", unique = false)
     private String observation;
-    @Column(name = "date_reception", nullable = true, length = 19)
+    @Column(name = "date_reception", length = 19)
     private Date dateReception;
-    @Column(name = "exercice_budgetaire", nullable = true, length = 4)
+    @Column(name = "exercice_budgetaire", length = 4)
     private Integer exerciceBudgetaire;
     //cmd, retour, autre
     @Column(name = "motif", nullable = false)
@@ -70,6 +72,7 @@ public class Entree extends AbstractBaseEntity {
     @JoinColumn(name = "magasin_id")
     private Magasin magasin;
 
+    @JsonIgnoreProperties(value = {"entree", "medaille"})
     @OneToMany(mappedBy = "entree")
-    private Set<LigneEntree> ligneentrees;
+    private Set<LigneEntree> ligneentrees = new HashSet<>();
 }

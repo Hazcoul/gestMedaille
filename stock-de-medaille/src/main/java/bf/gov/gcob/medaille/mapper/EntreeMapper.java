@@ -1,25 +1,24 @@
 package bf.gov.gcob.medaille.mapper;
 
-import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.Acquisition;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.model.enums.EAcquisition;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EntreeMapper extends AbstractBaseMapper {
-	
-	@Autowired
-	private FournisseurMapper fournisseurMapper;
-	@Autowired
-	private MagasinMapper magasinMapper;
-	@Autowired
-	private LigneEntreeMapper ligneEntreeMapper;
+
+    @Autowired
+    private FournisseurMapper fournisseurMapper;
+    @Autowired
+    private MagasinMapper magasinMapper;
+    @Autowired
+    private LigneEntreeMapper ligneEntreeMapper;
 
     public EntreeDTO toDTO(Entree entity) {
         if (Objects.isNull(entity)) {
@@ -39,10 +38,11 @@ public class EntreeMapper extends AbstractBaseMapper {
         dto.setFournisseur(fournisseurMapper.buildFournisseurDto(entity.getFournisseur()));
         dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
         dto.setLigneEntrees(entity.getLigneentrees().stream().map(ligneEntreeMapper::toDTO).toList());
-        dto.setStatus(MvtStatus.valueOf(dto.getStatus().toString()));
+        dto.setStatus(MvtStatus.valueOf(entity.getStatus().toString()));
         setCommonFieldsFromEntity(entity, dto);
         return dto;
     }
+
     public Entree toEntity(EntreeDTO dto) {
         Entree entity = new Entree();
         entity.setAcquisition(EAcquisition.valueOf(dto.getAcquisition().toString()));
