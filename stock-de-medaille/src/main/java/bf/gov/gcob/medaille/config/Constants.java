@@ -12,7 +12,7 @@ public final class Constants {
     public static String SYSTEM_ACCOUNT = "system";
 
     //repertoire de stockage de fichiers uploaded
-    public static final String appStoreRootPath = "/opt/uploads";
+    public static final String appStoreRootPath = "/Users/anptic";
 
     // EXTENSIONS AUTORISEES
     public static final String EXTENSION_PDF = ".pdf";
