@@ -111,9 +111,6 @@ public class EntreeServiceImpl implements EntreeService {
 
     public Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable) {
         log.debug("Request to get all entree");
-      /*  Calendar calendar = new GregorianCalendar();
-        calendar.setTime(entreeDTO.getDateEntree());
-        int year = calendar.get(Calendar.YEAR);*/
         return entreeRepository.findByCriteria(
                 filterEntreeDto.getAnnee(),
                 filterEntreeDto.getFournisseur(),
