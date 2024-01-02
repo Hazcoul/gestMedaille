@@ -4,13 +4,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,5 +101,13 @@ public class EntreeController {
         log.debug("REST request to delete Entree: {}", id);
         entreeService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+    }
+
+    @PostMapping("/entrees/statistique/commandes")
+    public ResponseEntity<List<EntreeDTO>> getAllCommandeByCriteria(@RequestBody FilterEntreeDto filterEntreeDto, Pageable pageable){
+        log.debug("REST request to get a page of commandes");
+        Page<EntreeDTO> page = entreeService.findAllByCriteria(filterEntreeDto,pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 }

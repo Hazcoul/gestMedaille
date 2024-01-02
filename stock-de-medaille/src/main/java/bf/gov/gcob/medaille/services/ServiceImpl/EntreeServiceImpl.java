@@ -4,6 +4,7 @@ import bf.gov.gcob.medaille.mapper.EntreeMapper;
 import bf.gov.gcob.medaille.mapper.LigneEntreeMapper;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
+import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
 import bf.gov.gcob.medaille.model.dto.LigneEntreeDTO;
 import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
@@ -12,12 +13,12 @@ import bf.gov.gcob.medaille.repository.EntreeRepository;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
 import bf.gov.gcob.medaille.services.EntreeService;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,6 +107,17 @@ public class EntreeServiceImpl implements EntreeService {
     public void delete(Long id) {
         log.debug("Request to delete Entree : {}", id);
         entreeRepository.deleteById(id);
+    }
+
+    public Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable) {
+        log.debug("Request to get all entree");
+      /*  Calendar calendar = new GregorianCalendar();
+        calendar.setTime(entreeDTO.getDateEntree());
+        int year = calendar.get(Calendar.YEAR);*/
+        return entreeRepository.findByCriteria(
+                filterEntreeDto.getAnnee(),
+                filterEntreeDto.getFournisseur(),
+                pageable).map(entreeMapper::toDTO);
     }
     
 }
