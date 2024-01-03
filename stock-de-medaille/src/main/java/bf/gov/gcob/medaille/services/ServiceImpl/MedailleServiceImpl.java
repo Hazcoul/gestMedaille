@@ -82,9 +82,21 @@ public class MedailleServiceImpl implements MedailleService {
     }
 
     @Override
-    public List<MedailleDTO> findAll() {
+    public List<MedailleDTO> findAll() throws IOException {
         log.info("Liste des medailles");
-        return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        List<MedailleDTO> medailleDTOS=null;
+        Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");
+        if (!Files.exists(subfolderPath)) {
+            log.info("Le repertoire de stockage est introuvable sur le serveur.");
+        }
+
+
+        medailleDTOS= medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        for (MedailleDTO medailleDto:medailleDTOS) {
+            Path path = subfolderPath.resolve(medailleDto.getLienImage());
+            medailleDto.setImage(Files.readAllBytes(path));
+        }
+        return medailleDTOS;
     }
 
     @Override
