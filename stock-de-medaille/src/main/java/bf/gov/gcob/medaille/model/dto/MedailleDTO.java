@@ -17,6 +17,7 @@ public class MedailleDTO extends AbstractBaseDTO {
     private Integer stock;
     private String lienImage;
     private String description;
+    private byte[] image;
     private DistinctionDTO distinction;
     private GradeDTO grade;
 }

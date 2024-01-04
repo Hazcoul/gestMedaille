@@ -114,7 +114,7 @@ public class MedailleController {
      * @return
      */
     @GetMapping()
-    public Mono<ResponseEntity<List<MedailleDTO>>> findAll() {
+    public Mono<ResponseEntity<List<MedailleDTO>>> findAll() throws IOException {
         List<MedailleDTO> response = service.findAll();
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));

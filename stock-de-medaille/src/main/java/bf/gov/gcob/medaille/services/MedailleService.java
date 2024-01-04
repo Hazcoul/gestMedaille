@@ -46,7 +46,7 @@ public interface MedailleService {
      *
      * @return
      */
-    List<MedailleDTO> findAll();
+    List<MedailleDTO> findAll() throws IOException;
 
     byte[] getImageMedaille(String lienImage) throws IOException;
 
