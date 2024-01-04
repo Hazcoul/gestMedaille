@@ -8,6 +8,7 @@ import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -107,7 +108,19 @@ public class EntreeController {
     public ResponseEntity<List<EntreeDTO>> getAllCommandeByCriteria(@RequestBody FilterEntreeDto filterEntreeDto, Pageable pageable){
         log.debug("REST request to get a page of commandes");
         Page<EntreeDTO> page = entreeService.findAllByCriteria(filterEntreeDto,pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = new HttpHeaders() {
+            {
+                add("Access-Control-Expose-Headers", "X-Total-Count");
+                add("X-Total-Count", String.valueOf(page.getTotalElements()));
+            }
+        };
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/entrees/statistique/commandes/impression/{idCommande}")
+    public Resource getlisteEntreeByCommande(@PathVariable("idCommande") Long id) {
+        log.debug("REST request to get a page of commandes");
+        log.debug(String.valueOf(id));
+        return entreeService.getlisteEntreeByCommande(id);
     }
 }
