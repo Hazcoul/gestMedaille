@@ -42,11 +42,20 @@ public interface MedailleService {
     MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille);
 
     /**
+     * Modifie les infos ainsi que l'image d'une medaille
+     *
+     * @param medailleDTO
+     * @param imageMedaille
+     * @return
+     */
+    MedailleDTO update(MedailleDTO medailleDTO, MultipartFile imageMedaille);
+
+    /**
      * liste toutes les medailles
      *
      * @return
      */
-    List<MedailleDTO> findAll();
+    List<MedailleDTO> findAll() throws IOException;
 
     byte[] getImageMedaille(String lienImage) throws IOException;
 

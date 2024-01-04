@@ -109,12 +109,30 @@ public class MedailleController {
     }
 
     /**
+     * Mise a jour ddes infos + image d'une medaille
+     *
+     * @param medailleDTO
+     * @param photoFile
+     * @return
+     * @throws URISyntaxException
+     */
+    @PostMapping(path = "/update/global", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Mono<ResponseEntity<MedailleDTO>> updateDTOWithImage(@Valid @RequestPart(value = "data", required = true) MedailleDTO medailleDTO,
+            @RequestPart(value = "photo", required = false) MultipartFile photoFile) throws URISyntaxException {
+        if (medailleDTO.getIdMedaille() == null) {
+            throw new RuntimeException("Veuillez renseigner la medaille SVP.");
+        }
+        MedailleDTO response = service.update(medailleDTO, photoFile);
+        return Mono.just(ResponseEntity.ok().body(response));
+    }
+
+    /**
      * Liste de toutes les medailles
      *
      * @return
      */
     @GetMapping()
-    public Mono<ResponseEntity<List<MedailleDTO>>> findAll() {
+    public Mono<ResponseEntity<List<MedailleDTO>>> findAll() throws IOException {
         List<MedailleDTO> response = service.findAll();
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));

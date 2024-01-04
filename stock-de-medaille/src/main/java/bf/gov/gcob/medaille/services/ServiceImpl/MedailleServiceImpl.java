@@ -50,6 +50,7 @@ public class MedailleServiceImpl implements MedailleService {
         log.info("Creation d'une medaille {} avec l'image catalogue {}", medailleDTO, imageMedaille.getOriginalFilename());
         Medaille medaille = mapper.toEntity(medailleDTO);
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
+        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
         medaille = medailleRepository.save(medaille);
         try {
             this.saveImageMedaille(medaille, imageMedaille);
@@ -65,7 +66,8 @@ public class MedailleServiceImpl implements MedailleService {
         Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante est introuvable. "));
         medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
         medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
-        medaille.setStock(medailleDTO.getStock());
+        //medaille.setStock(medailleDTO.getStock());
+        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
 
@@ -82,9 +84,36 @@ public class MedailleServiceImpl implements MedailleService {
     }
 
     @Override
-    public List<MedailleDTO> findAll() {
+    public MedailleDTO update(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
+        log.info("Mise à jour d'une medaille {} ", medailleDTO);
+        Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante est introuvable. "));
+        medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
+        medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
+        //medaille.setStock(medailleDTO.getStock());
+        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
+        medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
+        medaille = medailleRepository.save(medaille);
+        if (imageMedaille != null) {
+            this.saveImageMedaille(medaille, imageMedaille);
+        }
+        return mapper.toDTO(medaille);
+    }
+
+    @Override
+    public List<MedailleDTO> findAll() throws IOException {
         log.info("Liste des medailles");
-        return medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        List<MedailleDTO> medailleDTOS = null;
+        Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");
+        if (!Files.exists(subfolderPath)) {
+            log.info("Le repertoire de stockage est introuvable sur le serveur.");
+        }
+
+        medailleDTOS = medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        for (MedailleDTO medailleDto : medailleDTOS) {
+            Path path = subfolderPath.resolve(medailleDto.getLienImage());
+            medailleDto.setImage(Files.readAllBytes(path));
+        }
+        return medailleDTOS;
     }
 
     @Override
