@@ -134,31 +134,6 @@
             <version>6.0.0</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports</artifactId>
-            <version>6.20.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.lowagie</groupId>
-                    <artifactId>itext</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.barcode4j</groupId>
-                    <artifactId>barcode4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sourceforge.barbecue</groupId>
-                    <artifactId>barbecue</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports-fonts</artifactId>
-            <version>6.20.3</version>
-        </dependency>
-        
         <dependency><!-- Pour gerer les DTO et MAPPERS -->
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -170,15 +145,17 @@
             <version>1.5.5.Final</version>
             <type>jar</type>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>6.16.0</version>
-        </dependency-->
-        <!--        <dependency>-->
-        <!--		    <groupId>org.springframework</groupId>-->
-        <!--		    <artifactId>spring-webmvc</artifactId>-->
-        <!--	    </dependency>-->
+            <version>6.20.5</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
