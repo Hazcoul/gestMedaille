@@ -4,10 +4,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import bf.gov.gcob.medaille.model.dto.EntreeDTO;
+import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
+import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,6 +104,25 @@ public class SortieController {
         log.debug("REST request to delete Sortie: {}", id);
         sortieService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+    }
+
+    @PostMapping("/sorties/statistique/sorties")
+    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+        log.debug("REST request to get a page of sorties");
+        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto,pageable);
+        HttpHeaders headers = new HttpHeaders() {
+            {
+                add("Access-Control-Expose-Headers", "X-Total-Count");
+                add("X-Total-Count", String.valueOf(page.getTotalElements()));
+            }
+        };
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/sorties/statistique/sorties/impression/{idSortie}")
+    public Resource getLigneSortieBySortie(@PathVariable("idSortie") Long id) {
+        log.debug("REST request to get a page of sorties");
+        return sortieService.getLigneSortieBySortie(id);
     }
 
 }
