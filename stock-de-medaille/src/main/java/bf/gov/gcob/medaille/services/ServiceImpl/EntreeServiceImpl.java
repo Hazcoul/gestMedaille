@@ -155,7 +155,7 @@ public class EntreeServiceImpl implements EntreeService {
                 ligneImpressionEntreeDTO.setLibelleFournisseur(ligneEntreeDTO.getEntree().getFournisseur().getLibelle());
                 ligneImpressionEntreeDTO.setNomMagasin(ligneEntreeDTO.getEntree().getMagasin().getNomMagasin());
                 ligneImpressionEntreeDTO.setNumeroCommande(ligneEntreeDTO.getEntree().getNumeroCmd());
-                ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille().getNomComplet());
+                ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille()!=null?ligneEntreeDTO.getMedaille().getNomComplet(): "");
                 ligneImpressionEntreeDTO.setAcquisition(ligneEntreeDTO.getEntree().getAcquisition().name());
 
                 ligneImpressionEntreeDTOS.add(ligneImpressionEntreeDTO);
