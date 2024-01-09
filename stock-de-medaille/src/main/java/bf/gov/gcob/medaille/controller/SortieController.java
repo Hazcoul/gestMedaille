@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import bf.gov.gcob.medaille.model.dto.EntreeDTO;
-import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
-import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
+import bf.gov.gcob.medaille.model.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.services.SortieService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
@@ -119,10 +116,29 @@ public class SortieController {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @PostMapping("/sorties/statistique/sorties/periode")
+    public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+        log.debug("REST request to get a page of sorties");
+        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto,pageable);
+        HttpHeaders headers = new HttpHeaders() {
+            {
+                add("Access-Control-Expose-Headers", "X-Total-Count");
+                add("X-Total-Count", String.valueOf(page.getTotalElements()));
+            }
+        };
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
     @GetMapping("/sorties/statistique/sorties/impression/{idSortie}")
     public Resource getLigneSortieBySortie(@PathVariable("idSortie") Long id) {
         log.debug("REST request to get a page of sorties");
         return sortieService.getLigneSortieBySortie(id);
+    }
+
+    @PostMapping("/sorties/statistique/sorties/periode/impression")
+    public Resource getLigneSortieByPeriode(@RequestBody FilterSortieDto filterSortieDto) {
+        log.debug("REST request to get a page of sorties");
+        return sortieService.getLigneSortieByPeriode(filterSortieDto);
     }
 
 }

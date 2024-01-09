@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.kafka.common.protocol.types.Field;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,4 +21,6 @@ public class FilterSortieDto extends AbstractBaseDTO {
     private Long ordonnateur;
     private Long beneficiaire;
     private String motifSortie;
+    private Date dateDebut;
+    private Date dateFin;
 }

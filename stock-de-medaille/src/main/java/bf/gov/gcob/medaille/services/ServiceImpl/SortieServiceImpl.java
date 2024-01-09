@@ -14,10 +14,15 @@ import bf.gov.gcob.medaille.services.SortieService;
 
 import java.io.File;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import bf.gov.gcob.medaille.utils.PageUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.slf4j.Logger;
@@ -29,6 +34,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
 
 @Service
 public class SortieServiceImpl implements SortieService {
@@ -183,6 +190,72 @@ public class SortieServiceImpl implements SortieService {
                 filterSortieDto.getOrdonnateur(),
                 filterSortieDto.getDetenteur(),
                 filterSortieDto.getBeneficiaire(),
-                pageable).map(sortieMapper::toDTO);    }
+                pageable).map(sortieMapper::toDTO);
+    }
+
+    @Override
+    public Page<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto, Pageable pageable) {
+
+        List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
+        ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
+
+        return createPageFromList(ligneImpressionSortiePeriodeDTOS,pageable);
+    }
+
+    List<LigneImpressionSortiePeriodeDTO>getFilterListeByperiode(FilterSortieDto filterSortieDto){
+        Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));
+        Date dateDebut = new Date(filterSortieDto.getDateDebut().getTime() - (1000 * 60 * 60 * 24));
+        filterSortieDto.setDateFin(datefin);
+        filterSortieDto.setDateDebut(dateDebut);
+        List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
+        EMotifSortie eMotifSortie = EMotifSortie.getByLibelle(filterSortieDto.getMotifSortie());
+        ligneImpressionSortiePeriodeDTOS =
+                sortieRepository.countTotalMedailleByMedailleAndPeriode(
+                        eMotifSortie
+                );
+        ligneImpressionSortiePeriodeDTOS = ligneImpressionSortiePeriodeDTOS.stream()
+                .filter(dates -> dates.getDateSortie().after(filterSortieDto.getDateDebut()) && dates.getDateSortie().before(filterSortieDto.getDateFin()))
+                .collect(Collectors.toList());
+        return ligneImpressionSortiePeriodeDTOS;
+    }
+
+    @Override
+    public Resource getLigneSortieByPeriode(FilterSortieDto filterSortieDto) {
+        SimpleDateFormat sm = new SimpleDateFormat("dd/MM/yyyy");
+        Date dateDebutInitial = filterSortieDto.getDateDebut();
+        Date dateFinInitial = filterSortieDto.getDateFin();
+        if(filterSortieDto.getDateFin()==null){
+            filterSortieDto.setDateFin(new Date());
+            dateFinInitial = new Date();
+        }
+        List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
+        ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionSortiePeriodeDTOS);
+        HashMap<String, Object> parametres = new HashMap<String, Object>();
+        parametres.put("motif", filterSortieDto.getMotifSortie());
+        parametres.put("titre", "SORTIE POUR "+filterSortieDto.getMotifSortie().toUpperCase()+" "+"DE LA PERIODE DE "+sm.format(dateDebutInitial)+" "+"AU"+" "+sm.format(dateFinInitial));
+        return imprimerListeByPeriode(parametres, beanCollectionDataSource);
+    }
+
+    private Resource imprimerListeByPeriode(HashMap<String, Object> parametres, JRBeanCollectionDataSource beanCollectionDataSource) {
+        String embleme = "";
+
+        try {
+            Resource resourceLoaderResource = resourceLoader.getResource("classpath:reports/liste_sortie_periode.jrxml");
+            Resource emblemeLoaderResource = resourceLoader.getResource("classpath:reports/embleme.png");
+            File emblemeLogo = emblemeLoaderResource.getFile();
+            embleme = emblemeLogo.getAbsolutePath();
+
+            InputStream is = resourceLoaderResource.getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(is);
+
+            parametres.put("P_EMBLEME", embleme);
+            JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
+            return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }
