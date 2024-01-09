@@ -35,9 +35,9 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>-->
         <dependency>
-	      <groupId>org.springframework.boot</groupId>
-	      <artifactId>spring-boot-starter-web</artifactId>
-	    </dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
@@ -51,15 +51,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-data</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.security</groupId>-->
-<!--            <artifactId>spring-security-jwt</artifactId>-->
-<!--            <version>1.1.0.RELEASE</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.security</groupId>-->
+        <!--            <artifactId>spring-security-jwt</artifactId>-->
+        <!--            <version>1.1.0.RELEASE</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -134,7 +134,6 @@
             <version>6.0.0</version>
             <type>jar</type>
         </dependency>
-        
         <dependency><!-- Pour gerer les DTO et MAPPERS -->
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -146,10 +145,17 @@
             <version>1.5.5.Final</version>
             <type>jar</type>
         </dependency>
-        <!--        <dependency>-->
-        <!--		    <groupId>org.springframework</groupId>-->
-        <!--		    <artifactId>spring-webmvc</artifactId>-->
-        <!--	    </dependency>-->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.5</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>

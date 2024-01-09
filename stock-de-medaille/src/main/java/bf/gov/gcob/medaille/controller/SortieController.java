@@ -4,10 +4,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import bf.gov.gcob.medaille.model.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.services.SortieService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
@@ -98,6 +101,44 @@ public class SortieController {
         log.debug("REST request to delete Sortie: {}", id);
         sortieService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+    }
+
+    @PostMapping("/sorties/statistique/sorties")
+    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+        log.debug("REST request to get a page of sorties");
+        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto,pageable);
+        HttpHeaders headers = new HttpHeaders() {
+            {
+                add("Access-Control-Expose-Headers", "X-Total-Count");
+                add("X-Total-Count", String.valueOf(page.getTotalElements()));
+            }
+        };
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @PostMapping("/sorties/statistique/sorties/periode")
+    public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+        log.debug("REST request to get a page of sorties");
+        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto,pageable);
+        HttpHeaders headers = new HttpHeaders() {
+            {
+                add("Access-Control-Expose-Headers", "X-Total-Count");
+                add("X-Total-Count", String.valueOf(page.getTotalElements()));
+            }
+        };
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/sorties/statistique/sorties/impression/{idSortie}")
+    public Resource getLigneSortieBySortie(@PathVariable("idSortie") Long id) {
+        log.debug("REST request to get a page of sorties");
+        return sortieService.getLigneSortieBySortie(id);
+    }
+
+    @PostMapping("/sorties/statistique/sorties/periode/impression")
+    public Resource getLigneSortieByPeriode(@RequestBody FilterSortieDto filterSortieDto) {
+        log.debug("REST request to get a page of sorties");
+        return sortieService.getLigneSortieByPeriode(filterSortieDto);
     }
 
 }

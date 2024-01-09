@@ -15,6 +15,7 @@ public class MedailleDTO extends AbstractBaseDTO {
     private Long idMedaille;
     private String nomComplet;
     private Integer stock;
+    private String code;
     private String lienImage;
     private String description;
     private byte[] image;
