@@ -5,12 +5,7 @@
  */
 package bf.gov.gcob.medaille.controller;
 
-import bf.gov.gcob.medaille.model.dto.AuthenticationResponse;
-import bf.gov.gcob.medaille.model.dto.LoginVM;
-import bf.gov.gcob.medaille.model.dto.PasswordModif;
-import bf.gov.gcob.medaille.model.dto.ResetConnectPaswword;
-import bf.gov.gcob.medaille.model.dto.ResetPaswword;
-import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
+import bf.gov.gcob.medaille.model.dto.*;
 import bf.gov.gcob.medaille.security.JwtAuthenticationManager;
 import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.UtilisateurService;
@@ -224,4 +219,11 @@ public class UtilisateurController {
         UtilisateurDTO response = service.getById(idUser);
         return Mono.just(ResponseEntity.ok().body(response));
     }
+    @GetMapping(path = "/statistique/count")
+    public ResponseEntity<List<Integer>> find() {
+        List<Integer> etat = service.count();
+        return ResponseEntity.ok().body(etat);
+    }
+
+
 }

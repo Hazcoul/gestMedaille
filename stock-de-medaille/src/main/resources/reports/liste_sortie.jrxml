@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="liste_sortie" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="20a15b05-04b1-4fdf-81e6-49aebdc1cc37">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="P_EMBLEME" class="java.lang.String"/>
+	<parameter name="titre" class="java.lang.String"/>
+	<parameter name="ordonnateur" class="java.lang.String"/>
+	<parameter name="detenteur" class="java.lang.String"/>
+	<parameter name="beneficiaire" class="java.lang.String"/>
+	<parameter name="motif" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="medaille" class="java.lang.String"/>
+	<field name="quantite" class="java.lang.Integer"/>
+	<variable name="total" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{quantite}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="210" splitType="Stretch">
+			<image>
+				<reportElement x="470" y="10" width="65" height="63" uuid="e3525e6d-1b94-4295-9eda-084fd104e9f5"/>
+				<imageExpression><![CDATA[$P{P_EMBLEME}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="435" y="-7" width="121" height="17" uuid="42f72f66-5e25-4793-b482-cdb5784bbeb3"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BURKINA FASO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="73" width="141" height="19" uuid="5f243913-2f49-4ae4-9971-6f65485a8d03"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unité-Progrès-Justice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="340" height="17" uuid="6520beb9-f6da-48f1-912e-a594183d5324"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GRANDE CHANCELLERIE DES ORDRES NATIONAUX]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Opaque" x="2" y="130" width="561" height="71" backcolor="#F0E9E9" uuid="591a6c1f-5f03-497d-b8c5-1a232a0fabe7"/>
+				<graphicElement>
+					<pen lineWidth="4.0" lineStyle="Double"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="10" y="140" width="300" height="20" uuid="803d5576-31df-440d-a575-40b832898a3d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Ordonnateur : "+$P{ordonnateur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="320" y="140" width="236" height="20" uuid="cccd87c7-3648-4066-b1d1-02ebffa97050"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Détenteur: "+$P{detenteur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="170" width="300" height="20" uuid="12d151e1-5d2d-4b79-8e61-c2d349b8e1f1"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Structure bénéficiaire: "+$P{beneficiaire}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="320" y="169" width="236" height="21" uuid="0d3ddfec-ba39-4fce-91bc-d7b03d8e1fde"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Motif : "+$P{motif}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="90" width="488" height="20" uuid="9e2833dd-a1a0-489a-a1c4-644cb47b0ade"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{titre}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="10" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="9" width="450" height="16" backcolor="#F0E9E9" uuid="1cbc610d-8bc5-4674-a003-7fe0cf00bd3b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Médaille]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="450" y="9" width="113" height="16" backcolor="#F0E9E9" uuid="e71f365c-e784-4816-a1c8-336913173eac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantité]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="ElementGroupHeight" x="450" y="0" width="113" height="16" uuid="2bf8e47c-ad60-4f16-a8a3-cd85ad062a79">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6bd68710-56f0-4598-a05b-a5a06e163c68"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="4" bottomPadding="0" rightPadding="0">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{quantite}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="450" height="16" uuid="96dec487-d267-4c48-adb6-560edf38632c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="126669be-36c2-44fa-970a-77000854d9d9"/>
+				</reportElement>
+				<box leftPadding="3">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{medaille}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="40">
+			<staticText>
+				<reportElement x="280" y="10" width="171" height="30" uuid="3077248f-aac4-4868-b470-10a6fce85282"/>
+				<box topPadding="0" leftPadding="3" bottomPadding="0" rightPadding="7">
+					<pen lineWidth="1.25"/>
+					<topPen lineWidth="1.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL MEDAILLE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="451" y="10" width="112" height="30" uuid="3c7dc214-087c-493a-9177-e7f6c62056d4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" bottomPadding="0" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
