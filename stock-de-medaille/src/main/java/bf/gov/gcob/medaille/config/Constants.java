@@ -30,4 +30,36 @@ public final class Constants {
 
     private Constants() {
     }
+
+    /**
+     * Fonction qui renvoie l'extension du futur ficher à créeer et le format du
+     * contenu du fichier à renvoyer
+     *
+     * @param extension
+     * @return
+     */
+    public static String[] constructFormatAndExtension(String extension) {
+        String[] result = new String[2];
+
+        switch (extension.toUpperCase()) {
+            case "PDF":
+                result[0] = "application/pdf";
+                result[1] = ".pdf";
+                break;
+            case "EXCEL":
+                result[0] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                result[1] = ".xlsx";
+                break;
+            case "WORD":
+                result[0] = "application/ms-word";
+                result[1] = ".docx";
+                break;
+            default:
+                result[0] = "application/pdf";
+                result[1] = ".pdf";
+                break;
+        }
+
+        return result;
+    }
 }
