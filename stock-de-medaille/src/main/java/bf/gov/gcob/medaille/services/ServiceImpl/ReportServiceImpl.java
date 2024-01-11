@@ -7,11 +7,13 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.entities.PieceJointe;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.model.reportdto.LigneEntreeDTO;
 import bf.gov.gcob.medaille.model.reportdto.OrdreEntreeMatiereDTO;
 import bf.gov.gcob.medaille.repository.EntreeRepository;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
+import bf.gov.gcob.medaille.repository.PieceJointeRepository;
 import bf.gov.gcob.medaille.services.ReportService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,8 @@ public class ReportServiceImpl implements ReportService {
 
     private final LigneEntreeRepository ligneEntreeRepository;
 
+    private final PieceJointeRepository pieceJointeRepository;
+
     @Override
     public void printOrdreEntreeMatiere(Long idEntree, String format, OutputStream os) throws JRException {
         log.info("Export d'état d'ordre d'entrée : {}", idEntree);
@@ -61,7 +65,8 @@ public class ReportServiceImpl implements ReportService {
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
             //initalisation du titre 
-            String titre = "<b><u>ORDRE D'ENTREE DE MATIERES</u><br/><i>N° 50/1008000311/2021/0002 du 20 septembre 2021</i></b>";
+            String refEntree = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
+            List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntreeIdEntree(entree.getIdEntree());
             List<LigneEntreeDTO> ligneEntreeDTOs = new ArrayList<>();
             List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(entree.getIdEntree());
             int i = 1;
@@ -73,12 +78,12 @@ public class ReportServiceImpl implements ReportService {
             OrdreEntreeMatiereDTO data = new OrdreEntreeMatiereDTO(
                     logo,
                     (entree.getExerciceBudgetaire() != null ? entree.getExerciceBudgetaire().toString() : null),
-                    titre,
+                    refEntree,
                     entree.getAcquisition().getLibelle(),
                     "DEST.INCONNUE",
                     (entree.getFournisseur() != null ? entree.getFournisseur().getSigle() : null),
-                    "TYPE.INCONNU",
-                    "REF.INCONNUE",
+                    (pieceJointes != null ? pieceJointes.get(0).getTypePiece().getLibelle() : null),
+                    (pieceJointes != null ? pieceJointes.get(0).getReferencePiece() : null),
                     ligneEntreeDTOs
             );
 

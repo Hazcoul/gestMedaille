@@ -28,7 +28,7 @@ public class OrdreEntreeMatiereDTO {
 
     private String exercice;
 
-    private String titre;
+    private String referenceEntree; //ex. : N° 50/1008000311/2021/0002 du 20 septembre 2021
 
     private String modeAcquisition;
 

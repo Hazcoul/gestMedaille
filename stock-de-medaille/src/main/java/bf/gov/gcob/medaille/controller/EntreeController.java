@@ -3,7 +3,6 @@ package bf.gov.gcob.medaille.controller;
 import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
-import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.services.EntreeService;
 import bf.gov.gcob.medaille.services.ReportService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
@@ -132,16 +131,25 @@ public class EntreeController {
         return entreeService.getlisteEntreeByCommande(id);
     }
 
+    /**
+     * Valide une entree et genere un etat d'ordre d'entree de matieres
+     *
+     * @param response
+     * @param idEntree
+     * @param format
+     * @throws IOException
+     * @throws JRException
+     */
     @GetMapping(value = "/entrees/validation/{id}/{format}")
     public void validerEntreeMatieres(HttpServletResponse response, @PathVariable(name = "id", required = true) Long idEntree, @PathVariable(name = "format", required = true) String format)
             throws IOException, JRException {
-        Entree entree = entreeService.validerEntree(idEntree);
+        EntreeDTO entree = entreeService.validerEntree(idEntree);
 
         String[] tab = Constants.constructFormatAndExtension(format);
         response.setContentType(tab[0]);
         response.setHeader("Content-Disposition", String.format("attachment; filename=\"ORDRE_ENTREE_" + idEntree + tab[1] + "\""));
         OutputStream outputStream = response.getOutputStream();
-        reportService.printOrdreEntreeMatiere(idEntree, format, outputStream);
+        reportService.printOrdreEntreeMatiere(entree.getIdEntree(), format, outputStream);
 
     }
 }
