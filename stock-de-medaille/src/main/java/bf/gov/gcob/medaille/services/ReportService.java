@@ -23,4 +23,6 @@ public interface ReportService {
      * @throws JRException
      */
     void printOrdreEntreeMatiere(Long idEntree, String format, OutputStream os) throws JRException;
+
+    void printBmConsommation(Long idSortie, String format, OutputStream os) throws JRException;
 }

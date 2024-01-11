@@ -1,5 +1,10 @@
 package bf.gov.gcob.medaille.config;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Defini les données constantes du système
  *
@@ -13,6 +18,8 @@ public final class Constants {
 
     //repertoire de stockage de fichiers uploaded
     public static final String appStoreRootPath = "/Users/anptic";
+
+    private static final DateFormat appShortDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
 
     // EXTENSIONS AUTORISEES
     public static final String EXTENSION_PDF = ".pdf";
@@ -61,5 +68,15 @@ public final class Constants {
         }
 
         return result;
+    }
+
+    /**
+     * CONVERTIR DATE EN FORMAT : 11-01-2024
+     *
+     * @param date
+     * @return
+     */
+    public static String convertDateToShort(Date date) {
+        return appShortDateFormat.format(date);
     }
 }

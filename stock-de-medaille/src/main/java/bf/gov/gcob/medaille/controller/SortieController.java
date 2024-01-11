@@ -1,10 +1,20 @@
 package bf.gov.gcob.medaille.controller;
 
+import bf.gov.gcob.medaille.config.Constants;
+import bf.gov.gcob.medaille.model.dto.*;
+import bf.gov.gcob.medaille.services.ReportService;
+import bf.gov.gcob.medaille.services.SortieService;
+import bf.gov.gcob.medaille.utils.web.HeaderUtil;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
+import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
-import bf.gov.gcob.medaille.model.dto.*;
+import net.sf.jasperreports.engine.JRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import bf.gov.gcob.medaille.services.SortieService;
-import bf.gov.gcob.medaille.utils.web.HeaderUtil;
-import bf.gov.gcob.medaille.utils.web.PaginationUtil;
-import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api")
@@ -46,8 +50,11 @@ public class SortieController {
 
     private final SortieService sortieService;
 
-    public SortieController(SortieService sortieService) {
+    private final ReportService reportService;
+
+    public SortieController(SortieService sortieService, ReportService reportService) {
         this.sortieService = sortieService;
+        this.reportService = reportService;
     }
 
     @PostMapping("/sorties")
@@ -83,19 +90,19 @@ public class SortieController {
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
         return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
-    
+
     @GetMapping("/sorties/{id}")
     public ResponseEntity<SortieDTO> findByIdSortie(@PathVariable(value = "id", required = true) Long idSortie) {
-    	log.debug("REST request to get one sortie");
-    	return new ResponseEntity<>(sortieService.findOne(idSortie), HttpStatus.OK);
+        log.debug("REST request to get one sortie");
+        return new ResponseEntity<>(sortieService.findOne(idSortie), HttpStatus.OK);
     }
 
     @GetMapping("/sorties/{annee}")
-	public ResponseEntity<List<SortieDTO>> findByDecoByAn(@PathVariable(name = "annee", required = true) int annee) {
-		List<SortieDTO> sortieDTOS = sortieService.findByDecoByAn(annee);
-		return ResponseEntity.ok().body(sortieDTOS);
-	}
-    
+    public ResponseEntity<List<SortieDTO>> findByDecoByAn(@PathVariable(name = "annee", required = true) int annee) {
+        List<SortieDTO> sortieDTOS = sortieService.findByDecoByAn(annee);
+        return ResponseEntity.ok().body(sortieDTOS);
+    }
+
     @DeleteMapping("/sorties/{id}")
     public ResponseEntity<Void> deleteSortie(@PathVariable("id") Long id) {
         log.debug("REST request to delete Sortie: {}", id);
@@ -104,9 +111,9 @@ public class SortieController {
     }
 
     @PostMapping("/sorties/statistique/sorties")
-    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
         log.debug("REST request to get a page of sorties");
-        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto,pageable);
+        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto, pageable);
         HttpHeaders headers = new HttpHeaders() {
             {
                 add("Access-Control-Expose-Headers", "X-Total-Count");
@@ -117,9 +124,9 @@ public class SortieController {
     }
 
     @PostMapping("/sorties/statistique/sorties/periode")
-    public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable){
+    public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
         log.debug("REST request to get a page of sorties");
-        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto,pageable);
+        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto, pageable);
         HttpHeaders headers = new HttpHeaders() {
             {
                 add("Access-Control-Expose-Headers", "X-Total-Count");
@@ -139,6 +146,28 @@ public class SortieController {
     public Resource getLigneSortieByPeriode(@RequestBody FilterSortieDto filterSortieDto) {
         log.debug("REST request to get a page of sorties");
         return sortieService.getLigneSortieByPeriode(filterSortieDto);
+    }
+
+    /**
+     * Valide une sortie et genere un bordereau de mise en consommation
+     *
+     * @param response
+     * @param idSortie
+     * @param format
+     * @throws IOException
+     * @throws JRException
+     */
+    @GetMapping(value = "/sorties/validation/{id}/{format}")
+    public void validerSortie(HttpServletResponse response, @PathVariable(name = "id", required = true) Long idSortie, @PathVariable(name = "format", required = true) String format)
+            throws IOException, JRException {
+        SortieDTO sortie = sortieService.validerSortie(idSortie);
+
+        String[] tab = Constants.constructFormatAndExtension(format);
+        response.setContentType(tab[0]);
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"BORDEREAU_CONSOMMATION_" + idSortie + tab[1] + "\""));
+        OutputStream outputStream = response.getOutputStream();
+        reportService.printBmConsommation(sortie.getIdSortie(), format, outputStream);
+
     }
 
 }

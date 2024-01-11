@@ -11,18 +11,13 @@ import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.SortieService;
-
+import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
 import java.io.File;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import bf.gov.gcob.medaille.utils.PageUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.slf4j.Logger;
@@ -34,8 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
 
 @Service
 public class SortieServiceImpl implements SortieService {
@@ -50,7 +43,7 @@ public class SortieServiceImpl implements SortieService {
     private final ResourceLoader resourceLoader;
 
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
-                             SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader) {
+            SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
@@ -134,9 +127,6 @@ public class SortieServiceImpl implements SortieService {
         Optional<Sortie> sortie = sortieRepository.findById(id);
 
         //DecimalFormat decimalFormat = new DecimalFormat("#,##0");
-
-
-
         for (LigneSortieDTO ligneSortieDTO : ligneSortieDTOS) {
             LigneImpressionSortieDTO ligneImpressionSortieDTO = new LigneImpressionSortieDTO();
             ligneImpressionSortieDTO.setMedaille(ligneSortieDTO.getMedaille().getNomComplet());
@@ -147,11 +137,11 @@ public class SortieServiceImpl implements SortieService {
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionSortieDTOS);
         HashMap<String, Object> parametres = new HashMap<String, Object>();
         System.err.println(sortie.get().getMotifSortie().getLibelle());
-        parametres.put("ordonnateur", sortie.get().getOrdonnateur().getNom()+" "+sortie.get().getOrdonnateur().getPrenom());
+        parametres.put("ordonnateur", sortie.get().getOrdonnateur().getNom() + " " + sortie.get().getOrdonnateur().getPrenom());
         parametres.put("beneficiaire", sortie.get().getBeneficiaire().getRaisonSociale());
         parametres.put("motif", sortie.get().getMotifSortie().getLibelle());
-        parametres.put("detenteur", sortie.get().getDetenteur().getNom()+" "+sortie.get().getDetenteur().getPrenom());
-        parametres.put("titre", "SORTIE N° "+sortie.get().getNumeroSortie());
+        parametres.put("detenteur", sortie.get().getDetenteur().getNom() + " " + sortie.get().getDetenteur().getPrenom());
+        parametres.put("titre", "SORTIE N° " + sortie.get().getNumeroSortie());
 
         return imprimer(parametres, beanCollectionDataSource);
     }
@@ -170,7 +160,6 @@ public class SortieServiceImpl implements SortieService {
 
             parametres.put("P_EMBLEME", embleme);
 
-
             JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
             return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
         } catch (Exception e) {
@@ -178,7 +167,6 @@ public class SortieServiceImpl implements SortieService {
             return null;
         }
     }
-
 
     @Override
     public Page<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto, Pageable pageable) {
@@ -199,18 +187,18 @@ public class SortieServiceImpl implements SortieService {
         List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
         ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
 
-        return createPageFromList(ligneImpressionSortiePeriodeDTOS,pageable);
+        return createPageFromList(ligneImpressionSortiePeriodeDTOS, pageable);
     }
 
-    List<LigneImpressionSortiePeriodeDTO>getFilterListeByperiode(FilterSortieDto filterSortieDto){
+    List<LigneImpressionSortiePeriodeDTO> getFilterListeByperiode(FilterSortieDto filterSortieDto) {
         Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));
         Date dateDebut = new Date(filterSortieDto.getDateDebut().getTime() - (1000 * 60 * 60 * 24));
         filterSortieDto.setDateFin(datefin);
         filterSortieDto.setDateDebut(dateDebut);
         List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
         EMotifSortie eMotifSortie = EMotifSortie.getByLibelle(filterSortieDto.getMotifSortie());
-        ligneImpressionSortiePeriodeDTOS =
-                sortieRepository.countTotalMedailleByMedailleAndPeriode(
+        ligneImpressionSortiePeriodeDTOS
+        = sortieRepository.countTotalMedailleByMedailleAndPeriode(
                         eMotifSortie
                 );
         ligneImpressionSortiePeriodeDTOS = ligneImpressionSortiePeriodeDTOS.stream()
@@ -224,7 +212,7 @@ public class SortieServiceImpl implements SortieService {
         SimpleDateFormat sm = new SimpleDateFormat("dd/MM/yyyy");
         Date dateDebutInitial = filterSortieDto.getDateDebut();
         Date dateFinInitial = filterSortieDto.getDateFin();
-        if(filterSortieDto.getDateFin()==null){
+        if (filterSortieDto.getDateFin() == null) {
             filterSortieDto.setDateFin(new Date());
             dateFinInitial = new Date();
         }
@@ -233,7 +221,7 @@ public class SortieServiceImpl implements SortieService {
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionSortiePeriodeDTOS);
         HashMap<String, Object> parametres = new HashMap<String, Object>();
         parametres.put("motif", filterSortieDto.getMotifSortie());
-        parametres.put("titre", "SORTIE POUR "+filterSortieDto.getMotifSortie().toUpperCase()+" "+"DE LA PERIODE DE "+sm.format(dateDebutInitial)+" "+"AU"+" "+sm.format(dateFinInitial));
+        parametres.put("titre", "SORTIE POUR " + filterSortieDto.getMotifSortie().toUpperCase() + " " + "DE LA PERIODE DE " + sm.format(dateDebutInitial) + " " + "AU" + " " + sm.format(dateFinInitial));
         return imprimerListeByPeriode(parametres, beanCollectionDataSource);
     }
 
@@ -256,6 +244,14 @@ public class SortieServiceImpl implements SortieService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public SortieDTO validerSortie(Long idSortie) {
+        Sortie sortie = sortieRepository.findById(idSortie).get();
+        sortie.setStatus(EMvtStatus.VALIDATED);
+        sortie.setValiderLe(new Date());
+        return sortieMapper.toDTO(sortieRepository.save(sortie));
     }
 
 }

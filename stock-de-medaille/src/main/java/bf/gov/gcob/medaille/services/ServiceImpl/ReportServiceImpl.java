@@ -5,15 +5,22 @@
  */
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
+import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.model.entities.Entree;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.PieceJointe;
+import bf.gov.gcob.medaille.model.entities.Sortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.model.reportdto.BmConsommationDTO;
 import bf.gov.gcob.medaille.model.reportdto.LigneEntreeDTO;
+import bf.gov.gcob.medaille.model.reportdto.LigneSortieDTO;
 import bf.gov.gcob.medaille.model.reportdto.OrdreEntreeMatiereDTO;
 import bf.gov.gcob.medaille.repository.EntreeRepository;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
+import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.PieceJointeRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.ReportService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +59,11 @@ public class ReportServiceImpl implements ReportService {
 
     private final EntreeRepository entreeRepository;
 
+    private final SortieRepository sortieRepository;
+
     private final LigneEntreeRepository ligneEntreeRepository;
+
+    private final LigneSortieRepository ligneSortieRepository;
 
     private final PieceJointeRepository pieceJointeRepository;
 
@@ -89,6 +100,51 @@ public class ReportServiceImpl implements ReportService {
 
             //modeles de rapport a utiliser
             InputStream is = this.getClass().getResourceAsStream("/ordre_entree_matieres.jasper");
+            // construction des Datasources a travers le jrbeans
+            JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(data));
+            // appel de la methode d'export en fonction du format souhaité
+            this.exportToWordAndPDF(format, dataSource, is, os);
+        } catch (JRException e) {
+            log.error("Erreur survenue lors de la génération de données : {}", e);
+            throw new RuntimeException("Document indisponible, pour cause d'erreur inconnue ! Veuillez réessayer SVP.");
+        } catch (IOException ex) {
+            log.error("Erreur survenue lors du chargement de l'embleme : {}", ex);
+        }
+    }
+
+    @Override
+    public void printBmConsommation(Long idSortie, String format, OutputStream os) throws JRException {
+        log.info("Export de bordereau de mise en consommation : {}", idSortie);
+        Sortie sortie = sortieRepository.findByIdSortieAndStatus(idSortie, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("La sortie est inexistante ou non encore validée."));
+        try {
+            // chargement du logo (armoirie du BF)
+            InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
+
+            //initalisation du titre 
+            String refSortie = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
+            List<LigneSortieDTO> ligneSortieDTOs = new ArrayList<>();
+            List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(sortie.getIdSortie());
+            int i = 1;
+            for (LigneSortie le : les) {
+                ligneSortieDTOs.add(new LigneSortieDTO("" + i, "code" + i, (le.getMedaille() == null ? "DESIG. INCONNUE" : le.getMedaille().getNomComplet()), le.getQuantiteLigne().toString(), sortie.getMotifSortie().getLibelle(), "observation " + i));
+                i++;
+            }
+            // conteneur de données de base à imprimer
+            BmConsommationDTO data = new BmConsommationDTO(
+                    logo,
+                    refSortie,
+                    (sortie.getDateSortie() != null ? Constants.convertDateToShort(sortie.getDateSortie()) : null),
+                    (sortie.getMagasin() != null ? sortie.getMagasin().getNomMagasin() : null),
+                    (sortie.getDetenteur() != null ? sortie.getDetenteur().getPrenom() + " " + sortie.getDetenteur().getNom() : null),
+                    (sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
+                    "MAG. SOMEBODY",
+                    "CPM. SOMEBODY",
+                    (sortie.getOrdonnateur() != null ? sortie.getOrdonnateur().getPrenom() + " " + sortie.getOrdonnateur().getNom() : null),
+                    ligneSortieDTOs
+            );
+
+            //modeles de rapport a utiliser
+            InputStream is = this.getClass().getResourceAsStream("/BMConsommation.jasper");
             // construction des Datasources a travers le jrbeans
             JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(data));
             // appel de la methode d'export en fonction du format souhaité

@@ -28,7 +28,7 @@
 	<field name="referenceBordereau" class="java.lang.String"/>
 	<field name="logo" class="java.io.InputStream"/>
 	<field name="lignesSorties" class="java.util.List"/>
-	<field name="date" class="java.lang.String"/>
+	<field name="dateSortie" class="java.lang.String"/>
 	<field name="magasin" class="java.lang.String"/>
 	<field name="detenteur" class="java.lang.String"/>
 	<field name="beneficiaire" class="java.lang.String"/>
@@ -135,7 +135,7 @@
 					<textElement textAlignment="Right">
 						<font fontName="Arial" size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Ouagadougou, le : " + ($F{date} ==null ? "NON-PRECISE":$F{date})]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Ouagadougou, le " + ($F{dateSortie} ==null ? "NON-PRECISE":$F{dateSortie})]]></textFieldExpression>
 				</textField>
 			</frame>
 			<rectangle>
