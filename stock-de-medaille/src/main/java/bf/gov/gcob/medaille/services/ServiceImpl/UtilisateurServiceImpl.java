@@ -6,10 +6,8 @@ import bf.gov.gcob.medaille.model.dto.PasswordModif;
 import bf.gov.gcob.medaille.model.dto.ResetConnectPaswword;
 import bf.gov.gcob.medaille.model.dto.ResetPaswword;
 import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
-import bf.gov.gcob.medaille.model.entities.Profil;
-import bf.gov.gcob.medaille.model.entities.Utilisateur;
-import bf.gov.gcob.medaille.repository.ProfilRepository;
-import bf.gov.gcob.medaille.repository.UtilisateurRepository;
+import bf.gov.gcob.medaille.model.entities.*;
+import bf.gov.gcob.medaille.repository.*;
 import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.UtilisateurService;
 import io.jsonwebtoken.Claims;
@@ -18,12 +16,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +69,18 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     private String secret;
     
     private final String DEFAULT_PASSWORD = "S!g@c!L:2023";
+
+    @Autowired
+    private FournisseurRepository fournisseurRepository;
+
+    @Autowired
+    private MagasinRepository magasinRepository;
+
+    @Autowired
+    private LigneEntreeRepository ligneEntreeRepository;
+
+    @Autowired
+    private LigneSortieRepository ligneSortieRepository;
     
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
@@ -487,5 +492,28 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         Utilisateur utilisateur = utilisateurRepository.findById(id).orElseThrow(() -> new RuntimeException("L'utilisateur " + id + " est introuvable."));
         return mapper.toCustomDto(utilisateur);
     }
-    
+
+    @Override
+    public List<Integer> count() {
+        List<Integer> nombre = new ArrayList<>();
+        List<LigneEntree> ligneEntrees = ligneEntreeRepository.findAll();
+        List<LigneSortie> ligneSorties = ligneSortieRepository.findAll();
+        Integer nombreEntree = ligneEntrees.stream()
+                .mapToInt(LigneEntree::getQuantiteLigne)
+                .sum();
+
+        Integer nombreSortie = ligneSorties.stream()
+                .mapToInt(LigneSortie::getQuantiteLigne)
+                .sum();
+
+        Integer stock = nombreEntree - nombreSortie;
+
+        nombre.add(utilisateurRepository.findAll().size());
+        nombre.add(fournisseurRepository.findAll().size());
+        nombre.add(magasinRepository.findAll().size());
+        nombre.add(stock);
+
+        return nombre;
+    }
+
 }

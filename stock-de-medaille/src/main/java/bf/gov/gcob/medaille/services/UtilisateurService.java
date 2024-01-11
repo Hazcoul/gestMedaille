@@ -48,4 +48,6 @@ public interface UtilisateurService {
     List<UtilisateurDTO> findAll();
 
     UtilisateurDTO getById(Long id);
+
+    List<Integer> count();
 }

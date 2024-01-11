@@ -13,15 +13,11 @@ import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.repository.EntreeRepository;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
 import bf.gov.gcob.medaille.services.EntreeService;
-
 import java.io.File;
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.jfree.util.Log;
@@ -44,16 +40,16 @@ public class EntreeServiceImpl implements EntreeService {
     private final LigneEntreeRepository ligneEntreeRepository;
     private final EntreeMapper entreeMapper;
     private final LigneEntreeMapper ligneEntreeMapper;
-
+    
     private final ResourceLoader resourceLoader;
     
     public EntreeServiceImpl(EntreeRepository entreeRepository, LigneEntreeRepository ligneEntreeRepository,
-                             EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader) {
+            EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader) {
         this.entreeRepository = entreeRepository;
         this.ligneEntreeRepository = ligneEntreeRepository;
         this.entreeMapper = entreeMapper;
         this.ligneEntreeMapper = ligneEntreeMapper;
-
+        
         this.resourceLoader = resourceLoader;
     }
     
@@ -124,7 +120,7 @@ public class EntreeServiceImpl implements EntreeService {
         log.debug("Request to delete Entree : {}", id);
         entreeRepository.deleteById(id);
     }
-
+    
     public Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable) {
         log.debug("Request to get all entree");
         return entreeRepository.findByCriteria(
@@ -132,63 +128,59 @@ public class EntreeServiceImpl implements EntreeService {
                 filterEntreeDto.getFournisseur(),
                 pageable).map(entreeMapper::toDTO);
     }
-
+    
     @Override
     public Resource getlisteEntreeByCommande(Long id) {
-            List<LigneEntreeDTO> ligneEntreeDTOS;
-            List<LigneImpressionEntreeDTO> ligneImpressionEntreeDTOS = new ArrayList<>();
-            Log.debug("AAAAAAAA");
-            Log.debug(id);
-
+        List<LigneEntreeDTO> ligneEntreeDTOS;
+        List<LigneImpressionEntreeDTO> ligneImpressionEntreeDTOS = new ArrayList<>();
+        Log.debug("AAAAAAAA");
+        Log.debug(id);
+        
         ligneEntreeDTOS = entreeRepository.findAllLigneByEntree(id).stream().map(ligneEntreeMapper::toDTO).collect(Collectors.toCollection(LinkedList::new));
         Optional<Entree> entree = entreeRepository.findById(id);
 
         //DecimalFormat decimalFormat = new DecimalFormat("#,##0");
-
-
-
-            for (LigneEntreeDTO ligneEntreeDTO : ligneEntreeDTOS) {
-                LigneImpressionEntreeDTO ligneImpressionEntreeDTO = new LigneImpressionEntreeDTO();
-                ligneImpressionEntreeDTO.setMontantLigne(ligneEntreeDTO.getMontantLigne().intValue());
-                ligneImpressionEntreeDTO.setQuantiteLigne(ligneEntreeDTO.getQuantiteLigne());
-                ligneImpressionEntreeDTO.setPrixUnitaire(ligneEntreeDTO.getPrixUnitaire().intValue());
-                ligneImpressionEntreeDTO.setLibelleFournisseur(ligneEntreeDTO.getEntree().getFournisseur().getLibelle());
-                ligneImpressionEntreeDTO.setNomMagasin(ligneEntreeDTO.getEntree().getMagasin().getNomMagasin());
-                ligneImpressionEntreeDTO.setNumeroCommande(ligneEntreeDTO.getEntree().getNumeroCmd());
-                ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille()!=null?ligneEntreeDTO.getMedaille().getNomComplet(): "");
-                ligneImpressionEntreeDTO.setAcquisition(ligneEntreeDTO.getEntree().getAcquisition().name());
-
-                ligneImpressionEntreeDTOS.add(ligneImpressionEntreeDTO);
-            }
-
-            JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionEntreeDTOS);
-
-            HashMap<String, Object> parametres = new HashMap<String, Object>();
+        for (LigneEntreeDTO ligneEntreeDTO : ligneEntreeDTOS) {
+            LigneImpressionEntreeDTO ligneImpressionEntreeDTO = new LigneImpressionEntreeDTO();
+            ligneImpressionEntreeDTO.setMontantLigne(ligneEntreeDTO.getMontantLigne().intValue());
+            ligneImpressionEntreeDTO.setQuantiteLigne(ligneEntreeDTO.getQuantiteLigne());
+            ligneImpressionEntreeDTO.setPrixUnitaire(ligneEntreeDTO.getPrixUnitaire().intValue());
+            ligneImpressionEntreeDTO.setLibelleFournisseur(ligneEntreeDTO.getEntree().getFournisseur().getLibelle());
+            ligneImpressionEntreeDTO.setNomMagasin(ligneEntreeDTO.getEntree().getMagasin().getNomMagasin());
+            ligneImpressionEntreeDTO.setNumeroCommande(ligneEntreeDTO.getEntree().getNumeroCmd());
+            ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille() != null ? ligneEntreeDTO.getMedaille().getNomComplet() : "");
+            ligneImpressionEntreeDTO.setAcquisition(ligneEntreeDTO.getEntree().getAcquisition().name());
+            
+            ligneImpressionEntreeDTOS.add(ligneImpressionEntreeDTO);
+        }
+        
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionEntreeDTOS);
+        
+        HashMap<String, Object> parametres = new HashMap<String, Object>();
         parametres.put("nomMagasin", entree.get().getMagasin().getNomMagasin());
         parametres.put("libelleFournisseur", entree.get().getFournisseur().getLibelle());
         parametres.put("nomDepot", entree.get().getMagasin().getDepot().getNomDepot());
         parametres.put("acquisition", entree.get().getAcquisition().getLibelle());
-        parametres.put("titre", "COMMANDE N° "+entree.get().getNumeroCmd());
-
-            return imprimer(parametres, beanCollectionDataSource);
-
+        parametres.put("titre", "COMMANDE N° " + entree.get().getNumeroCmd());
+        
+        return imprimer(parametres, beanCollectionDataSource);
+        
     }
-
+    
     private Resource imprimer(HashMap<String, Object> parametres, JRBeanCollectionDataSource beanCollectionDataSource) {
         String embleme = "";
-
+        
         try {
             Resource resourceLoaderResource = resourceLoader.getResource("classpath:reports/liste_commande.jrxml");
             Resource emblemeLoaderResource = resourceLoader.getResource("classpath:reports/embleme.png");
             File emblemeLogo = emblemeLoaderResource.getFile();
             embleme = emblemeLogo.getAbsolutePath();
-
+            
             InputStream is = resourceLoaderResource.getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(is);
-
+            
             parametres.put("P_EMBLEME", embleme);
-
-
+            
             JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
             return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
         } catch (Exception e) {
@@ -196,5 +188,13 @@ public class EntreeServiceImpl implements EntreeService {
             return null;
         }
     }
-
+    
+    @Override
+    public EntreeDTO validerEntree(Long idEntree) {
+        Entree entree = entreeRepository.findById(idEntree).get();
+        entree.setStatus(EMvtStatus.VALIDATED);
+        entree.setValiderLe(new Date());
+        return entreeMapper.toDTO(entreeRepository.save(entree));
+    }
+    
 }
