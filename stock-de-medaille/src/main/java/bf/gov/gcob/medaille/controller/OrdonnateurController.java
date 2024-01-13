@@ -39,6 +39,18 @@ public class OrdonnateurController {
         return ResponseEntity.ok().headers(headers).body(ordonnateurDTOS);
     }
 
+    @GetMapping("/desactivation/{id}")
+    public ResponseEntity<OrdonnateurDTO> desactiver(@PathVariable(name = "id", required = true) Long idOrdonnateur) {
+        OrdonnateurDTO response = ordonnateurService.desactiver((idOrdonnateur));
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/reactivation/{id}")
+    public ResponseEntity<OrdonnateurDTO> reactiver(@PathVariable(name = "id", required = true) Long idOrdonnateur) {
+        OrdonnateurDTO response = ordonnateurService.reactiver((idOrdonnateur));
+        return ResponseEntity.ok().body(response);
+    }
+
     @PutMapping()
     public ResponseEntity<OrdonnateurDTO> update(@RequestBody OrdonnateurDTO ordonnateurDTO) throws URISyntaxException {
         if (ordonnateurDTO.getIdOrdonnateur() == null) {

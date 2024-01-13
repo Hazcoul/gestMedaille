@@ -60,6 +60,10 @@ public class Utilisateur extends AbstractBaseEntity {
     @Column(name = "prenom", length = 150)
     private String prenom;
 
+    private String fonction;//la fonction de l'utilisateur dans son service
+
+    private String titreHonorifique;//la distinction (ou titre honorifique) la plus elevee actuelle du user
+
     @Column(name = "contact", length = 20, unique = true)
     private String contact;
 
