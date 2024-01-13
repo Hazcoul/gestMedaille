@@ -22,9 +22,9 @@ import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.PieceJointeRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.ReportService;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,6 +43,8 @@ import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -68,14 +70,14 @@ public class ReportServiceImpl implements ReportService {
     private final PieceJointeRepository pieceJointeRepository;
 
     @Override
-    public void printOrdreEntreeMatiere(Long idEntree, String format, OutputStream os) throws JRException {
+    public Resource printOrdreEntreeMatiere(Long idEntree, String format) {
         log.info("Export d'état d'ordre d'entrée : {}", idEntree);
         Entree entree = entreeRepository.findByIdEntreeAndStatus(idEntree, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("L'entrée est inexistante ou non encore validée."));
         try {
             // chargement du logo (armoirie du BF)
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
-            //initalisation du titre 
+            //initalisation du titre
             String refEntree = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
             List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntreeIdEntree(entree.getIdEntree());
             List<LigneEntreeDTO> ligneEntreeDTOs = new ArrayList<>();
@@ -103,17 +105,19 @@ public class ReportServiceImpl implements ReportService {
             // construction des Datasources a travers le jrbeans
             JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(data));
             // appel de la methode d'export en fonction du format souhaité
-            this.exportToWordAndPDF(format, dataSource, is, os);
+            return this.exportToWordAndPDF(format, dataSource, is);
         } catch (JRException e) {
             log.error("Erreur survenue lors de la génération de données : {}", e);
             throw new RuntimeException("Document indisponible, pour cause d'erreur inconnue ! Veuillez réessayer SVP.");
         } catch (IOException ex) {
             log.error("Erreur survenue lors du chargement de l'embleme : {}", ex);
+            return null;
         }
+
     }
 
     @Override
-    public void printBmConsommation(Long idSortie, String format, OutputStream os) throws JRException {
+    public Resource printBmConsommation(Long idSortie, String format) {
         log.info("Export de bordereau de mise en consommation : {}", idSortie);
         Sortie sortie = sortieRepository.findByIdSortieAndStatus(idSortie, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("La sortie est inexistante ou non encore validée."));
         try {
@@ -148,12 +152,13 @@ public class ReportServiceImpl implements ReportService {
             // construction des Datasources a travers le jrbeans
             JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(data));
             // appel de la methode d'export en fonction du format souhaité
-            this.exportToWordAndPDF(format, dataSource, is, os);
+            return this.exportToWordAndPDF(format, dataSource, is);
         } catch (JRException e) {
             log.error("Erreur survenue lors de la génération de données : {}", e);
             throw new RuntimeException("Document indisponible, pour cause d'erreur inconnue ! Veuillez réessayer SVP.");
         } catch (IOException ex) {
             log.error("Erreur survenue lors du chargement de l'embleme : {}", ex);
+            return null;
         }
     }
 
@@ -166,7 +171,7 @@ public class ReportServiceImpl implements ReportService {
      * @param outputStream
      * @throws JRException
      */
-    private void exportToWordAndPDF(String fileFormat, JRDataSource datasource, InputStream inputStream, OutputStream outputStream) throws JRException {
+    private Resource exportToWordAndPDF(String fileFormat, JRDataSource datasource, InputStream inputStream) throws JRException {
         // Mappage et chargement des objets Reports
         Map<String, Object> loParameters = new HashMap<>();
         JasperReport japerReport = (JasperReport) JRLoader.loadObject(inputStream);
@@ -176,10 +181,12 @@ public class ReportServiceImpl implements ReportService {
         if (fileFormat.trim().toLowerCase().equals("word")) {//export to word file
             JRDocxExporter exporter = new JRDocxExporter();
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
             exporter.exportReport();
+            return new ByteArrayResource(baos.toByteArray());
         } else if (fileFormat.trim().toLowerCase().equals("pdf")) {//export to pdf file
-            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+            return new ByteArrayResource(JasperExportManager.exportReportToPdf(jasperPrint));
         } else {
             throw new RuntimeException("Vous ne pouvez obtenir qu'un document PDF ou Word ! Veuillez réessayer SVP.");
         }

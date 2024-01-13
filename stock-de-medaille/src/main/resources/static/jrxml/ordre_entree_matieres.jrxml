@@ -458,7 +458,7 @@
 				<subreportExpression><![CDATA["lignes_entrees.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement x="0" y="30" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
+				<reportElement positionType="Float" x="0" y="30" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -469,7 +469,7 @@
 				<text><![CDATA[Le Magasinier]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="237" y="30" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
+				<reportElement positionType="Float" x="237" y="30" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -480,7 +480,7 @@
 				<text><![CDATA[Le Comptable Principal Matières]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="582" y="30" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
+				<reportElement positionType="Float" x="582" y="30" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>

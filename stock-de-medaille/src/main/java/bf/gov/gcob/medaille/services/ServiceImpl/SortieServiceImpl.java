@@ -32,26 +32,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SortieServiceImpl implements SortieService {
-
+    
     private final Logger log = LoggerFactory.getLogger(SortieServiceImpl.class);
-
+    
     private final SortieRepository sortieRepository;
     private final LigneSortieRepository ligneSortieRepository;
     private final SortieMapper sortieMapper;
     private final LigneSortieMapper ligneSortieMapper;
-
+    
     private final ResourceLoader resourceLoader;
-
+    
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
             SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
         this.ligneSortieMapper = ligneSortieMapper;
-
+        
         this.resourceLoader = resourceLoader;
     }
-
+    
     @Override
     public SortieDTO save(SortieDTO sortieDTO) {
         log.debug("REST request to save Sortie : {}", sortieDTO);
@@ -87,7 +87,7 @@ public class SortieServiceImpl implements SortieService {
         }
         return sortieMapper.toDTO(sortie);
     }
-
+    
     @Override
     @Transactional(readOnly = true)
     public List<SortieDTO> findAll() {
@@ -96,13 +96,13 @@ public class SortieServiceImpl implements SortieService {
                 .stream()
                 .map(sortieMapper::toDTO).toList();
     }
-
+    
     @Override
     public List<SortieDTO> findByDecoByAn(int annee) {
         return sortieRepository.findSortieByDecoByYear(annee, EMotifSortie.DECORATION)
                 .stream().map(sortieMapper::toDTO).collect(Collectors.toList());
     }
-
+    
     @Override
     @Transactional(readOnly = true)
     public SortieDTO findOne(Long id) {
@@ -111,18 +111,18 @@ public class SortieServiceImpl implements SortieService {
                 .orElseThrow(() -> new RuntimeException("Sortie with ID = " + id + " not found"));
         return sortieMapper.toDTO(sortie);
     }
-
+    
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Sortie : {}", id);
         sortieRepository.deleteById(id);
     }
-
+    
     @Override
     public Resource getLigneSortieBySortie(Long id) {
         List<LigneSortieDTO> ligneSortieDTOS;
         List<LigneImpressionSortieDTO> ligneImpressionSortieDTOS = new ArrayList<>();
-
+        
         ligneSortieDTOS = sortieRepository.findAllLigneBySortie(id).stream().map(ligneSortieMapper::toDTO).collect(Collectors.toCollection(LinkedList::new));
         Optional<Sortie> sortie = sortieRepository.findById(id);
 
@@ -133,7 +133,7 @@ public class SortieServiceImpl implements SortieService {
             ligneImpressionSortieDTO.setQuantite(ligneSortieDTO.getQuantiteLigne());
             ligneImpressionSortieDTOS.add(ligneImpressionSortieDTO);
         }
-
+        
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionSortieDTOS);
         HashMap<String, Object> parametres = new HashMap<String, Object>();
         System.err.println(sortie.get().getMotifSortie().getLibelle());
@@ -142,24 +142,24 @@ public class SortieServiceImpl implements SortieService {
         parametres.put("motif", sortie.get().getMotifSortie().getLibelle());
         parametres.put("detenteur", sortie.get().getDetenteur().getNom() + " " + sortie.get().getDetenteur().getPrenom());
         parametres.put("titre", "SORTIE N° " + sortie.get().getNumeroSortie());
-
+        
         return imprimer(parametres, beanCollectionDataSource);
     }
-
+    
     private Resource imprimer(HashMap<String, Object> parametres, JRBeanCollectionDataSource beanCollectionDataSource) {
         String embleme = "";
-
+        
         try {
             Resource resourceLoaderResource = resourceLoader.getResource("classpath:reports/liste_sortie.jrxml");
             Resource emblemeLoaderResource = resourceLoader.getResource("classpath:reports/embleme.png");
             File emblemeLogo = emblemeLoaderResource.getFile();
             embleme = emblemeLogo.getAbsolutePath();
-
+            
             InputStream is = resourceLoaderResource.getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(is);
-
+            
             parametres.put("P_EMBLEME", embleme);
-
+            
             JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
             return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
         } catch (Exception e) {
@@ -167,7 +167,7 @@ public class SortieServiceImpl implements SortieService {
             return null;
         }
     }
-
+    
     @Override
     public Page<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto, Pageable pageable) {
         log.debug("Request to get all sortie");
@@ -180,16 +180,16 @@ public class SortieServiceImpl implements SortieService {
                 filterSortieDto.getBeneficiaire(),
                 pageable).map(sortieMapper::toDTO);
     }
-
+    
     @Override
     public Page<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto, Pageable pageable) {
-
+        
         List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
         ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
-
+        
         return createPageFromList(ligneImpressionSortiePeriodeDTOS, pageable);
     }
-
+    
     List<LigneImpressionSortiePeriodeDTO> getFilterListeByperiode(FilterSortieDto filterSortieDto) {
         Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));
         Date dateDebut = new Date(filterSortieDto.getDateDebut().getTime() - (1000 * 60 * 60 * 24));
@@ -206,7 +206,7 @@ public class SortieServiceImpl implements SortieService {
                 .collect(Collectors.toList());
         return ligneImpressionSortiePeriodeDTOS;
     }
-
+    
     @Override
     public Resource getLigneSortieByPeriode(FilterSortieDto filterSortieDto) {
         SimpleDateFormat sm = new SimpleDateFormat("dd/MM/yyyy");
@@ -224,19 +224,19 @@ public class SortieServiceImpl implements SortieService {
         parametres.put("titre", "SORTIE POUR " + filterSortieDto.getMotifSortie().toUpperCase() + " " + "DE LA PERIODE DE " + sm.format(dateDebutInitial) + " " + "AU" + " " + sm.format(dateFinInitial));
         return imprimerListeByPeriode(parametres, beanCollectionDataSource);
     }
-
+    
     private Resource imprimerListeByPeriode(HashMap<String, Object> parametres, JRBeanCollectionDataSource beanCollectionDataSource) {
         String embleme = "";
-
+        
         try {
             Resource resourceLoaderResource = resourceLoader.getResource("classpath:reports/liste_sortie_periode.jrxml");
             Resource emblemeLoaderResource = resourceLoader.getResource("classpath:reports/embleme.png");
             File emblemeLogo = emblemeLoaderResource.getFile();
             embleme = emblemeLogo.getAbsolutePath();
-
+            
             InputStream is = resourceLoaderResource.getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(is);
-
+            
             parametres.put("P_EMBLEME", embleme);
             JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
             return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
@@ -245,13 +245,14 @@ public class SortieServiceImpl implements SortieService {
             return null;
         }
     }
-
+    
     @Override
     public SortieDTO validerSortie(Long idSortie) {
+        log.info("Validation de la sortie : {}", idSortie);
         Sortie sortie = sortieRepository.findById(idSortie).get();
         sortie.setStatus(EMvtStatus.VALIDATED);
         sortie.setValiderLe(new Date());
         return sortieMapper.toDTO(sortieRepository.save(sortie));
     }
-
+    
 }

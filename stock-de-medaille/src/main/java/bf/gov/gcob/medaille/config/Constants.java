@@ -17,7 +17,7 @@ public final class Constants {
     public static String SYSTEM_ACCOUNT = "system";
 
     //repertoire de stockage de fichiers uploaded
-    public static final String appStoreRootPath = "/Users/anptic";
+    public static final String appStoreRootPath = "/opt/uploads";//Users/anptic
 
     private static final DateFormat appShortDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
 

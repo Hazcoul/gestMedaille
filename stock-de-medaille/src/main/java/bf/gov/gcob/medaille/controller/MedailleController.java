@@ -55,7 +55,7 @@ public class MedailleController {
      * @throws JsonProcessingException
      */
     //@PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\",\"" + Constants.GEST + "\")")
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.IMAGE_PNG_VALUE})
     public Mono<ResponseEntity<MedailleDTO>> create(
             @Valid @RequestPart(value = "data", required = true) MedailleDTO medailleDTO,
             @RequestPart(value = "photo", required = true) MultipartFile photo) throws URISyntaxException, JsonProcessingException {
