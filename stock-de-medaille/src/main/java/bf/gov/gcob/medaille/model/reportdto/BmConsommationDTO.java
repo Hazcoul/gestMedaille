@@ -40,5 +40,5 @@ public class BmConsommationDTO {
 
     private String ordonnateur;
 
-    List<LigneSortieDTO> lignesSorties;
+    List<bf.gov.gcob.medaille.model.reportdto.LigneSortieDTO> lignesSorties;
 }
