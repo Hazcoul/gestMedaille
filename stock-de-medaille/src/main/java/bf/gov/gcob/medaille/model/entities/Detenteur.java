@@ -41,4 +41,8 @@ public class Detenteur extends AbstractBaseEntity {
     private String telephone;
     @Column(name = "email", unique = true)
     private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "beneficiaire_id", nullable = false)
+    private Beneficiaire beneficiaire;
 }

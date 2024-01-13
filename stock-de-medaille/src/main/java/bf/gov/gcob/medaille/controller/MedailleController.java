@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -56,7 +55,7 @@ public class MedailleController {
      * @throws JsonProcessingException
      */
     //@PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\",\"" + Constants.GEST + "\")")
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.IMAGE_PNG_VALUE})
     public Mono<ResponseEntity<MedailleDTO>> create(
             @Valid @RequestPart(value = "data", required = true) MedailleDTO medailleDTO,
             @RequestPart(value = "photo", required = true) MultipartFile photo) throws URISyntaxException, JsonProcessingException {
@@ -134,7 +133,8 @@ public class MedailleController {
     @GetMapping()
     public Mono<ResponseEntity<List<MedailleDTO>>> findAll() throws IOException {
         List<MedailleDTO> response = service.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 

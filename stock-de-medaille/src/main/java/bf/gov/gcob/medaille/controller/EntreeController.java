@@ -1,6 +1,5 @@
 package bf.gov.gcob.medaille.controller;
 
-import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
 import bf.gov.gcob.medaille.services.EntreeService;
@@ -8,10 +7,8 @@ import bf.gov.gcob.medaille.services.ReportService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -35,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 @CrossOrigin("*")
 @RestController
@@ -88,7 +85,8 @@ public class EntreeController {
     public ResponseEntity<List<EntreeDTO>> getAllEntrees() {
         log.debug("REST request to get all entrees");
         List<EntreeDTO> response = entreeService.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
 
@@ -134,22 +132,16 @@ public class EntreeController {
     /**
      * Valide une entree et genere un etat d'ordre d'entree de matieres
      *
-     * @param response
      * @param idEntree
      * @param format
+     * @return
      * @throws IOException
      * @throws JRException
      */
     @GetMapping(value = "/entrees/validation/{id}/{format}")
-    public void validerEntreeMatieres(HttpServletResponse response, @PathVariable(name = "id", required = true) Long idEntree, @PathVariable(name = "format", required = true) String format)
+    public Mono<Resource> validerEntreeMatieres(@PathVariable(name = "id", required = true) Long idEntree, @PathVariable(name = "format", required = true) String format)
             throws IOException, JRException {
         EntreeDTO entree = entreeService.validerEntree(idEntree);
-
-        String[] tab = Constants.constructFormatAndExtension(format);
-        response.setContentType(tab[0]);
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"ORDRE_ENTREE_" + idEntree + tab[1] + "\""));
-        OutputStream outputStream = response.getOutputStream();
-        reportService.printOrdreEntreeMatiere(entree.getIdEntree(), format, outputStream);
-
+        return Mono.just(reportService.printOrdreEntreeMatiere(entree.getIdEntree(), format));
     }
 }

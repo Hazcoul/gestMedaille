@@ -5,8 +5,7 @@
  */
 package bf.gov.gcob.medaille.services;
 
-import java.io.OutputStream;
-import net.sf.jasperreports.engine.JRException;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -19,10 +18,16 @@ public interface ReportService {
      *
      * @param idEntree
      * @param format
-     * @param os
-     * @throws JRException
+     * @return
      */
-    void printOrdreEntreeMatiere(Long idEntree, String format, OutputStream os) throws JRException;
+    Resource printOrdreEntreeMatiere(Long idEntree, String format);
 
-    void printBmConsommation(Long idSortie, String format, OutputStream os) throws JRException;
+    /**
+     * Exporte un borderau de mise en consommation apres validation d'une sortie
+     *
+     * @param idSortie
+     * @param format
+     * @return
+     */
+    Resource printBmConsommation(Long idSortie, String format);
 }

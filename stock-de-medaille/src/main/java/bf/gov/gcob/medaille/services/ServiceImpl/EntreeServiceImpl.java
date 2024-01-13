@@ -191,6 +191,7 @@ public class EntreeServiceImpl implements EntreeService {
     
     @Override
     public EntreeDTO validerEntree(Long idEntree) {
+        log.info("Validation de l'entrée : {}", idEntree);
         Entree entree = entreeRepository.findById(idEntree).get();
         entree.setStatus(EMvtStatus.VALIDATED);
         entree.setValiderLe(new Date());

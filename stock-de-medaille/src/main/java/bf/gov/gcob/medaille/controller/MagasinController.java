@@ -12,16 +12,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @CrossOrigin("*")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/magasins")
 public class MagasinController {
-    
+
     private final MagasinService magasinService;
-    
+
     @PostMapping()
     public ResponseEntity<MagasinDTO> create(@RequestBody MagasinDTO magasinDTO) throws URISyntaxException {
         if (magasinDTO.getIdMagasin() != null) {
@@ -30,14 +29,15 @@ public class MagasinController {
         MagasinDTO response = magasinService.create(magasinDTO);
         return ResponseEntity.created(new URI("/api/magasins")).body(response);
     }
-    
+
     @GetMapping()
     public ResponseEntity<List<MagasinDTO>> find() {
         List<MagasinDTO> magasinDTOS = magasinService.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(magasinDTOS));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(magasinDTOS));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(magasinDTOS));
         return ResponseEntity.ok().headers(headers).body(magasinDTOS);
     }
-    
+
     @PutMapping()
     public ResponseEntity<MagasinDTO> update(@RequestBody MagasinDTO request) throws URISyntaxException {
         if (request.getIdMagasin() == null) {
@@ -46,7 +46,7 @@ public class MagasinController {
         MagasinDTO response = magasinService.update(request);
         return ResponseEntity.ok().body(response);
     }
-    
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(name = "id", required = true) Long idMagasin) {
         magasinService.delete(idMagasin);

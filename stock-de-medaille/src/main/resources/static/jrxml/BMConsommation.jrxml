@@ -406,7 +406,7 @@
 				<subreportExpression><![CDATA["lignes_sorties.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement x="0" y="35" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
+				<reportElement positionType="Float" x="0" y="35" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -417,7 +417,7 @@
 				<text><![CDATA[Le Magasinier]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="350" y="35" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
+				<reportElement positionType="Float" x="350" y="35" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -428,7 +428,7 @@
 				<text><![CDATA[Le Comptable Principal Matières]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="580" y="35" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
+				<reportElement positionType="Float" x="580" y="35" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -439,7 +439,7 @@
 				<text><![CDATA[L'Ordonnateur Principal]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="180" y="35" width="130" height="20" uuid="1f2650fb-2a5f-4254-8b9d-fc1770b4dceb">
+				<reportElement positionType="Float" x="180" y="35" width="130" height="20" uuid="1f2650fb-2a5f-4254-8b9d-fc1770b4dceb">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -450,7 +450,7 @@
 				<text><![CDATA[Le Detenteur]]></text>
 			</staticText>
 			<textField isBlankWhenNull="false">
-				<reportElement x="0" y="116" width="130" height="20" uuid="9743888b-bead-44a5-8996-8dc31cb71e0f">
+				<reportElement positionType="Float" x="0" y="116" width="130" height="20" uuid="9743888b-bead-44a5-8996-8dc31cb71e0f">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -462,7 +462,7 @@
 				<textFieldExpression><![CDATA[($F{magasinier} ==null? ".............................":$F{magasinier})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement x="180" y="116" width="130" height="20" uuid="0413247c-4ad1-4e96-b07f-84d951d7dd3e">
+				<reportElement positionType="Float" x="180" y="116" width="130" height="20" uuid="0413247c-4ad1-4e96-b07f-84d951d7dd3e">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -474,7 +474,7 @@
 				<textFieldExpression><![CDATA[($F{detenteur} ==null? ".............................":$F{detenteur})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement x="580" y="116" width="220" height="20" uuid="3988b282-e577-4971-9e89-166bfa7b85d1">
+				<reportElement positionType="Float" x="580" y="116" width="220" height="20" uuid="3988b282-e577-4971-9e89-166bfa7b85d1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -486,7 +486,7 @@
 				<textFieldExpression><![CDATA[($F{ordonnateur} ==null? ".............................":$F{ordonnateur})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement x="350" y="116" width="220" height="20" uuid="5a035e3d-9787-4e17-b515-c60c7cb68740">
+				<reportElement positionType="Float" x="350" y="116" width="220" height="20" uuid="5a035e3d-9787-4e17-b515-c60c7cb68740">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>

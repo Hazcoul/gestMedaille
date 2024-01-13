@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UtilisateurMapper {
-
+    
     @Autowired
     private ProfilRepository profilRepository;
 
@@ -31,9 +31,9 @@ public class UtilisateurMapper {
         if (utilisateur == null) {
             return null;
         }
-
+        
         UtilisateurDTO dto = new UtilisateurDTO();
-
+        
         dto.setId(utilisateur.getId());
         dto.setActif(utilisateur.isActif());
         dto.setActivationKey(utilisateur.getActivationKey());
@@ -45,11 +45,13 @@ public class UtilisateurMapper {
         dto.setMatricule(utilisateur.getMatricule());
         dto.setNom(utilisateur.getNom());
         dto.setPrenom(utilisateur.getPrenom());
+        dto.setFonction(utilisateur.getFonction());
+        dto.setTitreHonorifique(utilisateur.getTitreHonorifique());
         dto.setProfils(this.mapProfilsToStrings(utilisateur));
         dto.setPrivileges(this.mapPrivilegesToStrings(utilisateur));
         dto.setResetDate(utilisateur.getResetDate());
         dto.setResetExpireDate(utilisateur.getResetExpireDate());
-
+        
         return dto;
     }
 
@@ -62,9 +64,9 @@ public class UtilisateurMapper {
         if (utilisateurDTO == null) {
             return null;
         }
-
+        
         Utilisateur entity = new Utilisateur();
-
+        
         entity.setId(utilisateurDTO.getId());
         entity.setActif(utilisateurDTO.isActif());
         entity.setActivationKey(utilisateurDTO.getActivationKey());
@@ -75,11 +77,13 @@ public class UtilisateurMapper {
         entity.setMatricule(utilisateurDTO.getMatricule());
         entity.setNom(utilisateurDTO.getNom());
         entity.setPrenom(utilisateurDTO.getPrenom());
+        entity.setFonction(utilisateurDTO.getFonction());
+        entity.setTitreHonorifique(utilisateurDTO.getTitreHonorifique());
         entity.setProfils(this.mapStringsToProfils(utilisateurDTO));
         entity.setResetDate(utilisateurDTO.getResetDate());
         entity.setResetExpireDate(utilisateurDTO.getResetExpireDate());
         entity.setResetKey(utilisateurDTO.getResetKey());
-
+        
         return entity;
     }
 
@@ -88,49 +92,49 @@ public class UtilisateurMapper {
         if (utilisateur == null || utilisateur.getProfils().isEmpty()) {
             return null;
         }
-
+        
         Set<String> profilsLibelles = new HashSet<>();
-
+        
         utilisateur.getProfils().stream().forEach(p -> {
             profilsLibelles.add(p.getLibelle());
         });
-
+        
         return profilsLibelles;
     }
-
+    
     private Set<Profil> mapStringsToProfils(UtilisateurDTO utilisateurDTO) {
         if (utilisateurDTO == null || utilisateurDTO.getProfils() == null) {
             return null;
         }
-
+        
         Set<Profil> profiles = new HashSet<>();
-
+        
         profiles = utilisateurDTO.getProfils().stream()
                 .map(profilRepository::findByLibelle)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
-
+        
         return profiles;
     }
-
+    
     private Set<String> mapPrivilegesToStrings(Utilisateur utilisateur) {
         if (utilisateur == null) {
             return null;
         }
-
+        
         Set<Privilege> actions = new HashSet<>();
         Set<String> privilegesLibelles = new HashSet<>();
-
+        
         utilisateur.getProfils().stream().forEach(r -> {
             actions.addAll(r.getPrivilegeCollection());
         });
-
+        
         privilegesLibelles = actions.stream()
                 .map(Privilege::getCode)
                 .collect(Collectors.toSet());
-
+        
         return privilegesLibelles;
     }
-
+    
 }

@@ -1,16 +1,13 @@
 package bf.gov.gcob.medaille.controller;
 
-import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.model.dto.*;
 import bf.gov.gcob.medaille.services.ReportService;
 import bf.gov.gcob.medaille.services.SortieService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -34,7 +31,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 @CrossOrigin("*")
 @RestController
@@ -87,7 +84,8 @@ public class SortieController {
     public ResponseEntity<List<SortieDTO>> getAllSorties() {
         log.debug("REST request to get all sorties");
         List<SortieDTO> response = sortieService.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
 
@@ -158,16 +156,10 @@ public class SortieController {
      * @throws JRException
      */
     @GetMapping(value = "/sorties/validation/{id}/{format}")
-    public void validerSortie(HttpServletResponse response, @PathVariable(name = "id", required = true) Long idSortie, @PathVariable(name = "format", required = true) String format)
+    public Mono<Resource> validerSortie(@PathVariable(name = "id", required = true) Long idSortie, @PathVariable(name = "format", required = true) String format)
             throws IOException, JRException {
         SortieDTO sortie = sortieService.validerSortie(idSortie);
-
-        String[] tab = Constants.constructFormatAndExtension(format);
-        response.setContentType(tab[0]);
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"BORDEREAU_CONSOMMATION_" + idSortie + tab[1] + "\""));
-        OutputStream outputStream = response.getOutputStream();
-        reportService.printBmConsommation(sortie.getIdSortie(), format, outputStream);
-
+        return Mono.just(reportService.printBmConsommation(sortie.getIdSortie(), format));
     }
 
 }
