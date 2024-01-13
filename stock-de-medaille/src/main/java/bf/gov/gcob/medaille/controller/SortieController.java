@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @CrossOrigin("*")
 @RestController
@@ -87,7 +86,8 @@ public class SortieController {
     public ResponseEntity<List<SortieDTO>> getAllSorties() {
         log.debug("REST request to get all sorties");
         List<SortieDTO> response = sortieService.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
 

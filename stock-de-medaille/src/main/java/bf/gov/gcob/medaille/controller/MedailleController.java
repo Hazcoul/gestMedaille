@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -134,7 +133,8 @@ public class MedailleController {
     @GetMapping()
     public Mono<ResponseEntity<List<MedailleDTO>>> findAll() throws IOException {
         List<MedailleDTO> response = service.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 
