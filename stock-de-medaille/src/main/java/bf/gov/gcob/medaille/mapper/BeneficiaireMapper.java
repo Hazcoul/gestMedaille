@@ -35,7 +35,7 @@ public class BeneficiaireMapper extends AbstractBaseMapper {
     	entity.setSigle(dto.getSigle());
     	entity.setTelephoneFix(dto.getTelephoneFix());
     	entity.setTelephoneMobile(dto.getTelephoneMobile());
-    	setCommonFieldsFromDTO(dto, entity);
+    	//setCommonFieldsFromDTO(dto, entity);
     	
         return entity;
     }

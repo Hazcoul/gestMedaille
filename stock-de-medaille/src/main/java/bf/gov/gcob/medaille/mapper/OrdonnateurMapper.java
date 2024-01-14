@@ -48,7 +48,7 @@ public class OrdonnateurMapper extends AbstractBaseMapper {
         entity.setDebutMandat(dto.getDebutMandat());
         entity.setFinMandat(dto.getFinMandat());
         entity.setActuel(dto.isActuel());
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
 
         return entity;
     }

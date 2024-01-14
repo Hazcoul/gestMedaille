@@ -43,7 +43,7 @@ public class MedailleMapper extends AbstractBaseMapper {
         entity.setLienImage(dto.getLienImage());
         entity.setNomComplet(dto.getNomComplet());
         entity.setGrade((dto.getGrade() != null ? gradeMapper.toEntity(dto.getGrade()) : null));
-        entity.setStock(dto.getStock());
+       // entity.setStock(dto.getStock());
 
         return entity;
     }

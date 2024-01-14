@@ -57,7 +57,7 @@ public class EntreeMapper extends AbstractBaseMapper {
         entity.setFournisseur(fournisseurMapper.buildFournisseur(dto.getFournisseur()));
         entity.setMagasin(magasinMapper.toEntity(dto.getMagasin()));
         entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
         return entity;
     }
 }

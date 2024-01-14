@@ -37,7 +37,7 @@ public class MagasinMapper extends AbstractBaseMapper {
     	entity.setIdMagasin(dto.getIdMagasin());
     	entity.setNomMagasin(dto.getNomMagasin());
     	entity.setDepot(depotMapper.toEntity(dto.getDepot()));
-    	setCommonFieldsFromDTO(dto, entity);
+    	//setCommonFieldsFromDTO(dto, entity);
         return entity;
     }
 
