@@ -24,7 +24,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-    @Value("${gco.content.security.policy}")
+    @Value("${gcob.content.security.policy}")
     private String contentSecurityPolicy;
 
     @Bean
