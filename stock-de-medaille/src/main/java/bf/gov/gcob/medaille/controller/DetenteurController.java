@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,7 +37,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @RequestMapping(path = "/api/detenteurs")
 public class DetenteurController {
-    
+
     private DetenteurService service;
 
     /**
@@ -81,7 +80,8 @@ public class DetenteurController {
     @GetMapping()
     public Mono<ResponseEntity<List<DetenteurDTO>>> findAll() {
         List<DetenteurDTO> response = service.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 
@@ -97,7 +97,7 @@ public class DetenteurController {
         return Mono.just(ResponseEntity
                 .noContent()
                 .build());
-        
+
     }
-    
+
 }

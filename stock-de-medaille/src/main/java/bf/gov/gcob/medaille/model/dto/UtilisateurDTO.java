@@ -39,6 +39,10 @@ public class UtilisateurDTO {
     @Size(max = 50)
     private String prenom;
 
+    private String fonction;//la fonction de l'utilisateur dans son service
+
+    private String titreHonorifique;//la distinction (ou titre honorifique) la plus elevee actuelle du user
+
     private String contact;
 
     private boolean actif = false;
@@ -86,6 +90,8 @@ public class UtilisateurDTO {
         this.matricule = user.getMatricule();
         this.nom = user.getNom();
         this.prenom = user.getPrenom();
+        this.fonction = user.getFonction();
+        this.titreHonorifique = user.getTitreHonorifique();
         this.contact = user.getContact();
         this.email = user.getEmail();
         this.actif = user.isActif();

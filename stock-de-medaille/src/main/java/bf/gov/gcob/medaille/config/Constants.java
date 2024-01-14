@@ -1,5 +1,10 @@
 package bf.gov.gcob.medaille.config;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Defini les données constantes du système
  *
@@ -12,7 +17,9 @@ public final class Constants {
     public static String SYSTEM_ACCOUNT = "system";
 
     //repertoire de stockage de fichiers uploaded
-    public static final String appStoreRootPath = "/Users/anptic";
+    public static final String appStoreRootPath = "/opt/uploads";//Users/anptic
+
+    private static final DateFormat appShortDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
 
     // EXTENSIONS AUTORISEES
     public static final String EXTENSION_PDF = ".pdf";
@@ -29,5 +36,47 @@ public final class Constants {
     public static final String CONS = "CONS";
 
     private Constants() {
+    }
+
+    /**
+     * Fonction qui renvoie l'extension du futur ficher à créeer et le format du
+     * contenu du fichier à renvoyer
+     *
+     * @param extension
+     * @return
+     */
+    public static String[] constructFormatAndExtension(String extension) {
+        String[] result = new String[2];
+
+        switch (extension.toUpperCase()) {
+            case "PDF":
+                result[0] = "application/pdf";
+                result[1] = ".pdf";
+                break;
+            case "EXCEL":
+                result[0] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                result[1] = ".xlsx";
+                break;
+            case "WORD":
+                result[0] = "application/ms-word";
+                result[1] = ".docx";
+                break;
+            default:
+                result[0] = "application/pdf";
+                result[1] = ".pdf";
+                break;
+        }
+
+        return result;
+    }
+
+    /**
+     * CONVERTIR DATE EN FORMAT : 11-01-2024
+     *
+     * @param date
+     * @return
+     */
+    public static String convertDateToShort(Date date) {
+        return appShortDateFormat.format(date);
     }
 }

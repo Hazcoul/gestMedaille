@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 /**
@@ -204,7 +203,8 @@ public class UtilisateurController {
     @GetMapping(path = "/list")
     public Mono<ResponseEntity<List<UtilisateurDTO>>> findAll() {
         List<UtilisateurDTO> response = service.findAll();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(response));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(response));
         return Mono.just(ResponseEntity.ok().headers(headers).body(response));
     }
 
@@ -219,11 +219,11 @@ public class UtilisateurController {
         UtilisateurDTO response = service.getById(idUser);
         return Mono.just(ResponseEntity.ok().body(response));
     }
+
     @GetMapping(path = "/statistique/count")
     public ResponseEntity<List<Integer>> find() {
         List<Integer> etat = service.count();
         return ResponseEntity.ok().body(etat);
     }
-
 
 }

@@ -36,6 +36,6 @@ public class EntreeDTO extends AbstractBaseDTO {
     }
 
     public enum Acquisition {
-        COMMANDE, REVERSEMENT, RETOUR;
+        ACQUISITION, REVERSEMENT, RETOUR;
     }
 }

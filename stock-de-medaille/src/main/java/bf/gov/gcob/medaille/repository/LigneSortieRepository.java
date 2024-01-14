@@ -1,9 +1,10 @@
 package bf.gov.gcob.medaille.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LigneSortieRepository extends JpaRepository<LigneSortie, Long> {
 
+    List<LigneSortie> findBySortieIdSortie(Long idSortie);
 }

@@ -1,9 +1,10 @@
 package bf.gov.gcob.medaille.repository;
 
 import bf.gov.gcob.medaille.model.entities.Entree;
-import java.util.List;
-
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface EntreeRepository extends JpaRepository<Entree, Long> {
 
     @Query("select e from LigneEntree e where e.entree.idEntree=:idEntree")
     List<LigneEntree> findAllLigneByEntree(@Param("idEntree") Long idEntree);
+
+    Optional<Entree> findByIdEntreeAndStatus(Long idEntree, EMvtStatus status);
 }

@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @CrossOrigin("*")
 @RestController
@@ -34,7 +33,8 @@ public class FournisseurController {
     @GetMapping()
     public ResponseEntity<List<FournisseurDTO>> find() {
         List<FournisseurDTO> fournisseurs = fournisseurService.find();
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(fournisseurs));
+        //HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), new PageImpl<>(fournisseurs));
+        HttpHeaders headers = PaginationUtil.getHeaders(new PageImpl<>(fournisseurs));
         return ResponseEntity.ok().headers(headers).body(fournisseurs);
     }
 

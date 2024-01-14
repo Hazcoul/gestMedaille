@@ -1,110 +1,76 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package bf.gov.gcob.medaille.config;
 
-import bf.gov.gcob.medaille.utils.StockDeMedailleProperties;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import java.io.File;
-import static java.net.URLDecoder.decode;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.server.WebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
+ *
+ * @author Canisius <canisiushien@gmail.com>
  */
 @Configuration
-public class WebConfigurer implements ServletContextInitializer, WebServerFactoryCustomizer<WebServerFactory> {
+@EnableWebFlux
+public class WebConfigurer {
 
-    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
-
-    private final Environment env;
-
-    private final StockDeMedailleProperties stockDeMedailleProperties;
-
-    public WebConfigurer(Environment env, StockDeMedailleProperties stockDeMedailleProperties) {
-        this.env = env;
-        this.stockDeMedailleProperties = stockDeMedailleProperties;
-    }
-
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        if (env.getActiveProfiles().length != 0) {
-            log.info("Web application configuration, using profiles: {}", (Object[]) env.getActiveProfiles());
-        }
-
-        log.info("Web application fully configured");
-    }
-
-    /**
-     * Customize the Servlet engine: Mime types, the document root, the cache.
-     */
-    @Override
-    public void customize(WebServerFactory server) {
-        // When running in an IDE or with ./mvnw spring-boot:run, set location of the static web assets.
-        setLocationForStaticAssets(server);
-    }
-
-    private void setLocationForStaticAssets(WebServerFactory server) {
-        if (server instanceof ConfigurableServletWebServerFactory servletWebServer) {
-            File root;
-            String prefixPath = resolvePathPrefix();
-            root = new File(prefixPath + "target/classes/static/");
-            if (root.exists() && root.isDirectory()) {
-                servletWebServer.setDocumentRoot(root);
-            }
-        }
-    }
-
-    /**
-     * Resolve path prefix to static resources.
-     */
-    private String resolvePathPrefix() {
-        String fullExecutablePath = decode(this.getClass().getResource("").getPath(), StandardCharsets.UTF_8);
-        String rootPath = Paths.get(".").toUri().normalize().getPath();
-        String extractedPath = fullExecutablePath.replace(rootPath, "");
-        int extractionEndIndex = extractedPath.indexOf("target/");
-        if (extractionEndIndex <= 0) {
-            return "";
-        }
-        return extractedPath.substring(0, extractionEndIndex);
-    }
-
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = stockDeMedailleProperties.getCors();
-//        if (!CollectionUtils.isEmpty(config.getAllowedOrigins()) || !CollectionUtils.isEmpty(config.getAllowedOriginPatterns())) {
-//            log.debug("Registering CORS filter");
-//            source.registerCorsConfiguration("/api/**", config);
-//            source.registerCorsConfiguration("/**", config);
-//            source.registerCorsConfiguration("/management/**", config);
-//            source.registerCorsConfiguration("/v3/api-docs", config);
-//            source.registerCorsConfiguration("/swagger-ui/**", config);
-//        }
-//        return new CorsFilter(source);
-//    }
     @Bean
-    public CorsFilter corsFilter() {//ceci fonctionne avec le angular
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    public CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList("*"));
-        //or any domain that you want to restrict to 
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
-        //Add the method support as you like 
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        config.addAllowedMethod("*");
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.setAllowCredentials(false);
+        config.setMaxAge(1800L);
+        config.setExposedHeaders(Arrays.asList("Authorization,Link,X-Total-Count,X-GCOB-alert,X-GCOB-error,X-GCOB-params"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
+        if (!CollectionUtils.isEmpty(config.getAllowedOrigins())) {
+            source.registerCorsConfiguration("/api/**", config);
+            source.registerCorsConfiguration("/v3/api-docs", config);
+            source.registerCorsConfiguration("/swagger-resources", config);
+            source.registerCorsConfiguration("/swagger-ui/**", config);
+            source.registerCorsConfiguration("/**", config);
+        }
+        return new CorsWebFilter(source);
+    }
+
+    //swagger doc config
+    @Bean
+    public OpenAPI openApiInformation() {
+        Server localServer = new Server()
+                .url("http://localhost:8070")
+                .description("Localhost Server URL");
+
+        Contact contact = new Contact()
+                .email("infos@gcob.bf")
+                .name("GCOB Dev team");
+
+        Info info = new Info()
+                .contact(contact)
+                .description("Documentation API GESTION-STOCK-MEDAILLE")
+                .summary("Demo of Spring Boot 3 & Open API 3 Integration")
+                .title("STOCK-MEDAILLE API REST")
+                .version("V1.0.0")
+                .license(new License());
+
+        return new OpenAPI().info(info).addServersItem(localServer);
     }
 }
