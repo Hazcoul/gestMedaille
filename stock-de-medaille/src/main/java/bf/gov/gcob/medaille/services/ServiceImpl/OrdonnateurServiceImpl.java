@@ -3,7 +3,9 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 import bf.gov.gcob.medaille.mapper.OrdonnateurMapper;
 import bf.gov.gcob.medaille.model.dto.OrdonnateurDTO;
 import bf.gov.gcob.medaille.model.entities.Ordonnateur;
+import bf.gov.gcob.medaille.model.entities.Sortie;
 import bf.gov.gcob.medaille.repository.OrdonnateurRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.OrdonnateurService;
 import java.util.Date;
 import java.util.List;
@@ -11,15 +13,17 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class OrdonnateurServiceImpl implements OrdonnateurService {
-    
+
     private final OrdonnateurRepository ordonnateurRepository;
+    private final SortieRepository sortieRepository;
     private final OrdonnateurMapper ordonnateurMapper;
-    
+
     @Override
     public OrdonnateurDTO create(OrdonnateurDTO ordonnateurDTO) {
         Ordonnateur response = ordonnateurMapper.toEntity(ordonnateurDTO);
@@ -34,13 +38,13 @@ public class OrdonnateurServiceImpl implements OrdonnateurService {
         response = ordonnateurRepository.save(response);
         return ordonnateurMapper.toDTO(response);
     }
-    
+
     @Override
     public List<OrdonnateurDTO> findAll() {
         List<OrdonnateurDTO> ordonnateurs = ordonnateurRepository.findAll().stream().map(ordonnateurMapper::toDTO).collect(Collectors.toList());
         return ordonnateurs;
     }
-    
+
     @Override
     public OrdonnateurDTO update(OrdonnateurDTO ordonnateurDTO) {
         Ordonnateur response = ordonnateurRepository.findById(ordonnateurDTO.getIdOrdonnateur()).orElse(null);
@@ -56,12 +60,18 @@ public class OrdonnateurServiceImpl implements OrdonnateurService {
         response = ordonnateurRepository.save(response);
         return ordonnateurMapper.toDTO(response);
     }
-    
+
     @Override
     public void delete(Long idOrdonnateur) {
-        ordonnateurRepository.deleteById(idOrdonnateur);
+        log.info("Suppression de l'ordonnateur {} ", idOrdonnateur);
+        List<Sortie> sorties = sortieRepository.findByOrdonnateurIdOrdonnateur(idOrdonnateur);
+        if (sorties != null || !CollectionUtils.isEmpty(sorties)) {
+            throw new RuntimeException("Veuillez supprimer les sorties... de cet ordonnateur avant de poursuivre.");
+        } else {
+            ordonnateurRepository.deleteById(idOrdonnateur);
+        }
     }
-    
+
     @Override
     public OrdonnateurDTO desactiver(Long idOrdonnateur) {
         log.info("Desactivation de l'ordonnateur : {}", idOrdonnateur);
@@ -70,7 +80,7 @@ public class OrdonnateurServiceImpl implements OrdonnateurService {
         response.setFinMandat(new Date());
         return ordonnateurMapper.toDTO(ordonnateurRepository.save(response));
     }
-    
+
     @Override
     public OrdonnateurDTO reactiver(Long idOrdonnateur) {
         log.info("Reactivation de l'ordonnateur : {}", idOrdonnateur);

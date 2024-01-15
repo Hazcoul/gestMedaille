@@ -28,4 +28,8 @@ public interface EntreeRepository extends JpaRepository<Entree, Long> {
     List<LigneEntree> findAllLigneByEntree(@Param("idEntree") Long idEntree);
 
     Optional<Entree> findByIdEntreeAndStatus(Long idEntree, EMvtStatus status);
+
+    List<Entree> findByMagasinIdMagasin(Long idMagasin);
+
+    List<Entree> findByFournisseurIdFournisseur(Long idFournisseur);
 }

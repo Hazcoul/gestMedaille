@@ -30,4 +30,12 @@ public interface SortieRepository extends JpaRepository<Sortie, Long> {
     List<LigneImpressionSortiePeriodeDTO> countTotalMedailleByMedailleAndPeriode(@Param("motifSortie") EMotifSortie motifSortie);
 
     Optional<Sortie> findByIdSortieAndStatus(Long idSortie, EMvtStatus status);
+
+    List<Sortie> findByMagasinIdMagasin(Long idMagasin);
+
+    List<Sortie> findByBeneficiaireIdBeneficiaire(Long idBeneficiaire);
+
+    List<Sortie> findByDetenteurIdDetenteur(Long idDetenteur);
+
+    List<Sortie> findByOrdonnateurIdOrdonnateur(Long idOrdonnateur);
 }

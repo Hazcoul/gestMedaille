@@ -8,13 +8,16 @@ package bf.gov.gcob.medaille.services.ServiceImpl;
 import bf.gov.gcob.medaille.mapper.DetenteurMapper;
 import bf.gov.gcob.medaille.model.dto.DetenteurDTO;
 import bf.gov.gcob.medaille.model.entities.Detenteur;
+import bf.gov.gcob.medaille.model.entities.Sortie;
 import bf.gov.gcob.medaille.repository.DetenteurRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.DetenteurService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 public class DetenteurServiceImpl implements DetenteurService {
 
     private DetenteurRepository detenteurRepository;
+    private final SortieRepository sortieRepository;
     private DetenteurMapper mapper;
 
     @Override
@@ -56,6 +60,11 @@ public class DetenteurServiceImpl implements DetenteurService {
     @Override
     public void delete(Long idDetenteur) {
         log.info("Suppression du detenteur {} ", idDetenteur);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Sortie> sorties = sortieRepository.findByDetenteurIdDetenteur(idDetenteur);
+        if (sorties != null || !CollectionUtils.isEmpty(sorties)) {
+            throw new RuntimeException("Veuillez supprimer les sorties... de cet detenteur avant de poursuivre.");
+        } else {
+            detenteurRepository.deleteById(idDetenteur);
+        }
     }
 }

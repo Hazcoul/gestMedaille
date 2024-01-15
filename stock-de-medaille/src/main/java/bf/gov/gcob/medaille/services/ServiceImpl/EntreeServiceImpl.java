@@ -30,29 +30,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class EntreeServiceImpl implements EntreeService {
-    
+
     private final Logger log = LoggerFactory.getLogger(EntreeServiceImpl.class);
-    
+
     private final EntreeRepository entreeRepository;
     private final LigneEntreeRepository ligneEntreeRepository;
     private final EntreeMapper entreeMapper;
     private final LigneEntreeMapper ligneEntreeMapper;
-    
+
     private final ResourceLoader resourceLoader;
-    
+
     public EntreeServiceImpl(EntreeRepository entreeRepository, LigneEntreeRepository ligneEntreeRepository,
             EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader) {
         this.entreeRepository = entreeRepository;
         this.ligneEntreeRepository = ligneEntreeRepository;
         this.entreeMapper = entreeMapper;
         this.ligneEntreeMapper = ligneEntreeMapper;
-        
+
         this.resourceLoader = resourceLoader;
     }
-    
+
     @Override
     public EntreeDTO save(EntreeDTO entreeDTO) {
         log.debug("REST request to save Entree : {}", entreeDTO);
@@ -87,10 +88,10 @@ public class EntreeServiceImpl implements EntreeService {
                 ligneEntreeRepository.saveAll(lignesEntree);
             }
         }
-        
+
         return entreeMapper.toDTO(entree);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<EntreeDTO> findAll() {
@@ -99,13 +100,13 @@ public class EntreeServiceImpl implements EntreeService {
                 .stream()
                 .map(entreeMapper::toDTO).toList();
     }
-    
+
     @Override
     public List<EntreeDTO> findByAn(int annee) {
         return entreeRepository.findEntreeByYear(annee)
                 .stream().map(entreeMapper::toDTO).collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public EntreeDTO findOne(Long id) {
@@ -114,13 +115,18 @@ public class EntreeServiceImpl implements EntreeService {
                 .orElseThrow(() -> new RuntimeException("Entree with ID = " + id + " not found"));
         return entreeMapper.toDTO(entree);
     }
-    
+
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Entree : {}", id);
-        entreeRepository.deleteById(id);
+        List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(id);
+        if (les == null || CollectionUtils.isEmpty(les)) {
+            entreeRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Veuillez supprimer les lignes de cette entrée... avant de poursuivre.");
+        }
     }
-    
+
     public Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable) {
         log.debug("Request to get all entree");
         return entreeRepository.findByCriteria(
@@ -128,14 +134,14 @@ public class EntreeServiceImpl implements EntreeService {
                 filterEntreeDto.getFournisseur(),
                 pageable).map(entreeMapper::toDTO);
     }
-    
+
     @Override
     public Resource getlisteEntreeByCommande(Long id) {
         List<LigneEntreeDTO> ligneEntreeDTOS;
         List<LigneImpressionEntreeDTO> ligneImpressionEntreeDTOS = new ArrayList<>();
         Log.debug("AAAAAAAA");
         Log.debug(id);
-        
+
         ligneEntreeDTOS = entreeRepository.findAllLigneByEntree(id).stream().map(ligneEntreeMapper::toDTO).collect(Collectors.toCollection(LinkedList::new));
         Optional<Entree> entree = entreeRepository.findById(id);
 
@@ -150,37 +156,37 @@ public class EntreeServiceImpl implements EntreeService {
             ligneImpressionEntreeDTO.setNumeroCommande(ligneEntreeDTO.getEntree().getNumeroCmd());
             ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille() != null ? ligneEntreeDTO.getMedaille().getNomComplet() : "");
             ligneImpressionEntreeDTO.setAcquisition(ligneEntreeDTO.getEntree().getAcquisition().name());
-            
+
             ligneImpressionEntreeDTOS.add(ligneImpressionEntreeDTO);
         }
-        
+
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ligneImpressionEntreeDTOS);
-        
+
         HashMap<String, Object> parametres = new HashMap<String, Object>();
         parametres.put("nomMagasin", entree.get().getMagasin().getNomMagasin());
         parametres.put("libelleFournisseur", entree.get().getFournisseur().getLibelle());
         parametres.put("nomDepot", entree.get().getMagasin().getDepot().getNomDepot());
         parametres.put("acquisition", entree.get().getAcquisition().getLibelle());
         parametres.put("titre", "COMMANDE N° " + entree.get().getNumeroCmd());
-        
+
         return imprimer(parametres, beanCollectionDataSource);
-        
+
     }
-    
+
     private Resource imprimer(HashMap<String, Object> parametres, JRBeanCollectionDataSource beanCollectionDataSource) {
         String embleme = "";
-        
+
         try {
             Resource resourceLoaderResource = resourceLoader.getResource("classpath:reports/liste_commande.jrxml");
             Resource emblemeLoaderResource = resourceLoader.getResource("classpath:reports/embleme.png");
             File emblemeLogo = emblemeLoaderResource.getFile();
             embleme = emblemeLogo.getAbsolutePath();
-            
+
             InputStream is = resourceLoaderResource.getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(is);
-            
+
             parametres.put("P_EMBLEME", embleme);
-            
+
             JasperPrint print = JasperFillManager.fillReport(jasperReport, parametres, beanCollectionDataSource);
             return new ByteArrayResource(JasperExportManager.exportReportToPdf(print));
         } catch (Exception e) {
@@ -188,7 +194,7 @@ public class EntreeServiceImpl implements EntreeService {
             return null;
         }
     }
-    
+
     @Override
     public EntreeDTO validerEntree(Long idEntree) {
         log.info("Validation de l'entrée : {}", idEntree);
@@ -197,5 +203,5 @@ public class EntreeServiceImpl implements EntreeService {
         entree.setValiderLe(new Date());
         return entreeMapper.toDTO(entreeRepository.save(entree));
     }
-    
+
 }

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LigneSortieRepository extends JpaRepository<LigneSortie, Long> {
 
     List<LigneSortie> findBySortieIdSortie(Long idSortie);
+
+    List<LigneSortie> findByMedailleIdMedaille(Long idMedaille);
 }
