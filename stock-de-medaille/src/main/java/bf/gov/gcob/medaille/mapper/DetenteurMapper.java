@@ -44,7 +44,7 @@ public class DetenteurMapper extends AbstractBaseMapper {
         entity.setPrenom(dto.getPrenom());
         entity.setTelephone(dto.getTelephone());
         entity.setBeneficiaire((dto.getBeneficiaire() != null ? beneficiaireMapper.toEntity(dto.getBeneficiaire()) : null));
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
 
         return entity;
     }

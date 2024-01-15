@@ -40,7 +40,7 @@ public class FournisseurMapper extends AbstractBaseMapper {
         fournisseur.setEmail(fournisseurDto.getEmail());
         fournisseur.setNomCompletPersonneRessource(fournisseurDto.getNomCompletPersonneRessource());
         fournisseur.setTelephonePersonneRessource(fournisseurDto.getTelephonePersonneRessource());
-        setCommonFieldsFromDTO(fournisseurDto, fournisseur);
+        //setCommonFieldsFromDTO(fournisseurDto, fournisseur);
         return fournisseur;
     }
 

@@ -40,7 +40,7 @@ public class LigneSortieMapper extends AbstractBaseMapper {
     	entity.setCloseSortie(dto.isCloseSortie());
     	entity.setIdLigneSortie(dto.getIdLigneSortie());
     	entity.setQuantiteLigne(dto.getQuantiteLigne());
-    	setCommonFieldsFromDTO(dto, entity);
+    	//setCommonFieldsFromDTO(dto, entity);
     	
         return entity;
     }

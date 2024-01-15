@@ -64,7 +64,7 @@ public class SortieMapper extends AbstractBaseMapper {
         entity.setValiderPar(dto.getValiderPar());
         entity.setStatus(null == dto.getStatus() ? EMvtStatus.CREATED : EMvtStatus.valueOf(dto.getStatus().toString()));
         entity.setNumeroSortie(dto.getNumeroSortie());
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
 
         return entity;
     }

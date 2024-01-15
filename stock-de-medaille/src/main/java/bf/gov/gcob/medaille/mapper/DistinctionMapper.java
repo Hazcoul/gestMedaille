@@ -38,7 +38,7 @@ public class DistinctionMapper extends AbstractBaseMapper {
     	entity.setIdDistinction(dto.getIdDistinction());
     	entity.setLibelle(dto.getLibelle());
     	entity.setReferenceDecret(dto.getReferenceDecret());
-    	setCommonFieldsFromDTO(dto, entity);
+    	//setCommonFieldsFromDTO(dto, entity);
     	
         return entity;
     }
