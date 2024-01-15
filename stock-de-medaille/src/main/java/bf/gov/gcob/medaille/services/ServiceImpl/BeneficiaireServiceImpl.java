@@ -5,6 +5,11 @@
  */
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import bf.gov.gcob.medaille.mapper.BeneficiaireMapper;
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
 import bf.gov.gcob.medaille.model.entities.Beneficiaire;
@@ -59,9 +64,11 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
     }
 
     @Override
-    public Page<BeneficiaireDTO> findAll(Pageable pageable) {
+    public List<BeneficiaireDTO> findAll() {
         log.info("Liste des beneficiaires");
-        return beneficiaireRepository.findAll(pageable).map(mapper::toDTO);
+        return beneficiaireRepository.findAll()
+        		.stream()
+        		.map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
