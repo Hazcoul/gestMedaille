@@ -35,6 +35,9 @@ public class LigneEntreeMapper extends AbstractBaseMapper {
     }
 
     public LigneEntree toEntity(LigneEntreeDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         LigneEntree entity = new LigneEntree();
         entity.setCloseEntree(dto.isCloseEntree());
         entity.setIdLigneEntree(dto.getIdLigneEntree());

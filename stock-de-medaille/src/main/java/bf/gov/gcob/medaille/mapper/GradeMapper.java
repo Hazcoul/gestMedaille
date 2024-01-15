@@ -26,6 +26,9 @@ public class GradeMapper extends AbstractBaseMapper {
     }
 
     public Grade toEntity(GradeDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         Grade entity = new Grade();
         entity.setDescription(dto.getDescription());
         entity.setIdGrade(dto.getIdGrade());

@@ -8,20 +8,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PieceJointeMapper extends AbstractBaseMapper {
-    
+
     private final SortieMapper sortieMapper;
     private final EntreeMapper entreeMapper;
-    
+
     public PieceJointeMapper(SortieMapper sortieMapper, EntreeMapper entreeMapper) {
         this.entreeMapper = entreeMapper;
         this.sortieMapper = sortieMapper;
     }
-    
+
     public PieceJointeDTO toDTO(PieceJointe entity) {
         if (Objects.isNull(entity)) {
             return null;
         }
-        
+
         PieceJointeDTO dto = new PieceJointeDTO();
         dto.setDescription(entity.getDescription());
         dto.setEntree(entreeMapper.toDTO(entity.getEntree()));
@@ -31,11 +31,14 @@ public class PieceJointeMapper extends AbstractBaseMapper {
         dto.setSortie(sortieMapper.toDTO(entity.getSortie()));
         dto.setTypePiece(entity.getTypePiece().getLibelle());
         setCommonFieldsFromEntity(entity, dto);
-        
+
         return dto;
     }
-    
+
     public PieceJointe toEntity(PieceJointeDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         PieceJointe entity = new PieceJointe();
         entity.setDescription(dto.getDescription());
         entity.setIdPiece(dto.getIdPiece());
@@ -45,8 +48,8 @@ public class PieceJointeMapper extends AbstractBaseMapper {
         entity.setEntree(entreeMapper.toEntity(dto.getEntree()));
         entity.setSortie(sortieMapper.toEntity(dto.getSortie()));
         //setCommonFieldsFromDTO(dto, entity);
-        
+
         return entity;
     }
-    
+
 }

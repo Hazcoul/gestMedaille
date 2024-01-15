@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO.MotifSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
@@ -14,18 +13,18 @@ import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 
 @Component
 public class SortieMapper extends AbstractBaseMapper {
-	
-	@Autowired
-	private BeneficiaireMapper beneficiaireMapper;
-	@Autowired
-	private DetenteurMapper detenteurMapper;
-	@Autowired
-	private MagasinMapper magasinMapper;
-	@Autowired
-	private OrdonnateurMapper ordonnateurMapper;
-	@Autowired
-	private LigneSortieMapper ligneSortieMapper;
-	
+
+    @Autowired
+    private BeneficiaireMapper beneficiaireMapper;
+    @Autowired
+    private DetenteurMapper detenteurMapper;
+    @Autowired
+    private MagasinMapper magasinMapper;
+    @Autowired
+    private OrdonnateurMapper ordonnateurMapper;
+    @Autowired
+    private LigneSortieMapper ligneSortieMapper;
+
     public SortieDTO toDTO(Sortie entity) {
         if (Objects.isNull(entity)) {
             return null;
@@ -51,6 +50,9 @@ public class SortieMapper extends AbstractBaseMapper {
     }
 
     public Sortie toEntity(SortieDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         Sortie entity = new Sortie();
         entity.setBeneficiaire(beneficiaireMapper.toEntity(dto.getBeneficiaire()));
         entity.setDateSortie(dto.getDateSortie());

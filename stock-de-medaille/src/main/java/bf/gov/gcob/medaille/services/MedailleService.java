@@ -8,7 +8,7 @@ package bf.gov.gcob.medaille.services;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
 
 /**
  *
@@ -22,7 +22,7 @@ public interface MedailleService {
      * @param medailleDTO
      * @return
      */
-    MedailleDTO create(MedailleDTO medailleDTO, MultipartFile imageMedaille);
+    MedailleDTO create(MedailleDTO medailleDTO, FilePart imageMedaille);
 
     /**
      * modifie des infos d'une medaille deja enregistrée
@@ -39,7 +39,7 @@ public interface MedailleService {
      * @param imageMedaille : fichier image de la medaille
      * @return
      */
-    MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille);
+    MedailleDTO updateImagecatalogue(Long medailleId, FilePart imageMedaille);
 
     /**
      * Modifie les infos ainsi que l'image d'une medaille
@@ -48,7 +48,7 @@ public interface MedailleService {
      * @param imageMedaille
      * @return
      */
-    MedailleDTO update(MedailleDTO medailleDTO, MultipartFile imageMedaille);
+    MedailleDTO update(MedailleDTO medailleDTO, FilePart imageMedaille);
 
     /**
      * liste toutes les medailles

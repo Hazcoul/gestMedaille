@@ -24,15 +24,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -52,11 +51,11 @@ public class MedailleServiceImpl implements MedailleService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public MedailleDTO create(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
-        log.info("Creation d'une medaille {} avec l'image catalogue {}", medailleDTO, imageMedaille.getOriginalFilename());
+    public MedailleDTO create(MedailleDTO medailleDTO, FilePart imageMedaille) {
+        log.info("Creation d'une medaille {} avec l'image catalogue {}", medailleDTO, imageMedaille.filename());
         Medaille medaille = mapper.toEntity(medailleDTO);
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
-        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
+        medaille.setCode(medaille.getDistinction().getCode() + "" + (medaille.getGrade() == null ? "" : medaille.getGrade().getCode()));
         medaille = medailleRepository.save(medaille);
         try {
             this.saveImageMedaille(medaille, imageMedaille);
@@ -73,7 +72,7 @@ public class MedailleServiceImpl implements MedailleService {
         medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
         medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
         //medaille.setStock(medailleDTO.getStock());
-        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
+        medaille.setCode(medaille.getDistinction().getCode() + "" + (medaille.getGrade() == null ? "" : medaille.getGrade().getCode()));
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
 
@@ -81,7 +80,7 @@ public class MedailleServiceImpl implements MedailleService {
     }
 
     @Override
-    public MedailleDTO updateImagecatalogue(Long medailleId, MultipartFile imageMedaille) {
+    public MedailleDTO updateImagecatalogue(Long medailleId, FilePart imageMedaille) {
         log.info("Mise à jour d'une image de la medaille {} ", medailleId);
         Medaille medaille = medailleRepository.findById(medailleId).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleId + "] correspondante est introuvable. "));
         this.saveImageMedaille(medaille, imageMedaille);
@@ -90,14 +89,14 @@ public class MedailleServiceImpl implements MedailleService {
     }
 
     @Override
-    public MedailleDTO update(MedailleDTO medailleDTO, MultipartFile imageMedaille) {
+    public MedailleDTO update(MedailleDTO medailleDTO, FilePart imageMedaille) {
         log.info("Mise à jour d'une medaille {} ", medailleDTO);
         Medaille medaille = medailleRepository.findById(medailleDTO.getIdMedaille()).orElseThrow(() -> new RuntimeException("La médaille ID [" + medailleDTO.getIdMedaille() + "] correspondante est introuvable. "));
         medaille.setDistinction(distinctionMapper.toEntity(medailleDTO.getDistinction()));
         medaille.setGrade((gradeMapper.toEntity(medailleDTO.getGrade())));
         medaille.setDescription(medailleDTO.getDescription());
         //medaille.setStock(medailleDTO.getStock());
-        medaille.setCode(medaille.getDistinction().getCode() + "" + medaille.getGrade().getCode());
+        medaille.setCode(medaille.getDistinction().getCode() + "" + (medaille.getGrade() == null ? "" : medaille.getGrade().getCode()));
         medaille.setNomComplet(this.constructNomMedaille(medaille.getGrade(), medaille.getDistinction()));
         medaille = medailleRepository.save(medaille);
         if (imageMedaille != null) {
@@ -174,7 +173,7 @@ public class MedailleServiceImpl implements MedailleService {
         return response;
     }
 
-    private void saveImageMedaille(Medaille medaille, MultipartFile photoFile) {
+    private void saveImageMedaille(Medaille medaille, FilePart photoFile) {
         try {
             //on initie et crée automatiquement le repertoire de stockage s'il n'existe pas
             Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");
@@ -182,10 +181,11 @@ public class MedailleServiceImpl implements MedailleService {
                 Files.createDirectories(subfolderPath);
             }
             //on que le nom du fichier image est reglementaire et est au format autorisé
-            String originalFileName = photoFile.getOriginalFilename();
+            String originalFileName = photoFile.filename();//photoFile.getOriginalFilename();
             if (originalFileName.contains("..") && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_PNG)
                     && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_JPG)
-                    && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_JPEG)) {
+                    && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_JPEG)
+                    && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_GIF)) {
                 throw new RuntimeException(
                         "L'extension n'est pas acceptée ou le nom du fichier contient des caractères invalides.");
             }
@@ -195,20 +195,32 @@ public class MedailleServiceImpl implements MedailleService {
 
             //on verifie qu'il n'existe pas deja des fichiers de meme nom dans ce repertoire.
             //Si existe, on supprime tous les fichiers existants
-            if (Files.exists(filePath)) {
-                Files.walk(filePath)
-                        .filter(Files::isRegularFile)
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            } else {
-                Files.createDirectories(filePath);
+            //Attention ! ici, tout fichier ayant l'id comme nom sur le serveur doit etre delete, peut importe l'extension
+            String[] extensions = {Constants.EXTENSION_PNG, Constants.EXTENSION_JPG, Constants.EXTENSION_JPEG, Constants.EXTENSION_GIF};
+            for (String extension : extensions) {
+                Path verif = subfolderPath.resolve(medaille.getIdMedaille().toString() + extension);
+                if (Files.exists(verif)) {
+                    Files.walk(verif)
+                            .filter(Files::isRegularFile)
+                            .map(Path::toFile)
+                            .forEach(File::delete);
+                }
             }
+//            if (Files.exists(filePath)) {
+//                Files.walk(filePath)
+//                        .filter(Files::isRegularFile)
+//                        .map(Path::toFile)
+//                        .forEach(File::delete);
+//            } else {
+//                System.out.println("______________________ ici");
+//                Files.createDirectories(filePath);
+//            }
             //on met a jour notre enregistrement de medaille avec les infos de l'image
             medaille.setLienImage(/*filePath.toString()*/newFileName);
             medaille.setLastModifiedBy("default");
             medailleRepository.save(medaille);
             //on deplace l'image vers notre repertoire indiqué du server
-            Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            photoFile.transferTo(Paths.get(filePath.toUri())).subscribe();
         } catch (IOException e) {
         }
     }

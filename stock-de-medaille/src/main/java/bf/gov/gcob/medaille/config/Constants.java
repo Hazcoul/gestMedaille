@@ -26,6 +26,7 @@ public final class Constants {
     public static final String EXTENSION_PNG = ".png";
     public static final String EXTENSION_JPG = ".jpg";
     public static final String EXTENSION_JPEG = ".jpeg";
+    public static final String EXTENSION_GIF = ".gif";
 
     //privileges du systeme
     public static final String ADMIN = "ADMIN";
