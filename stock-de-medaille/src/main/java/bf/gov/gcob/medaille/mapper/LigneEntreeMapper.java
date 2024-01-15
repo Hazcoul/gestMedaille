@@ -41,7 +41,7 @@ public class LigneEntreeMapper extends AbstractBaseMapper {
         entity.setMontantLigne(dto.getMontantLigne());
         entity.setPrixUnitaire(dto.getPrixUnitaire());
         entity.setQuantiteLigne(dto.getQuantiteLigne());
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
 
         return entity;
     }

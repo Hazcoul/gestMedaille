@@ -44,7 +44,7 @@ public class PieceJointeMapper extends AbstractBaseMapper {
         entity.setTypePiece(ETypePiece.getByLibelle(dto.getTypePiece()));
         entity.setEntree(entreeMapper.toEntity(dto.getEntree()));
         entity.setSortie(sortieMapper.toEntity(dto.getSortie()));
-        setCommonFieldsFromDTO(dto, entity);
+        //setCommonFieldsFromDTO(dto, entity);
         
         return entity;
     }

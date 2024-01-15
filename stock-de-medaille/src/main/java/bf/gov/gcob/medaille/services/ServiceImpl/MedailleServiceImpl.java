@@ -12,7 +12,11 @@ import bf.gov.gcob.medaille.mapper.MedailleMapper;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.model.entities.Distinction;
 import bf.gov.gcob.medaille.model.entities.Grade;
+import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
+import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
 import bf.gov.gcob.medaille.services.MedailleService;
 import java.io.File;
@@ -27,6 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -39,9 +44,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class MedailleServiceImpl implements MedailleService {
 
     private MedailleRepository medailleRepository;
+    private LigneEntreeRepository ligneEntreeRepository;
+    private LigneSortieRepository ligneSortieRepository;
     private DistinctionMapper distinctionMapper;
     private GradeMapper gradeMapper;
-
     private MedailleMapper mapper;
 
     @Override
@@ -133,6 +139,11 @@ public class MedailleServiceImpl implements MedailleService {
     public void delete(Long idMedaille) {
         log.info("Suppression de la medaille {} ", idMedaille);
         Medaille medaille = medailleRepository.findById(idMedaille).orElseThrow(() -> new RuntimeException("La médaille ID [" + idMedaille + "] correspondante est d'office inexistante. "));
+        List<LigneEntree> les = ligneEntreeRepository.findByMedailleIdMedaille(medaille.getIdMedaille());
+        List<LigneSortie> lss = ligneSortieRepository.findByMedailleIdMedaille(medaille.getIdMedaille());
+        if ((les != null || !CollectionUtils.isEmpty(les)) || (lss != null || !CollectionUtils.isEmpty(lss))) {
+            throw new RuntimeException("Veuillez supprimer les lignes entrée/sortie... de cette medaille avant de poursuivre.");
+        }
         //Comme ladaite medaille est retrouvée en bd, 
         //on supprime d'abord l'image sur le server avant de supprimer l'enregistrement en bd
         Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("catalogue_medaille");

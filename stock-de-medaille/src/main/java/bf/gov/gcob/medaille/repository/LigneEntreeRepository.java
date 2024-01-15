@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LigneEntreeRepository extends JpaRepository<LigneEntree, Long> {
 
     List<LigneEntree> findByEntreeIdEntree(Long idEntree);
+
+    List<LigneEntree> findByMedailleIdMedaille(Long idMedaille);
 }

@@ -27,7 +27,7 @@ public class DepotMapper extends AbstractBaseMapper {
     	entity.setDescription(dto.getDescription());
     	entity.setIdDepot(dto.getIdDepot());
     	entity.setNomDepot(dto.getNomDepot());
-    	setCommonFieldsFromDTO(dto, entity);
+    	//setCommonFieldsFromDTO(dto, entity);
     	
         return entity;
     }

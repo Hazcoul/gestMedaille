@@ -17,6 +17,7 @@ public class GradeMapper extends AbstractBaseMapper {
         GradeDTO dto = new GradeDTO();
         dto.setDescription(entity.getDescription());
         dto.setIdGrade(entity.getIdGrade());
+        dto.setCode(entity.getCode());
         dto.setLibelle(entity.getLibelle());
         dto.setTypeGrade(entity.getTypeGrade().getLibelle());
         setCommonFieldsFromEntity(entity, dto);
@@ -28,6 +29,7 @@ public class GradeMapper extends AbstractBaseMapper {
         Grade entity = new Grade();
         entity.setDescription(dto.getDescription());
         entity.setIdGrade(dto.getIdGrade());
+        entity.setCode(dto.getCode());
         entity.setLibelle(dto.getLibelle());
         entity.setTypeGrade(ETypeGrade.getByLibelle(dto.getTypeGrade()));
         setCommonFieldsFromDTO(dto, entity);

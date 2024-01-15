@@ -13,10 +13,19 @@ import org.springframework.stereotype.Service;
 import bf.gov.gcob.medaille.mapper.BeneficiaireMapper;
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
 import bf.gov.gcob.medaille.model.entities.Beneficiaire;
+import bf.gov.gcob.medaille.model.entities.Detenteur;
+import bf.gov.gcob.medaille.model.entities.Sortie;
 import bf.gov.gcob.medaille.repository.BeneficiaireRepository;
+import bf.gov.gcob.medaille.repository.DetenteurRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.BeneficiaireService;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -28,6 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 public class BeneficiaireServiceImpl implements BeneficiaireService {
 
     private BeneficiaireRepository beneficiaireRepository;
+
+    private final DetenteurRepository detenteurRepository;
+
+    private SortieRepository sortieRepository;
 
     private BeneficiaireMapper mapper;
 
@@ -61,8 +74,13 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
     @Override
     public void delete(Long idBeneficiaire) {
         log.info("Suppression du beneficiaire {} ", idBeneficiaire);
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        this.beneficiaireRepository.deleteById(idBeneficiaire);    
+        List<Sortie> sorties = sortieRepository.findByBeneficiaireIdBeneficiaire(idBeneficiaire);
+        List<Detenteur> detenteurs = detenteurRepository.findByBeneficiaireIdBeneficiaire(idBeneficiaire);
+        if ((sorties != null || !CollectionUtils.isEmpty(sorties)) || (detenteurs != null || !CollectionUtils.isEmpty(detenteurs))) {
+            throw new RuntimeException("Veuillez supprimer les sorties/detenteurs... de cet beneficiaire avant de poursuivre.");
+        } else {
+            beneficiaireRepository.deleteById(idBeneficiaire);
+        }
     }
 
 }
