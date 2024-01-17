@@ -16,7 +16,7 @@ import lombok.Setter;
 public class EntreeDTO extends AbstractBaseDTO {
 
     private Long idEntree;
-    @NotNull
+    //@NotNull
     private Date dateEntree;
     //@NotNull
     private String numeroCmd;

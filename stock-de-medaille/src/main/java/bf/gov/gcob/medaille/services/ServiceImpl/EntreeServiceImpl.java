@@ -1,25 +1,18 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import bf.gov.gcob.medaille.mapper.EntreeMapper;
-import bf.gov.gcob.medaille.mapper.LigneEntreeMapper;
-import bf.gov.gcob.medaille.model.dto.EntreeDTO;
-import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
-import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
-import bf.gov.gcob.medaille.model.dto.LigneEntreeDTO;
-import bf.gov.gcob.medaille.model.dto.LigneImpressionEntreeDTO;
-import bf.gov.gcob.medaille.model.entities.Entree;
-import bf.gov.gcob.medaille.model.entities.LigneEntree;
-import bf.gov.gcob.medaille.model.enums.EMvtStatus;
-import bf.gov.gcob.medaille.repository.EntreeRepository;
-import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
-import bf.gov.gcob.medaille.services.EntreeService;
 import java.io.File;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +25,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import bf.gov.gcob.medaille.mapper.EntreeMapper;
+import bf.gov.gcob.medaille.mapper.LigneEntreeMapper;
+import bf.gov.gcob.medaille.mapper.MedailleMapper;
+import bf.gov.gcob.medaille.model.dto.EntreeDTO;
+import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
+import bf.gov.gcob.medaille.model.dto.LigneEntreeDTO;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionEntreeDTO;
+import bf.gov.gcob.medaille.model.entities.Entree;
+import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.repository.EntreeRepository;
+import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
+import bf.gov.gcob.medaille.repository.MedailleRepository;
+import bf.gov.gcob.medaille.services.EntreeService;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 @Service
 public class EntreeServiceImpl implements EntreeService {
 
@@ -41,17 +56,22 @@ public class EntreeServiceImpl implements EntreeService {
     private final LigneEntreeRepository ligneEntreeRepository;
     private final EntreeMapper entreeMapper;
     private final LigneEntreeMapper ligneEntreeMapper;
+    private final MedailleMapper medailleMapper;
+    private final MedailleRepository medailleRepository;
 
     private final ResourceLoader resourceLoader;
 
     public EntreeServiceImpl(EntreeRepository entreeRepository, LigneEntreeRepository ligneEntreeRepository,
-            EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader) {
+            EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader,
+            MedailleMapper medailleMapper, MedailleRepository medailleRepository) {
         this.entreeRepository = entreeRepository;
         this.ligneEntreeRepository = ligneEntreeRepository;
         this.entreeMapper = entreeMapper;
         this.ligneEntreeMapper = ligneEntreeMapper;
 
         this.resourceLoader = resourceLoader;
+        this.medailleMapper = medailleMapper;
+        this.medailleRepository = medailleRepository;
     }
 
     @Override
@@ -60,7 +80,7 @@ public class EntreeServiceImpl implements EntreeService {
         Entree entree = entreeMapper.toEntity(entreeDTO);
         if (null == entreeDTO.getIdEntree()) {
             Entree firstEntre = entreeRepository.findFirstByOrderByIdEntreeDesc();
-            Long lastId = (firstEntre != null ? firstEntre.getIdEntree() : 0L);
+            Long lastId = (firstEntre != null ? firstEntre.getIdEntree() : 0L) + 1;
             String cmdNumber = "" + lastId;
             int nbrZero = 4 - cmdNumber.length();
             if (nbrZero > 0) {
@@ -71,22 +91,20 @@ public class EntreeServiceImpl implements EntreeService {
             cmdNumber = "CMD-" + cmdNumber + LocalDate.now().getYear();
             entree.setNumeroCmd(cmdNumber);
         }
-        entree.setStatus(EMvtStatus.CREATED);
         entree = entreeRepository.save(entree);
         Set<LigneEntree> lignesEntree = new HashSet<>();
-        if (null == entreeDTO.getIdEntree() || (null != entreeDTO.getIdEntree() && !entreeDTO.getStatus().equals(MvtStatus.CLOSED))) {
-            if (null != entreeDTO.getLigneEntrees() && !entreeDTO.getLigneEntrees().isEmpty()) {
-                for (LigneEntreeDTO le : entreeDTO.getLigneEntrees()) {
-                    LigneEntree local = ligneEntreeMapper.toEntity(le);
-                    if (local.isCloseEntree()) {
-                        entree.setStatus(EMvtStatus.CLOSED);
-                        entreeRepository.save(entree);
-                    }
-                    local.setEntree(entree);
-                    lignesEntree.add(local);
-                }
-                ligneEntreeRepository.saveAll(lignesEntree);
+        List<Medaille> medaillesToUpdateStock = new ArrayList<>();
+        if(null != entreeDTO.getLigneEntrees() && !entreeDTO.getLigneEntrees().isEmpty()) {
+            for (LigneEntreeDTO le : entreeDTO.getLigneEntrees()) {
+            	Integer newStock = null != le.getMedaille().getStock() ? le.getMedaille().getStock() + le.getQuantiteLigne() : le.getQuantiteLigne();
+            	le.getMedaille().setStock(newStock);
+            	medaillesToUpdateStock.add(medailleMapper.toEntity(le.getMedaille()));
+                LigneEntree local = ligneEntreeMapper.toEntity(le);
+                local.setEntree(entree);
+                lignesEntree.add(local);
             }
+            ligneEntreeRepository.saveAllAndFlush(lignesEntree);
+            medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
         }
 
         return entreeMapper.toDTO(entree);

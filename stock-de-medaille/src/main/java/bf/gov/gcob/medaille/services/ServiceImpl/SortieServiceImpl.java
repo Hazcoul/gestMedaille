@@ -1,25 +1,21 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
-import bf.gov.gcob.medaille.mapper.SortieMapper;
-import bf.gov.gcob.medaille.model.dto.*;
-import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
-import bf.gov.gcob.medaille.model.entities.LigneSortie;
-import bf.gov.gcob.medaille.model.entities.Sortie;
-import bf.gov.gcob.medaille.model.enums.EMotifSortie;
-import bf.gov.gcob.medaille.model.enums.EMvtStatus;
-import bf.gov.gcob.medaille.repository.LigneSortieRepository;
-import bf.gov.gcob.medaille.repository.SortieRepository;
-import bf.gov.gcob.medaille.services.SortieService;
 import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
+
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -30,6 +26,30 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
+import bf.gov.gcob.medaille.mapper.MedailleMapper;
+import bf.gov.gcob.medaille.mapper.SortieMapper;
+import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionSortieDTO;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
+import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
+import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.entities.LigneSortie;
+import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.repository.LigneSortieRepository;
+import bf.gov.gcob.medaille.repository.MedailleRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
+import bf.gov.gcob.medaille.services.SortieService;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class SortieServiceImpl implements SortieService {
@@ -42,15 +62,21 @@ public class SortieServiceImpl implements SortieService {
     private final LigneSortieMapper ligneSortieMapper;
 
     private final ResourceLoader resourceLoader;
+    
+    private final MedailleMapper medailleMapper;
+    private final MedailleRepository medailleRepository;
 
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
-            SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader) {
+            SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader,
+            MedailleMapper medailleMapper, MedailleRepository medailleRepository) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
         this.ligneSortieMapper = ligneSortieMapper;
 
         this.resourceLoader = resourceLoader;
+        this.medailleMapper = medailleMapper;
+        this.medailleRepository = medailleRepository;
     }
 
     @Override
@@ -59,7 +85,7 @@ public class SortieServiceImpl implements SortieService {
         Sortie sortie = sortieMapper.toEntity(sortieDTO);
         if (null == sortieDTO.getIdSortie()) {
             Sortie firstSortie = sortieRepository.findFirstByOrderByIdSortieDesc();
-            Long lastId = (firstSortie != null ? firstSortie.getIdSortie() : 0L);
+            Long lastId = (firstSortie != null ? firstSortie.getIdSortie() : 0L) + 1;
             String sortieNumber = "" + lastId;
             int nbrZero = 4 - sortieNumber.length();
             if (nbrZero > 0) {
@@ -67,24 +93,28 @@ public class SortieServiceImpl implements SortieService {
                     sortieNumber = "0".concat(sortieNumber);
                 }
             }
-            sortieNumber = "CMD-" + sortieNumber + LocalDate.now().getYear();
+            sortieNumber = "S-" + sortieNumber + LocalDate.now().getYear();
             sortie.setNumeroSortie(sortieNumber);
         }
         sortie = sortieRepository.save(sortie);
         Set<LigneSortie> lignesSortie = new HashSet<>();
-        if (null == sortieDTO.getIdSortie() || (null != sortieDTO.getIdSortie() && !sortieDTO.getStatus().equals(MvtStatus.CLOSED))) {
-            if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
-                for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
+        List<Medaille> medaillesToUpdateStock = new ArrayList<>();
+        if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
+            for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
+            	Integer newStock = ls.getMedaille().getStock();
+            	if(null != newStock && newStock >= ls.getQuantiteLigne()) {
+            		newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
+            		ls.getMedaille().setStock(newStock);
+                	medaillesToUpdateStock.add(medailleMapper.toEntity(ls.getMedaille()));
                     LigneSortie local = ligneSortieMapper.toEntity(ls);
-                    if (local.isCloseSortie()) {
-                        sortie.setStatus(EMvtStatus.CLOSED);
-                        sortieRepository.save(sortie);
-                    }
                     local.setSortie(sortie);
                     lignesSortie.add(local);
-                }
-                ligneSortieRepository.saveAll(lignesSortie);
+            	}else {
+            		log.info("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
+            	}
             }
+            ligneSortieRepository.saveAllAndFlush(lignesSortie);
+            medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
         }
         return sortieMapper.toDTO(sortie);
     }

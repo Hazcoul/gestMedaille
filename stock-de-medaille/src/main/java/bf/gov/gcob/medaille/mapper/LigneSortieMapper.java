@@ -16,11 +16,6 @@ public class LigneSortieMapper extends AbstractBaseMapper {
 	@Autowired
 	private MedailleMapper medailleMapper;
 	
-//	public LigneSortieMapper(SortieMapper sortieMapper, MedailleMapper medailleMapper) {
-//		this.sortieMapper = sortieMapper;
-//		this.medailleMapper = medailleMapper;
-//	}
-	
     public LigneSortieDTO toDTO(LigneSortie entity) {
     	if(Objects.isNull(entity)) return null;
     	
@@ -29,7 +24,7 @@ public class LigneSortieMapper extends AbstractBaseMapper {
     	dto.setIdLigneSortie(entity.getIdLigneSortie());
     	dto.setMedaille(medailleMapper.toDTO(entity.getMedaille()));
     	dto.setQuantiteLigne(entity.getQuantiteLigne());
-    	dto.setSortie(sortieMapper.toDTO(entity.getSortie()));
+//    	dto.setSortie(sortieMapper.toDTO(entity.getSortie()));
     	setCommonFieldsFromEntity(entity, dto);
 
         return dto;
