@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO.MotifSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
