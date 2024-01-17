@@ -27,6 +27,7 @@ public class Grade extends AbstractBaseEntity {
     @Column(name = "type_grade", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private ETypeGrade typeGrade; //GRADE ou DIGNITE
+    @Column(nullable = false)
     private int code;//1 pour Chevalier, 2:Officier, 3:Commandeur, 4:Grand-officier et 5:Grand-croix
     private String libelle;
     private String description;

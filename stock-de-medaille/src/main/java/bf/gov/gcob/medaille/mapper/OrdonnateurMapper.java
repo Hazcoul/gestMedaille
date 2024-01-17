@@ -34,6 +34,9 @@ public class OrdonnateurMapper extends AbstractBaseMapper {
     }
 
     public Ordonnateur toEntity(OrdonnateurDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         Ordonnateur entity = new Ordonnateur();
         entity.setCivilite(ECivilite.getByLibelle(dto.getCivilite()));
         entity.setEmail(dto.getEmail());

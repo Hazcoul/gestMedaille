@@ -44,6 +44,9 @@ public class EntreeMapper extends AbstractBaseMapper {
     }
 
     public Entree toEntity(EntreeDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         Entree entity = new Entree();
         entity.setAcquisition(EAcquisition.valueOf(dto.getAcquisition().toString()));
         entity.setDateEntree(dto.getDateEntree());

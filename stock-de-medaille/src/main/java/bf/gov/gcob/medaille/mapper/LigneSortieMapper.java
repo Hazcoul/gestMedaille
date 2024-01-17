@@ -1,12 +1,10 @@
 package bf.gov.gcob.medaille.mapper;
 
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
+import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class LigneSortieMapper extends AbstractBaseMapper {
@@ -31,12 +29,15 @@ public class LigneSortieMapper extends AbstractBaseMapper {
     }
 
     public LigneSortie toEntity(LigneSortieDTO dto) {
-    	LigneSortie entity = new LigneSortie();
-    	entity.setCloseSortie(dto.isCloseSortie());
-    	entity.setIdLigneSortie(dto.getIdLigneSortie());
-    	entity.setQuantiteLigne(dto.getQuantiteLigne());
-    	//setCommonFieldsFromDTO(dto, entity);
-    	
+        if (Objects.isNull(dto)) {
+            return null;
+        }
+        LigneSortie entity = new LigneSortie();
+        entity.setCloseSortie(dto.isCloseSortie());
+        entity.setIdLigneSortie(dto.getIdLigneSortie());
+        entity.setQuantiteLigne(dto.getQuantiteLigne());
+        //setCommonFieldsFromDTO(dto, entity);
+
         return entity;
     }
 

@@ -2,16 +2,17 @@ package bf.gov.gcob.medaille.mapper;
 
 import bf.gov.gcob.medaille.model.dto.FournisseurDTO;
 import bf.gov.gcob.medaille.model.entities.Fournisseur;
-
 import java.util.Objects;
-
 import org.springframework.stereotype.Component;
 
 @Component
 public class FournisseurMapper extends AbstractBaseMapper {
+
     public FournisseurDTO buildFournisseurDto(Fournisseur fournisseur) {
-    	if(Objects.isNull(fournisseur)) return null;
-    	
+        if (Objects.isNull(fournisseur)) {
+            return null;
+        }
+
         FournisseurDTO fournisseurDto = new FournisseurDTO();
 
         fournisseurDto.setIdFournisseur(fournisseur.getIdFournisseur());
@@ -29,6 +30,9 @@ public class FournisseurMapper extends AbstractBaseMapper {
     }
 
     public Fournisseur buildFournisseur(FournisseurDTO fournisseurDto) {
+        if (Objects.isNull(fournisseurDto)) {
+            return null;
+        }
         Fournisseur fournisseur = new Fournisseur();
         fournisseur.setIdFournisseur(fournisseurDto.getIdFournisseur());
         fournisseur.setSigle(fournisseurDto.getSigle());

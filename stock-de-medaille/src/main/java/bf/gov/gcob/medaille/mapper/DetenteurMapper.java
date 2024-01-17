@@ -34,6 +34,9 @@ public class DetenteurMapper extends AbstractBaseMapper {
     }
 
     public Detenteur toEntity(DetenteurDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
         Detenteur entity = new Detenteur();
         entity.setCivilite(ECivilite.getByLibelle(dto.getCivilite()));
         entity.setEmail(dto.getEmail());
