@@ -28,9 +28,9 @@ public interface SortieService {
 
     Resource getLigneSortieBySortie(Long id);
 
-    Page<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto, Pageable pageable);
+    List<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto);
 
-    Page<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto, Pageable pageable);
+    List<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto);
 
     Resource getLigneSortieByPeriode(FilterSortieDto filterSortieDto);
 

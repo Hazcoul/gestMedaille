@@ -145,12 +145,11 @@ public class EntreeServiceImpl implements EntreeService {
         }
     }
 
-    public Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable) {
+    public List<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto) {
         log.debug("Request to get all entree");
         return entreeRepository.findByCriteria(
                 filterEntreeDto.getAnnee(),
-                filterEntreeDto.getFournisseur(),
-                pageable).map(entreeMapper::toDTO);
+                filterEntreeDto.getFournisseur()).stream().map(entreeMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -169,11 +168,11 @@ public class EntreeServiceImpl implements EntreeService {
             ligneImpressionEntreeDTO.setMontantLigne(ligneEntreeDTO.getMontantLigne().intValue());
             ligneImpressionEntreeDTO.setQuantiteLigne(ligneEntreeDTO.getQuantiteLigne());
             ligneImpressionEntreeDTO.setPrixUnitaire(ligneEntreeDTO.getPrixUnitaire().intValue());
-            ligneImpressionEntreeDTO.setLibelleFournisseur(ligneEntreeDTO.getEntree().getFournisseur().getLibelle());
-            ligneImpressionEntreeDTO.setNomMagasin(ligneEntreeDTO.getEntree().getMagasin().getNomMagasin());
-            ligneImpressionEntreeDTO.setNumeroCommande(ligneEntreeDTO.getEntree().getNumeroCmd());
+            ligneImpressionEntreeDTO.setLibelleFournisseur(entree.get().getFournisseur().getLibelle());
+            ligneImpressionEntreeDTO.setNomMagasin(entree.get().getMagasin().getNomMagasin());
+            ligneImpressionEntreeDTO.setNumeroCommande(entree.get().getNumeroCmd());
             ligneImpressionEntreeDTO.setNomCompletMedaille(ligneEntreeDTO.getMedaille() != null ? ligneEntreeDTO.getMedaille().getNomComplet() : "");
-            ligneImpressionEntreeDTO.setAcquisition(ligneEntreeDTO.getEntree().getAcquisition().name());
+            ligneImpressionEntreeDTO.setAcquisition(entree.get().getAcquisition().name());
 
             ligneImpressionEntreeDTOS.add(ligneImpressionEntreeDTO);
         }

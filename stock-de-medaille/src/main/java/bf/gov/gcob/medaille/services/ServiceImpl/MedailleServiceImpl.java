@@ -115,10 +115,10 @@ public class MedailleServiceImpl implements MedailleService {
         }
 
         medailleDTOS = medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
-        /*for (MedailleDTO medailleDto : medailleDTOS) {
+        for (MedailleDTO medailleDto : medailleDTOS) {
             Path path = subfolderPath.resolve(medailleDto.getLienImage());
             medailleDto.setImage(Files.readAllBytes(path));
-        }*/
+        }
         return medailleDTOS;
     }
 

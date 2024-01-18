@@ -21,7 +21,7 @@ public interface SortieRepository extends JpaRepository<Sortie, Long> {
     List<Sortie> findSortieByDecoByYear(int annee, EMotifSortie motif);
 
     @Query("select s from Sortie s where (:ordonnateur is null  or s.ordonnateur.idOrdonnateur=:ordonnateur)  and (:annee is null or YEAR(s.dateSortie)= :annee) and (:detenteur is null  or s.detenteur.idDetenteur=:detenteur) and (:beneficiaire is null  or s.beneficiaire.idBeneficiaire=:beneficiaire) and (:motifSortie is null or s.motifSortie=:motifSortie)")
-    Page<Sortie> findByCriteria(@Param("annee") Integer annee, @Param("motifSortie") EMotifSortie motifSortie, @Param("ordonnateur") Long ordonnateur, @Param("detenteur") Long detenteur, @Param("beneficiaire") Long beneficiaire, Pageable pageable);
+    List<Sortie> findByCriteria(@Param("annee") Integer annee, @Param("motifSortie") EMotifSortie motifSortie, @Param("ordonnateur") Long ordonnateur, @Param("detenteur") Long detenteur, @Param("beneficiaire") Long beneficiaire);
 
     @Query("select ls from LigneSortie ls where ls.sortie.idSortie=:idSortie")
     List<LigneSortie> findAllLigneBySortie(@Param("idSortie") Long idSortie);

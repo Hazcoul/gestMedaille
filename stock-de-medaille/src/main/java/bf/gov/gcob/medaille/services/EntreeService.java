@@ -25,7 +25,7 @@ public interface EntreeService {
 
     void delete(Long id);
 
-    Page<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto, Pageable pageable);
+    List<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto);
 
     Resource getlisteEntreeByCommande(Long id);
 
