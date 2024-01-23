@@ -121,16 +121,10 @@ public class EntreeController {
     }
 
     @PostMapping("/entrees/statistique/commandes")
-    public ResponseEntity<List<EntreeDTO>> getAllCommandeByCriteria(@RequestBody FilterEntreeDto filterEntreeDto, Pageable pageable) {
+    public ResponseEntity<List<EntreeDTO>> getAllCommandeByCriteria(@RequestBody FilterEntreeDto filterEntreeDto) {
         log.debug("REST request to get a page of commandes");
-        Page<EntreeDTO> page = entreeService.findAllByCriteria(filterEntreeDto, pageable);
-        HttpHeaders headers = new HttpHeaders() {
-            {
-                add("Access-Control-Expose-Headers", "X-Total-Count");
-                add("X-Total-Count", String.valueOf(page.getTotalElements()));
-            }
-        };
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        List<EntreeDTO> entreeDTOS = entreeService.findAllByCriteria(filterEntreeDto);
+        return ResponseEntity.ok().body(entreeDTOS);
     }
 
     @GetMapping("/entrees/statistique/commandes/impression/{idCommande}")

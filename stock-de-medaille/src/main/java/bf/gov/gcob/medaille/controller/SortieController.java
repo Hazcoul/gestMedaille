@@ -109,29 +109,23 @@ public class SortieController {
     }
 
     @PostMapping("/sorties/statistique/sorties")
-    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
+    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto) {
         log.debug("REST request to get a page of sorties");
-        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto, pageable);
-        HttpHeaders headers = new HttpHeaders() {
+        List<SortieDTO> sortieDTOS = sortieService.findAllByCriteria(filterSortieDto);
+       /* HttpHeaders headers = new HttpHeaders() {
             {
                 add("Access-Control-Expose-Headers", "X-Total-Count");
                 add("X-Total-Count", String.valueOf(page.getTotalElements()));
             }
-        };
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        };*/
+        return ResponseEntity.ok().body(sortieDTOS);
     }
 
     @PostMapping("/sorties/statistique/sorties/periode")
     public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
         log.debug("REST request to get a page of sorties");
-        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto, pageable);
-        HttpHeaders headers = new HttpHeaders() {
-            {
-                add("Access-Control-Expose-Headers", "X-Total-Count");
-                add("X-Total-Count", String.valueOf(page.getTotalElements()));
-            }
-        };
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS = sortieService.findAllSortiesByPeriode(filterSortieDto);
+        return ResponseEntity.ok().body(ligneImpressionSortiePeriodeDTOS);
     }
 
     @GetMapping("/sorties/statistique/sorties/impression/{idSortie}")

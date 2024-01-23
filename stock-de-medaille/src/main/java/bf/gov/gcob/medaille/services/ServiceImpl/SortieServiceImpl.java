@@ -205,7 +205,7 @@ public class SortieServiceImpl implements SortieService {
     }
 
     @Override
-    public Page<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto, Pageable pageable) {
+    public List<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto) {
         log.debug("Request to get all sortie");
         EMotifSortie eMotifSortie = EMotifSortie.getByLibelle(filterSortieDto.getMotifSortie());
         return sortieRepository.findByCriteria(
@@ -213,18 +213,17 @@ public class SortieServiceImpl implements SortieService {
                 eMotifSortie,
                 filterSortieDto.getOrdonnateur(),
                 filterSortieDto.getDetenteur(),
-                filterSortieDto.getBeneficiaire(),
-                pageable).map(sortieMapper::toDTO);
+                filterSortieDto.getBeneficiaire()).stream().map(sortieMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public Page<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto, Pageable pageable) {
-
+    public List<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto) {
         List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
         ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
 
-        return createPageFromList(ligneImpressionSortiePeriodeDTOS, pageable);
+        return ligneImpressionSortiePeriodeDTOS;
     }
+
 
     List<LigneImpressionSortiePeriodeDTO> getFilterListeByperiode(FilterSortieDto filterSortieDto) {
         Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));

@@ -24,7 +24,7 @@ public interface EntreeRepository extends JpaRepository<Entree, Long> {
     List<Entree> findEntreeByYear(int annee);
 
     @Query("select e from Entree e where (:fournisseur is null  or e.fournisseur.idFournisseur=:fournisseur)  and (:annee is null or YEAR(e.dateEntree)= :annee) ")
-    Page<Entree> findByCriteria(@Param("annee") Integer annee, @Param("fournisseur") Long fournisseur, Pageable pageable);
+    List<Entree> findByCriteria(@Param("annee") Integer annee, @Param("fournisseur") Long fournisseur);
 
     @Query("select e from LigneEntree e where e.entree.idEntree=:idEntree")
     List<LigneEntree> findAllLigneByEntree(@Param("idEntree") Long idEntree);

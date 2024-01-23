@@ -28,6 +28,7 @@ public class MedailleMapper extends AbstractBaseMapper {
         dto.setNomComplet(entity.getNomComplet());
         dto.setCode(entity.getCode());
         dto.setStock(entity.getStock());
+        dto.setCode(entity.getCode());
         setCommonFieldsFromEntity(entity, dto);
 
         return dto;
@@ -45,6 +46,7 @@ public class MedailleMapper extends AbstractBaseMapper {
         entity.setNomComplet(dto.getNomComplet());
         entity.setGrade(gradeMapper.toEntity(dto.getGrade()));
         entity.setStock(dto.getStock());
+        entity.setCode(dto.getCode());
 
         return entity;
     }
