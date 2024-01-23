@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import bf.gov.gcob.medaille.model.enums.EAcquisition;
 import bf.gov.gcob.medaille.model.enums.ECivilite;
 import bf.gov.gcob.medaille.model.enums.EMotifSortie;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.model.enums.ETypeDistinction;
 import bf.gov.gcob.medaille.model.enums.ETypeGrade;
 import bf.gov.gcob.medaille.model.enums.ETypePiece;
@@ -24,6 +25,7 @@ public class ReferentialService {
         referentials.put("typePieces", ETypePiece.getLibelleAsMap());
         referentials.put("acquisitions", EAcquisition.getLibelleAsMap());
         referentials.put("motifsSortie", EMotifSortie.getLibelleAsMap());
+        referentials.put("mvtStatus", EMvtStatus.getLibelleAsMap());
         return referentials;
 	}
 }

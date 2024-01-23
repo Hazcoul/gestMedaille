@@ -30,5 +30,7 @@ public interface EntreeService {
     Resource getlisteEntreeByCommande(Long id);
 
     EntreeDTO validerEntree(Long idEntree);
+    
+    EntreeDTO rejeter(Long idEntree, String comment);
 
 }

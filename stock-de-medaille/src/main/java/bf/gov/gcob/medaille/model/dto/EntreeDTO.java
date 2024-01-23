@@ -32,7 +32,7 @@ public class EntreeDTO extends AbstractBaseDTO {
     private MvtStatus status;
 
     public enum MvtStatus {
-        CREATED, VALIDATED, CANCELLED, CLOSED;
+        CREATED, VALIDATED, REJECT, CLOSED;
     }
 
     public enum Acquisition {

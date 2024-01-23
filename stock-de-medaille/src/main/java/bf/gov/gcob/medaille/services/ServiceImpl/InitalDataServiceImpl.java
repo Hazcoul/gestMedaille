@@ -5,12 +5,6 @@
  */
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import bf.gov.gcob.medaille.model.entities.Privilege;
-import bf.gov.gcob.medaille.model.entities.Profil;
-import bf.gov.gcob.medaille.model.entities.Utilisateur;
-import bf.gov.gcob.medaille.repository.PrivilegeRepository;
-import bf.gov.gcob.medaille.repository.ProfilRepository;
-import bf.gov.gcob.medaille.repository.UtilisateurRepository;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,13 +15,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
+
+import bf.gov.gcob.medaille.model.entities.GCOBConfig;
+import bf.gov.gcob.medaille.model.entities.Privilege;
+import bf.gov.gcob.medaille.model.entities.Profil;
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
+import bf.gov.gcob.medaille.repository.GCOBConfigRepository;
+import bf.gov.gcob.medaille.repository.PrivilegeRepository;
+import bf.gov.gcob.medaille.repository.ProfilRepository;
+import bf.gov.gcob.medaille.repository.UtilisateurRepository;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service d'auto initialisation de données
@@ -49,6 +53,9 @@ public class InitalDataServiceImpl {
 
     @Autowired
     private PrivilegeRepository privilegeRepository;
+    
+    @Autowired
+    private GCOBConfigRepository gcobConfigRepository;
 
     @Value("${application.resources.static-locations}")
     private String dataPath;
@@ -115,4 +122,12 @@ public class InitalDataServiceImpl {
         }
     }
 
+    @Transactional
+    public void initGCOBConfig() {
+    	if(gcobConfigRepository.findAll().isEmpty()) {
+    		GCOBConfig gcobConfig = new GCOBConfig("50", "1008000311", "SYSTEM");
+    		gcobConfigRepository.save(gcobConfig);
+    		log.info("Initialisation de la configuration GCOB... ok");
+    	}
+    }
 }

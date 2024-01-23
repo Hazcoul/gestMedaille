@@ -37,6 +37,7 @@ public class StockDeMedailleApplication implements CommandLineRunner {
         service.saveInitAuthorities();
         service.saveInitProfil();
         service.saveInitUser();
+        service.initGCOBConfig();
     }
 
     @Bean
