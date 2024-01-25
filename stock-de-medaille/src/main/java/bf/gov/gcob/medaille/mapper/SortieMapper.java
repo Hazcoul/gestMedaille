@@ -43,7 +43,7 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
         dto.setLigneSorties(entity.getLigneSorties().stream().map(ligneSortieMapper::toDTO).toList());
-        dto.setStatus(MvtStatus.valueOf(dto.getStatus().toString()));
+        dto.setStatus(MvtStatus.valueOf(entity.getStatus().toString()));
         dto.setNumeroSortie(entity.getNumeroSortie());
         setCommonFieldsFromEntity(entity, dto);
 

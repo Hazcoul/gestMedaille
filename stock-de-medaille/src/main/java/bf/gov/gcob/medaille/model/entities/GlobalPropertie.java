@@ -20,7 +20,7 @@ public class GlobalPropertie extends AbstractBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_global_propertie", nullable = false, unique = true)
     private Long        idGlobalPropertie;
-    @Column(name = "exercice_budgetaire", nullable = false, unique = true)
+    @Column(name = "exercice_budgetaire", nullable = false)
     private Integer      exerciceBudgetaire;
     @Column(name = "type_mvt", nullable = false)
     private Character typeMvt;

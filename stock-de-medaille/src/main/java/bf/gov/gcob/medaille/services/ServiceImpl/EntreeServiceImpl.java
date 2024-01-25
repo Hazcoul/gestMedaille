@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -35,13 +33,13 @@ import bf.gov.gcob.medaille.model.entities.GCOBConfig;
 import bf.gov.gcob.medaille.model.entities.GlobalPropertie;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
 import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.repository.EntreeRepository;
 import bf.gov.gcob.medaille.repository.GCOBConfigRepository;
 import bf.gov.gcob.medaille.repository.GlabalPropertieRepository;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
-import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.EntreeService;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -64,13 +62,11 @@ public class EntreeServiceImpl implements EntreeService {
     private final GCOBConfigRepository gcobConfigRepository;
 
     private final ResourceLoader resourceLoader;
-    
-    private final JwtUtil jwtUtil;
 
     public EntreeServiceImpl(EntreeRepository entreeRepository, LigneEntreeRepository ligneEntreeRepository,
             EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader,
             MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository, 
-            GCOBConfigRepository gcobConfigRepository, JwtUtil jwtUtil) {
+            GCOBConfigRepository gcobConfigRepository) {
         this.entreeRepository = entreeRepository;
         this.ligneEntreeRepository = ligneEntreeRepository;
         this.entreeMapper = entreeMapper;
@@ -80,8 +76,7 @@ public class EntreeServiceImpl implements EntreeService {
         this.medailleRepository = medailleRepository;
         this.globalPropertieRepository = globalPropertieRepository;
         this.gcobConfigRepository = gcobConfigRepository;
-        
-        this.jwtUtil = jwtUtil;
+
     }
 
     @Override
@@ -236,13 +231,15 @@ public class EntreeServiceImpl implements EntreeService {
 
     @Override
     @Transactional
-    public EntreeDTO validerEntree(Long idEntree) {
+    public EntreeDTO validerEntree(Long idEntree, Utilisateur user) {
         log.info("Validation de l'entrée : {}", idEntree);
+        if(null == user) {
+        	throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
+        }
         Entree entree = entreeRepository.findById(idEntree).get();
         entree.setStatus(EMvtStatus.VALIDATED);
         entree.setValiderLe(new Date());
-        entree.setValiderPar("admin");
-        //entree.setValiderPar(jwtUtil.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("Vous devez être connecté pour effectuer une validation.")));
+        entree.setValiderPar(user.getMatricule());
         entree = entreeRepository.save(entree);
         /** On met à jour le stock de médaille dans chaque ligne après validation*/
         List<Medaille> medaillesToUpdateStock = new ArrayList<>();
@@ -259,7 +256,6 @@ public class EntreeServiceImpl implements EntreeService {
             	throw new RuntimeException("La somme des quantités des lignes de l'entrée depasse la capacité du magasin.");
             }
             medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
-            entree.getMagasin().setCapacite(newCapacite + leSum);
         }
         return entreeMapper.toDTO(entree);
     }

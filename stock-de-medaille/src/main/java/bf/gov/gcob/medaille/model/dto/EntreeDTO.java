@@ -1,9 +1,9 @@
 package bf.gov.gcob.medaille.model.dto;
 
-import bf.gov.gcob.medaille.model.AbstractBaseDTO;
-import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+
+import bf.gov.gcob.medaille.model.AbstractBaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

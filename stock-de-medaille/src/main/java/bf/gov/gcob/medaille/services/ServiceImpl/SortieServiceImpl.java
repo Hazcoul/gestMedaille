@@ -1,7 +1,5 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
-
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -21,25 +19,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
-import bf.gov.gcob.medaille.mapper.MedailleMapper;
 import bf.gov.gcob.medaille.mapper.SortieMapper;
 import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortieDTO;
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
 import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.entities.GCOBConfig;
+import bf.gov.gcob.medaille.model.entities.GlobalPropertie;
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.Medaille;
 import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.repository.GCOBConfigRepository;
+import bf.gov.gcob.medaille.repository.GlabalPropertieRepository;
 import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
@@ -62,59 +62,70 @@ public class SortieServiceImpl implements SortieService {
     private final LigneSortieMapper ligneSortieMapper;
 
     private final ResourceLoader resourceLoader;
-    
-    private final MedailleMapper medailleMapper;
+
     private final MedailleRepository medailleRepository;
+    private final GlabalPropertieRepository globalPropertieRepository;
+    private final GCOBConfigRepository gcobConfigRepository;
 
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
             SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader,
-            MedailleMapper medailleMapper, MedailleRepository medailleRepository) {
+            MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository,
+            GCOBConfigRepository gcobConfigRepository) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
         this.ligneSortieMapper = ligneSortieMapper;
 
         this.resourceLoader = resourceLoader;
-        this.medailleMapper = medailleMapper;
         this.medailleRepository = medailleRepository;
+        this.gcobConfigRepository = gcobConfigRepository;
+        this.globalPropertieRepository = globalPropertieRepository;
     }
 
     @Override
     public SortieDTO save(SortieDTO sortieDTO) {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         Sortie sortie = sortieMapper.toEntity(sortieDTO);
+        
+        GlobalPropertie gp = null;
         if (null == sortieDTO.getIdSortie()) {
-            Sortie firstSortie = sortieRepository.findFirstByOrderByIdSortieDesc();
-            Long lastId = (firstSortie != null ? firstSortie.getIdSortie() : 0L) + 1;
-            String sortieNumber = "" + lastId;
-            int nbrZero = 4 - sortieNumber.length();
+        	Integer currentYear = LocalDate.now().getYear();
+        	GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
+        	 gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('S', currentYear).orElse(null);
+            Integer count = 0;
+        	if(null != gp) {
+            	count = gp.getSortieCount() + 1;
+            } else {
+            	gp = new GlobalPropertie();
+            	gp.setCreatedBy("SYSTEM");
+            	gp.setExerciceBudgetaire(currentYear);
+            	gp.setTypeMvt('S');
+            	gp = globalPropertieRepository.save(gp);
+            	count = gp.getSortieCount() + 1;
+            }
+            String completedCount = "" + count;
+            int nbrZero = 4 - completedCount.length();
             if (nbrZero > 0) {
                 for (int i = 0; i < nbrZero; i++) {
-                    sortieNumber = "0".concat(sortieNumber);
+                	completedCount = "0".concat(completedCount);
                 }
             }
-            sortieNumber = "S-" + sortieNumber + LocalDate.now().getYear();
-            sortie.setNumeroSortie(sortieNumber);
+    		String sNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
+            sortie.setNumeroSortie(sNumber);
         }
         sortie = sortieRepository.save(sortie);
+        if(null != gp) {
+        	gp.setSortieCount(gp.getSortieCount() + 1);
+        	globalPropertieRepository.save(gp);
+        }
         Set<LigneSortie> lignesSortie = new HashSet<>();
-        List<Medaille> medaillesToUpdateStock = new ArrayList<>();
         if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
             for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
-            	Integer newStock = ls.getMedaille().getStock();
-            	if(null != newStock && newStock >= ls.getQuantiteLigne()) {
-            		newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
-            		ls.getMedaille().setStock(newStock);
-                	medaillesToUpdateStock.add(medailleMapper.toEntity(ls.getMedaille()));
-                    LigneSortie local = ligneSortieMapper.toEntity(ls);
-                    local.setSortie(sortie);
-                    lignesSortie.add(local);
-            	}else {
-            		log.info("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
-            	}
+				LigneSortie local = ligneSortieMapper.toEntity(ls);
+				local.setSortie(sortie);
+				lignesSortie.add(local);
             }
             ligneSortieRepository.saveAllAndFlush(lignesSortie);
-            medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
         }
         return sortieMapper.toDTO(sortie);
     }
@@ -282,12 +293,41 @@ public class SortieServiceImpl implements SortieService {
     }
 
     @Override
-    public SortieDTO validerSortie(Long idSortie) {
+    @Transactional
+    public SortieDTO validerSortie(Long idSortie, Utilisateur user) {
         log.info("Validation de la sortie : {}", idSortie);
+        if(null == user) {
+        	throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
+        }
         Sortie sortie = sortieRepository.findById(idSortie).get();
         sortie.setStatus(EMvtStatus.VALIDATED);
         sortie.setValiderLe(new Date());
+        sortie.setValiderPar(user.getMatricule());
+        sortieRepository.save(sortie); 
+        List<Medaille> medaillesToUpdateStock = new ArrayList<>();
+        if (null != sortie.getLigneSorties() && !sortie.getLigneSorties().isEmpty()) {
+            for (LigneSortie ls : sortie.getLigneSorties()) {
+            	Integer newStock = ls.getMedaille().getStock();
+            	if(null != newStock && newStock >= ls.getQuantiteLigne()) {
+            		newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
+            		ls.getMedaille().setStock(newStock);
+                	medaillesToUpdateStock.add(ls.getMedaille());
+            	}else {
+            		throw new RuntimeException("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
+            	}
+            }
+            medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
+        }
         return sortieMapper.toDTO(sortieRepository.save(sortie));
     }
+
+	@Override
+	public SortieDTO rejeter(Long idSortie, String comment) {
+		log.info("Rejet de la sortie : {}", idSortie);
+		Sortie sortie = sortieRepository.findById(idSortie).get();
+		sortie.setDescription(comment);
+		sortie.setStatus(EMvtStatus.REJECT);	
+		return sortieMapper.toDTO(sortieRepository.save(sortie));
+	}
 
 }

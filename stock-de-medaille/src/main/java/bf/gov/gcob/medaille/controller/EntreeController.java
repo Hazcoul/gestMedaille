@@ -9,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +31,7 @@ import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.services.EntreeService;
 import bf.gov.gcob.medaille.services.ReportService;
+import bf.gov.gcob.medaille.services.UtilisateurService;
 import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
@@ -54,10 +54,14 @@ public class EntreeController {
     private final EntreeService entreeService;
 
     private final ReportService reportService;
+    
+    private final UtilisateurService utilisateurService;
 
-    public EntreeController(EntreeService entreeService, ReportService reportService) {
+    public EntreeController(EntreeService entreeService, ReportService reportService,
+    		UtilisateurService utilisateurService) {
         this.entreeService = entreeService;
         this.reportService = reportService;
+        this.utilisateurService = utilisateurService;
     }
 
     @PostMapping("/entrees")
@@ -135,7 +139,7 @@ public class EntreeController {
     }
 
     /**
-     * Valide une entree et genere un etat d'ordre d'entree de matieres
+     * Genere un etat d'ordre d'entree de matieres
      *
      * @param idEntree
      * @param format
@@ -150,10 +154,16 @@ public class EntreeController {
         return reportService.printOrdreEntreeMatiere(idEntree, format);
     }
     
+    /**
+     * Valide une entree de matieres
+     *
+     * @param idEntree
+     * @return
+     */
     @GetMapping(value = "/entrees/{id}/valider")
-    public Mono<?> validerEntreeMatieres(@PathVariable(name = "id", required = true) Long idEntree) {
+    public Mono<?> validerEntreeMatieres(@PathVariable(name = "id", required = true) Long idEntree, ServerHttpRequest request) {
         try {
-        	EntreeDTO entree = entreeService.validerEntree(idEntree);
+        	EntreeDTO entree = entreeService.validerEntree(idEntree, utilisateurService.findUserInfos(request));
             return Mono.just(entree);
 		} catch (Exception e) {
 			ApiResponse<Object> result = new ApiResponse<>();
