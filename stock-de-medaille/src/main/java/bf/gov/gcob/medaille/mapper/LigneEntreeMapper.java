@@ -1,15 +1,18 @@
 package bf.gov.gcob.medaille.mapper;
 
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import bf.gov.gcob.medaille.model.dto.LigneEntreeDTO;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
-import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class LigneEntreeMapper extends AbstractBaseMapper {
-
-    private final EntreeMapper entreeMapper;
-    private final MedailleMapper medailleMapper;
+	
+	@Autowired private EntreeMapper entreeMapper;
+	@Autowired private MedailleMapper medailleMapper;
 
     public LigneEntreeMapper(EntreeMapper entreeMapper, MedailleMapper medailleMapper) {
         this.entreeMapper = entreeMapper;
@@ -23,9 +26,9 @@ public class LigneEntreeMapper extends AbstractBaseMapper {
 
         LigneEntreeDTO dto = new LigneEntreeDTO();
         dto.setCloseEntree(entity.isCloseEntree());
-        dto.setEntree((entity.getEntree() != null ? entreeMapper.toDTO(entity.getEntree()) : null));
+        //dto.setEntree(entreeMapper.toDTO(entity.getEntree()));
         dto.setIdLigneEntree(entity.getIdLigneEntree());
-        dto.setMedaille((entity.getMedaille() != null ? medailleMapper.toDTO(entity.getMedaille()) : null));
+        dto.setMedaille(medailleMapper.toDTO(entity.getMedaille()));
         dto.setMontantLigne(entity.getMontantLigne());
         dto.setPrixUnitaire(entity.getPrixUnitaire());
         dto.setQuantiteLigne(entity.getQuantiteLigne());
@@ -44,6 +47,7 @@ public class LigneEntreeMapper extends AbstractBaseMapper {
         entity.setMontantLigne(dto.getMontantLigne());
         entity.setPrixUnitaire(dto.getPrixUnitaire());
         entity.setQuantiteLigne(dto.getQuantiteLigne());
+        entity.setMedaille(medailleMapper.toEntity(dto.getMedaille()));
         //setCommonFieldsFromDTO(dto, entity);
 
         return entity;

@@ -1,16 +1,18 @@
 package bf.gov.gcob.medaille.repository;
 
-import bf.gov.gcob.medaille.model.entities.Entree;
-import bf.gov.gcob.medaille.model.entities.LigneEntree;
-import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import bf.gov.gcob.medaille.model.entities.Entree;
+import bf.gov.gcob.medaille.model.entities.LigneEntree;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+
+@Repository
 public interface EntreeRepository extends JpaRepository<Entree, Long> {
 
     Entree findFirstByOrderByIdEntreeDesc();
@@ -22,7 +24,7 @@ public interface EntreeRepository extends JpaRepository<Entree, Long> {
     List<Entree> findEntreeByYear(int annee);
 
     @Query("select e from Entree e where (:fournisseur is null  or e.fournisseur.idFournisseur=:fournisseur)  and (:annee is null or YEAR(e.dateEntree)= :annee) ")
-    Page<Entree> findByCriteria(@Param("annee") Integer annee, @Param("fournisseur") Long fournisseur, Pageable pageable);
+    List<Entree> findByCriteria(@Param("annee") Integer annee, @Param("fournisseur") Long fournisseur);
 
     @Query("select e from LigneEntree e where e.entree.idEntree=:idEntree")
     List<LigneEntree> findAllLigneByEntree(@Param("idEntree") Long idEntree);

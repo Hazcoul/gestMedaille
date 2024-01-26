@@ -5,12 +5,12 @@
  */
 package bf.gov.gcob.medaille.services;
 
-import bf.gov.gcob.medaille.model.dto.LoginVM;
-import bf.gov.gcob.medaille.model.dto.PasswordModif;
-import bf.gov.gcob.medaille.model.dto.ResetConnectPaswword;
-import bf.gov.gcob.medaille.model.dto.ResetPaswword;
-import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
+import bf.gov.gcob.medaille.model.dto.*;
+
 import java.util.List;
+import java.util.Optional;
+
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
@@ -43,11 +43,15 @@ public interface UtilisateurService {
 
     String processResetPassword(final ResetPaswword resetPaswword);
 
-    String processResetConnectPassword(final ResetConnectPaswword resetPaswword, ServerHttpRequest request);
+    MResponse processResetConnectPassword(final ResetConnectPaswword resetPaswword, ServerHttpRequest request);
 
     List<UtilisateurDTO> findAll();
 
     UtilisateurDTO getById(Long id);
 
     List<Integer> count();
+
+    Optional<Utilisateur> requestPasswordResetToDefault(String login);
+
+    Utilisateur findUserInfos(ServerHttpRequest request);
 }

@@ -1,11 +1,7 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import bf.gov.gcob.medaille.mapper.UtilisateurMapper;
-import bf.gov.gcob.medaille.model.dto.LoginVM;
-import bf.gov.gcob.medaille.model.dto.PasswordModif;
-import bf.gov.gcob.medaille.model.dto.ResetConnectPaswword;
-import bf.gov.gcob.medaille.model.dto.ResetPaswword;
-import bf.gov.gcob.medaille.model.dto.UtilisateurDTO;
+import bf.gov.gcob.medaille.model.dto.*;
 import bf.gov.gcob.medaille.model.entities.*;
 import bf.gov.gcob.medaille.repository.*;
 import bf.gov.gcob.medaille.security.JwtUtil;
@@ -15,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,7 +65,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Value("${jwt.base64-secret}")
     private String secret;
     
-    private final String DEFAULT_PASSWORD = "S!g@c!L:2023";
+    private final String DEFAULT_PASSWORD = "admin2023";
 
     @Autowired
     private FournisseurRepository fournisseurRepository;
@@ -406,31 +403,41 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     }
     
     @Override
-    public String processResetConnectPassword(final ResetConnectPaswword resetPaswword, ServerHttpRequest request) {
+    public MResponse processResetConnectPassword(final ResetConnectPaswword resetPaswword, ServerHttpRequest request) {
         log.info("Modifier l'ancien password par un nouveau : {}", resetPaswword);
         Utilisateur optionalUser = this.getCurrentUser(request);
+
+        MResponse mResponse = new MResponse();
         
         if (optionalUser == null) {
-            throw new RuntimeException("Cet utilisateur n'existe pas");
+            mResponse.setCode("-1");
+            mResponse.setMsg("Cet utilisateur n'existe pas");
+          //  throw new RuntimeException("Cet utilisateur n'existe pas");
         }
         if (!passwordEncoder.matches(resetPaswword.getOldPassword(), optionalUser.getPassword())) {
-            throw new RuntimeException("Votre ancien mot de passe n'est pas correct!");
-        }
-        String password = passwordEncoder.encode(resetPaswword.getNewPassword());
-        Utilisateur user = optionalUser;
-        user.setResetKey(null);
-        user.setPassword(password);
-        String email = optionalUser.getEmail();
-        String emailSubject = "Mot de passe modifié";
-        String emailBody = "Votre de mot de passe a été modifié avec succès! Si vous n'êtes pas à l'origine de cette action, "
-                + "veuillez nous contacter.";
-        utilisateurRepository.save(user);
+            mResponse.setCode("-2");
+            mResponse.setMsg("Votre ancien mot de passe n'est pas correct!");
+         //   throw new RuntimeException("Votre ancien mot de passe n'est pas correct!");
+        }else{
+            String password = passwordEncoder.encode(resetPaswword.getNewPassword());
+            Utilisateur user = optionalUser;
+            user.setResetKey(null);
+            user.setPassword(password);
+            String email = optionalUser.getEmail();
+            String emailSubject = "Mot de passe modifié";
+            String emailBody = "Votre de mot de passe a été modifié avec succès! Si vous n'êtes pas à l'origine de cette action, "
+                    + "veuillez nous contacter.";
+            utilisateurRepository.save(user);
 //        if (mailService.isEmailValid(email)) {
 //            mailService.sendEmail(email, emailSubject, emailBody);
 //        } else {
 //            throw new RuntimeException("L'email de l'utilisateur n'est pas valide.");
 //        }
-        return "Le mot de passe a été changé";
+            mResponse.setCode("0");
+            mResponse.setMsg("Le mot de passe a été changé");
+        }
+
+        return mResponse;
     }
     
     @Override
@@ -514,6 +521,25 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         nombre.add(stock);
 
         return nombre;
+    }
+
+    @Override
+    public Optional<Utilisateur> requestPasswordResetToDefault(String login) {
+         Optional<Utilisateur> user = utilisateurRepository.findOneByLogin(login);
+         if(user.isPresent()){
+             user.get().setResetKey(null);
+             user.get().setActif(true);
+             user.get().setActivationKey(null);
+             user.get().setConfirmationExpireDate(null);
+             user.get().setResetDate(Instant.now());
+             user.get().setPassword(passwordEncoder.encode(this.DEFAULT_PASSWORD));
+             utilisateurRepository.save(user.get());
+         }
+         return user;
+    }
+
+    public Utilisateur findUserInfos(ServerHttpRequest request) {
+        return this.getCurrentUser(request);
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO.MotifSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
@@ -41,8 +42,8 @@ public class SortieMapper extends AbstractBaseMapper {
         dto.setOrdonnateur(ordonnateurMapper.toDTO(entity.getOrdonnateur()));
         dto.setValiderLe(entity.getValiderLe());
         dto.setValiderPar(entity.getValiderPar());
-        //dto.setLigneSorties(entity.getLigneSorties().stream().map(ligneSortieMapper::toDTO).toList());
-        //dto.setStatus(MvtStatus.valueOf(dto.getStatus().toString()));
+        dto.setLigneSorties(entity.getLigneSorties().stream().map(ligneSortieMapper::toDTO).toList());
+        dto.setStatus(MvtStatus.valueOf(entity.getStatus().toString()));
         dto.setNumeroSortie(entity.getNumeroSortie());
         setCommonFieldsFromEntity(entity, dto);
 

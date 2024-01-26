@@ -6,12 +6,15 @@
 package bf.gov.gcob.medaille.controller;
 
 import bf.gov.gcob.medaille.model.dto.*;
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import bf.gov.gcob.medaille.security.JwtAuthenticationManager;
 import bf.gov.gcob.medaille.security.JwtUtil;
 import bf.gov.gcob.medaille.services.UtilisateurService;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -191,8 +194,8 @@ public class UtilisateurController {
      * @return
      */
     @PostMapping("/reset-connect-password")
-    public ResponseEntity<String> processResetConnectPassword(final @RequestBody ResetConnectPaswword resetPassword, ServerHttpRequest request) {
-        return new ResponseEntity<>(service.processResetConnectPassword(resetPassword, request), HttpStatus.OK);
+    public MResponse processResetConnectPassword(final @RequestBody ResetConnectPaswword resetPassword, ServerHttpRequest request) {
+        return service.processResetConnectPassword(resetPassword, request);
     }
 
     /**
@@ -224,6 +227,22 @@ public class UtilisateurController {
     public ResponseEntity<List<Integer>> find() {
         List<Integer> etat = service.count();
         return ResponseEntity.ok().body(etat);
+    }
+
+    @PostMapping(path = "/reset-password-by-admin/init")
+    public MResponse requestPasswordReset(@RequestBody String login) {
+        Optional<Utilisateur> user = service.requestPasswordResetToDefault(login);
+        if (user.isPresent()) {
+            return new MResponse("0", "Mot de passe modifié avec succès !");
+        } else {
+            return new MResponse("-1", "Aucun compte n'est associé à cet login !");
+        }
+    }
+
+    @GetMapping(path = "/utilisateur-info")
+    public ResponseEntity<Utilisateur> findUserInfos(ServerHttpRequest request) {
+        Utilisateur response = service.findUserInfos(request);
+        return  ResponseEntity.ok().body(response);
     }
 
 }

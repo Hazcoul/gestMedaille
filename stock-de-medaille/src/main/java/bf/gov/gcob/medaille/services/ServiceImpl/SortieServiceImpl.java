@@ -1,35 +1,55 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
-import bf.gov.gcob.medaille.mapper.SortieMapper;
-import bf.gov.gcob.medaille.model.dto.*;
-import bf.gov.gcob.medaille.model.dto.EntreeDTO.MvtStatus;
-import bf.gov.gcob.medaille.model.entities.LigneSortie;
-import bf.gov.gcob.medaille.model.entities.Sortie;
-import bf.gov.gcob.medaille.model.enums.EMotifSortie;
-import bf.gov.gcob.medaille.model.enums.EMvtStatus;
-import bf.gov.gcob.medaille.repository.LigneSortieRepository;
-import bf.gov.gcob.medaille.repository.SortieRepository;
-import bf.gov.gcob.medaille.services.SortieService;
-import static bf.gov.gcob.medaille.utils.PageUtil.createPageFromList;
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
+import bf.gov.gcob.medaille.mapper.SortieMapper;
+import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionSortieDTO;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
+import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
+import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.entities.GCOBConfig;
+import bf.gov.gcob.medaille.model.entities.GlobalPropertie;
+import bf.gov.gcob.medaille.model.entities.LigneSortie;
+import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.entities.Utilisateur;
+import bf.gov.gcob.medaille.model.enums.EMotifSortie;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.repository.GCOBConfigRepository;
+import bf.gov.gcob.medaille.repository.GlabalPropertieRepository;
+import bf.gov.gcob.medaille.repository.LigneSortieRepository;
+import bf.gov.gcob.medaille.repository.MedailleRepository;
+import bf.gov.gcob.medaille.repository.SortieRepository;
+import bf.gov.gcob.medaille.services.SortieService;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class SortieServiceImpl implements SortieService {
@@ -43,48 +63,69 @@ public class SortieServiceImpl implements SortieService {
 
     private final ResourceLoader resourceLoader;
 
+    private final MedailleRepository medailleRepository;
+    private final GlabalPropertieRepository globalPropertieRepository;
+    private final GCOBConfigRepository gcobConfigRepository;
+
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
-            SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader) {
+            SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader,
+            MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository,
+            GCOBConfigRepository gcobConfigRepository) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
         this.ligneSortieMapper = ligneSortieMapper;
 
         this.resourceLoader = resourceLoader;
+        this.medailleRepository = medailleRepository;
+        this.gcobConfigRepository = gcobConfigRepository;
+        this.globalPropertieRepository = globalPropertieRepository;
     }
 
     @Override
     public SortieDTO save(SortieDTO sortieDTO) {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         Sortie sortie = sortieMapper.toEntity(sortieDTO);
+        
+        GlobalPropertie gp = null;
         if (null == sortieDTO.getIdSortie()) {
-            Sortie firstSortie = sortieRepository.findFirstByOrderByIdSortieDesc();
-            Long lastId = (firstSortie != null ? firstSortie.getIdSortie() : 0L);
-            String sortieNumber = "" + lastId;
-            int nbrZero = 4 - sortieNumber.length();
+        	Integer currentYear = LocalDate.now().getYear();
+        	GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
+        	 gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('S', currentYear).orElse(null);
+            Integer count = 0;
+        	if(null != gp) {
+            	count = gp.getSortieCount() + 1;
+            } else {
+            	gp = new GlobalPropertie();
+            	gp.setCreatedBy("SYSTEM");
+            	gp.setExerciceBudgetaire(currentYear);
+            	gp.setTypeMvt('S');
+            	gp = globalPropertieRepository.save(gp);
+            	count = gp.getSortieCount() + 1;
+            }
+            String completedCount = "" + count;
+            int nbrZero = 4 - completedCount.length();
             if (nbrZero > 0) {
                 for (int i = 0; i < nbrZero; i++) {
-                    sortieNumber = "0".concat(sortieNumber);
+                	completedCount = "0".concat(completedCount);
                 }
             }
-            sortieNumber = "CMD-" + sortieNumber + LocalDate.now().getYear();
-            sortie.setNumeroSortie(sortieNumber);
+    		String sNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
+            sortie.setNumeroSortie(sNumber);
         }
         sortie = sortieRepository.save(sortie);
+        if(null != gp) {
+        	gp.setSortieCount(gp.getSortieCount() + 1);
+        	globalPropertieRepository.save(gp);
+        }
         Set<LigneSortie> lignesSortie = new HashSet<>();
-        if (null == sortieDTO.getIdSortie() || (null != sortieDTO.getIdSortie() && !sortieDTO.getStatus().equals(MvtStatus.CLOSED))) {
-            if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
-                for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
-                    LigneSortie local = ligneSortieMapper.toEntity(ls);
-                    if (local.isCloseSortie()) {
-                        sortie.setStatus(EMvtStatus.CLOSED);
-                        sortieRepository.save(sortie);
-                    }
-                    local.setSortie(sortie);
-                    lignesSortie.add(local);
-                }
-                ligneSortieRepository.saveAll(lignesSortie);
+        if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
+            for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
+				LigneSortie local = ligneSortieMapper.toEntity(ls);
+				local.setSortie(sortie);
+				lignesSortie.add(local);
             }
+            ligneSortieRepository.saveAllAndFlush(lignesSortie);
         }
         return sortieMapper.toDTO(sortie);
     }
@@ -175,7 +216,7 @@ public class SortieServiceImpl implements SortieService {
     }
 
     @Override
-    public Page<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto, Pageable pageable) {
+    public List<SortieDTO> findAllByCriteria(FilterSortieDto filterSortieDto) {
         log.debug("Request to get all sortie");
         EMotifSortie eMotifSortie = EMotifSortie.getByLibelle(filterSortieDto.getMotifSortie());
         return sortieRepository.findByCriteria(
@@ -183,18 +224,17 @@ public class SortieServiceImpl implements SortieService {
                 eMotifSortie,
                 filterSortieDto.getOrdonnateur(),
                 filterSortieDto.getDetenteur(),
-                filterSortieDto.getBeneficiaire(),
-                pageable).map(sortieMapper::toDTO);
+                filterSortieDto.getBeneficiaire()).stream().map(sortieMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public Page<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto, Pageable pageable) {
-
+    public List<LigneImpressionSortiePeriodeDTO> findAllSortiesByPeriode(FilterSortieDto filterSortieDto) {
         List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS;
         ligneImpressionSortiePeriodeDTOS = this.getFilterListeByperiode(filterSortieDto);
 
-        return createPageFromList(ligneImpressionSortiePeriodeDTOS, pageable);
+        return ligneImpressionSortiePeriodeDTOS;
     }
+
 
     List<LigneImpressionSortiePeriodeDTO> getFilterListeByperiode(FilterSortieDto filterSortieDto) {
         Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));
@@ -253,12 +293,41 @@ public class SortieServiceImpl implements SortieService {
     }
 
     @Override
-    public SortieDTO validerSortie(Long idSortie) {
+    @Transactional
+    public SortieDTO validerSortie(Long idSortie, Utilisateur user) {
         log.info("Validation de la sortie : {}", idSortie);
+        if(null == user) {
+        	throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
+        }
         Sortie sortie = sortieRepository.findById(idSortie).get();
         sortie.setStatus(EMvtStatus.VALIDATED);
         sortie.setValiderLe(new Date());
+        sortie.setValiderPar(user.getMatricule());
+        sortieRepository.save(sortie); 
+        List<Medaille> medaillesToUpdateStock = new ArrayList<>();
+        if (null != sortie.getLigneSorties() && !sortie.getLigneSorties().isEmpty()) {
+            for (LigneSortie ls : sortie.getLigneSorties()) {
+            	Integer newStock = ls.getMedaille().getStock();
+            	if(null != newStock && newStock >= ls.getQuantiteLigne()) {
+            		newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
+            		ls.getMedaille().setStock(newStock);
+                	medaillesToUpdateStock.add(ls.getMedaille());
+            	}else {
+            		throw new RuntimeException("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
+            	}
+            }
+            medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
+        }
         return sortieMapper.toDTO(sortieRepository.save(sortie));
     }
+
+	@Override
+	public SortieDTO rejeter(Long idSortie, String comment) {
+		log.info("Rejet de la sortie : {}", idSortie);
+		Sortie sortie = sortieRepository.findById(idSortie).get();
+		sortie.setDescription(comment);
+		sortie.setStatus(EMvtStatus.REJECT);	
+		return sortieMapper.toDTO(sortieRepository.save(sortie));
+	}
 
 }

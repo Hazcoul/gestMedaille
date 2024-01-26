@@ -1,5 +1,24 @@
 package bf.gov.gcob.medaille.security;
 
+import java.security.Key;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 import bf.gov.gcob.medaille.model.entities.Privilege;
 import bf.gov.gcob.medaille.model.entities.Utilisateur;
 import bf.gov.gcob.medaille.repository.UtilisateurRepository;
@@ -8,18 +27,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import java.security.Key;
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * utilitaire de generation de token, de verification de token, d'extractions de
@@ -105,5 +112,26 @@ public class JwtUtil {
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+    
+    /**
+     * Get the login of the current user.
+     *
+     * @return the login of the current user.
+     */
+    public Optional<String> getCurrentUserLogin() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    private String extractPrincipal(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
+            return springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof String s) {
+            return s;
+        }
+        return null;
     }
 }

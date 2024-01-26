@@ -8,28 +8,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LigneSortieMapper extends AbstractBaseMapper {
-
-    @Autowired
-    private SortieMapper sortieMapper;
-    @Autowired
-    private MedailleMapper medailleMapper;
-
-//	public LigneSortieMapper(SortieMapper sortieMapper, MedailleMapper medailleMapper) {
-//		this.sortieMapper = sortieMapper;
-//		this.medailleMapper = medailleMapper;
-//	}
+	
+	@Autowired
+	private SortieMapper sortieMapper;
+	@Autowired
+	private MedailleMapper medailleMapper;
+	
     public LigneSortieDTO toDTO(LigneSortie entity) {
-        if (Objects.isNull(entity)) {
-            return null;
-        }
-
-        LigneSortieDTO dto = new LigneSortieDTO();
-        dto.setCloseSortie(entity.isCloseSortie());
-        dto.setIdLigneSortie(entity.getIdLigneSortie());
-        dto.setMedaille(medailleMapper.toDTO(entity.getMedaille()));
-        dto.setQuantiteLigne(entity.getQuantiteLigne());
-        dto.setSortie(sortieMapper.toDTO(entity.getSortie()));
-        setCommonFieldsFromEntity(entity, dto);
+    	if(Objects.isNull(entity)) return null;
+    	
+    	LigneSortieDTO dto = new LigneSortieDTO();
+    	dto.setCloseSortie(entity.isCloseSortie());
+    	dto.setIdLigneSortie(entity.getIdLigneSortie());
+    	dto.setMedaille(medailleMapper.toDTO(entity.getMedaille()));
+    	dto.setQuantiteLigne(entity.getQuantiteLigne());
+//    	dto.setSortie(sortieMapper.toDTO(entity.getSortie()));
+    	setCommonFieldsFromEntity(entity, dto);
 
         return dto;
     }
@@ -42,6 +36,7 @@ public class LigneSortieMapper extends AbstractBaseMapper {
         entity.setCloseSortie(dto.isCloseSortie());
         entity.setIdLigneSortie(dto.getIdLigneSortie());
         entity.setQuantiteLigne(dto.getQuantiteLigne());
+        entity.setMedaille(medailleMapper.toEntity(dto.getMedaille()));
         //setCommonFieldsFromDTO(dto, entity);
 
         return entity;

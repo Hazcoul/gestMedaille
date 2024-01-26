@@ -11,9 +11,9 @@ import lombok.Getter;
 @Getter
 public enum EMvtStatus {
 
-    CREATED(0, "Créée"),
+    CREATED(0, "En attente de validation"),
     VALIDATED(1, "Validée"),
-    CANCELLED(2, "Annulée"),
+    REJECT(2, "Rejetée"),
     CLOSED(3, "Cloturée");
 
     private Integer valeur;

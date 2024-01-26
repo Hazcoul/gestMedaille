@@ -1,27 +1,20 @@
 package bf.gov.gcob.medaille.controller;
 
-import bf.gov.gcob.medaille.model.dto.*;
-import bf.gov.gcob.medaille.services.ReportService;
-import bf.gov.gcob.medaille.services.SortieService;
-import bf.gov.gcob.medaille.utils.web.HeaderUtil;
-import bf.gov.gcob.medaille.utils.web.PaginationUtil;
-import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import net.sf.jasperreports.engine.JRException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +23,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import bf.gov.gcob.medaille.model.dto.ApiResponse;
+import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
+import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
+import bf.gov.gcob.medaille.model.dto.SortieDTO;
+import bf.gov.gcob.medaille.model.enums.EMvtStatus;
+import bf.gov.gcob.medaille.services.ReportService;
+import bf.gov.gcob.medaille.services.SortieService;
+import bf.gov.gcob.medaille.services.UtilisateurService;
+import bf.gov.gcob.medaille.utils.web.HeaderUtil;
+import bf.gov.gcob.medaille.utils.web.PaginationUtil;
+import bf.gov.gcob.medaille.utils.web.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import net.sf.jasperreports.engine.JRException;
 import reactor.core.publisher.Mono;
 
 @CrossOrigin("*")
@@ -48,10 +56,14 @@ public class SortieController {
     private final SortieService sortieService;
 
     private final ReportService reportService;
+    
+    private final UtilisateurService utilisateurService;
 
-    public SortieController(SortieService sortieService, ReportService reportService) {
+    public SortieController(SortieService sortieService, ReportService reportService,
+    		UtilisateurService utilisateurService) {
         this.sortieService = sortieService;
         this.reportService = reportService;
+        this.utilisateurService = utilisateurService;
     }
 
     @PostMapping("/sorties")
@@ -68,10 +80,16 @@ public class SortieController {
     }
 
     @PutMapping("/sorties")
-    public ResponseEntity<SortieDTO> updateSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
+    public ResponseEntity<?> updateSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         if (sortieDTO.getIdSortie() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
+        }
+        if(EMvtStatus.valueOf(sortieDTO.getStatus().toString()).equals(EMvtStatus.VALIDATED)) {
+        	ApiResponse<Object> result = new ApiResponse<>();
+        	result.setCode(ENTITY_NAME);
+        	result.setMsg("Une sortie validée n'est plus modifiable.");
+        	return ResponseEntity.badRequest().body(result);
         }
         SortieDTO newSortieDTO = sortieService.save(sortieDTO);
         return ResponseEntity
@@ -95,7 +113,7 @@ public class SortieController {
         return new ResponseEntity<>(sortieService.findOne(idSortie), HttpStatus.OK);
     }
 
-    @GetMapping("/sorties/{annee}")
+    @GetMapping("/sorties/par-annee/{annee}")
     public ResponseEntity<List<SortieDTO>> findByDecoByAn(@PathVariable(name = "annee", required = true) int annee) {
         List<SortieDTO> sortieDTOS = sortieService.findByDecoByAn(annee);
         return ResponseEntity.ok().body(sortieDTOS);
@@ -109,29 +127,23 @@ public class SortieController {
     }
 
     @PostMapping("/sorties/statistique/sorties")
-    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
+    public ResponseEntity<List<SortieDTO>> getAllSortieByCriteria(@RequestBody FilterSortieDto filterSortieDto) {
         log.debug("REST request to get a page of sorties");
-        Page<SortieDTO> page = sortieService.findAllByCriteria(filterSortieDto, pageable);
-        HttpHeaders headers = new HttpHeaders() {
+        List<SortieDTO> sortieDTOS = sortieService.findAllByCriteria(filterSortieDto);
+       /* HttpHeaders headers = new HttpHeaders() {
             {
                 add("Access-Control-Expose-Headers", "X-Total-Count");
                 add("X-Total-Count", String.valueOf(page.getTotalElements()));
             }
-        };
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        };*/
+        return ResponseEntity.ok().body(sortieDTOS);
     }
 
     @PostMapping("/sorties/statistique/sorties/periode")
     public ResponseEntity<List<LigneImpressionSortiePeriodeDTO>> getAllSortiePeriodeByCriteria(@RequestBody FilterSortieDto filterSortieDto, Pageable pageable) {
         log.debug("REST request to get a page of sorties");
-        Page<LigneImpressionSortiePeriodeDTO> page = sortieService.findAllSortiesByPeriode(filterSortieDto, pageable);
-        HttpHeaders headers = new HttpHeaders() {
-            {
-                add("Access-Control-Expose-Headers", "X-Total-Count");
-                add("X-Total-Count", String.valueOf(page.getTotalElements()));
-            }
-        };
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        List<LigneImpressionSortiePeriodeDTO> ligneImpressionSortiePeriodeDTOS = sortieService.findAllSortiesByPeriode(filterSortieDto);
+        return ResponseEntity.ok().body(ligneImpressionSortiePeriodeDTOS);
     }
 
     @GetMapping("/sorties/statistique/sorties/impression/{idSortie}")
@@ -147,19 +159,52 @@ public class SortieController {
     }
 
     /**
-     * Valide une sortie et genere un bordereau de mise en consommation
+     * Genere un bordereau de mise en consommation
      *
-     * @param response
      * @param idSortie
      * @param format
+     * @return
      * @throws IOException
      * @throws JRException
      */
-    @GetMapping(value = "/sorties/validation/{id}/{format}")
-    public Mono<Resource> validerSortie(@PathVariable(name = "id", required = true) Long idSortie, @PathVariable(name = "format", required = true) String format)
-            throws IOException, JRException {
-        SortieDTO sortie = sortieService.validerSortie(idSortie);
-        return Mono.just(reportService.printBmConsommation(sortie.getIdSortie(), format));
+    @GetMapping(value = "/sorties/{id}/bordereau/{format}")
+    public  Mono<Resource> generateBordereau(@PathVariable(name = "id", required = true) Long idSortie, @PathVariable(name = "format", required = true) String format)
+    	throws IOException, JRException {
+    	
+    	return Mono.just(reportService.printBmConsommation(idSortie, format));
+    }
+    
+    /**
+     * Valide une sortie de matieres
+     *
+     * @param idSortie
+     * @return
+     */
+    @GetMapping(value = "/sorties/{id}/valider")
+    public Mono<?> validerSortie(@PathVariable(name = "id", required = true) Long idSortie, ServerHttpRequest request) {
+        try {
+        	SortieDTO sortie = sortieService.validerSortie(idSortie, utilisateurService.findUserInfos(request));
+            return Mono.just(sortie);
+		} catch (Exception e) {
+			ApiResponse<Object> result = new ApiResponse<>();
+        	result.setCode(ENTITY_NAME);
+        	result.setMsg(e.getMessage());
+        	result.setData(e.getCause());
+			return Mono.just(result);
+		}
+    }
+    
+    @GetMapping(value = "/sorties/{id}/rejeter")
+    public Mono<?> rejeterSortie(@PathVariable(name = "id", required = true) Long id, @RequestParam(name = "comment", required = true) String comment) {
+    	try {
+            return Mono.just(sortieService.rejeter(id, comment));
+		} catch (Exception e) {
+			ApiResponse<Object> result = new ApiResponse<>();
+        	result.setCode(ENTITY_NAME);
+        	result.setMsg(e.getMessage());
+        	result.setData(e.getCause());
+			return Mono.just(ResponseEntity.badRequest().body(result));
+		}
     }
 
 }

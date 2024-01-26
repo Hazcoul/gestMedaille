@@ -21,12 +21,14 @@ public class MedailleMapper extends AbstractBaseMapper {
 
         MedailleDTO dto = new MedailleDTO();
         dto.setDescription(entity.getDescription());
-        dto.setDistinction((entity.getDistinction() != null ? distinctionMapper.toDTO(entity.getDistinction()) : null));
-        dto.setGrade((entity.getGrade() != null ? gradeMapper.toDTO(entity.getGrade()) : null));
+        dto.setDistinction(distinctionMapper.toDTO(entity.getDistinction()));
+        dto.setGrade(gradeMapper.toDTO(entity.getGrade()));
         dto.setIdMedaille(entity.getIdMedaille());
         dto.setLienImage(entity.getLienImage());
         dto.setNomComplet(entity.getNomComplet());
+        dto.setCode(entity.getCode());
         dto.setStock(entity.getStock());
+        dto.setCode(entity.getCode());
         setCommonFieldsFromEntity(entity, dto);
 
         return dto;
@@ -38,12 +40,13 @@ public class MedailleMapper extends AbstractBaseMapper {
         }
         Medaille entity = new Medaille();
         entity.setDescription(dto.getDescription());
-        entity.setDistinction((dto.getDistinction() != null ? distinctionMapper.toEntity(dto.getDistinction()) : null));
+        entity.setDistinction(distinctionMapper.toEntity(dto.getDistinction()));
         entity.setIdMedaille(dto.getIdMedaille());
         entity.setLienImage(dto.getLienImage());
         entity.setNomComplet(dto.getNomComplet());
-        entity.setGrade((dto.getGrade() != null ? gradeMapper.toEntity(dto.getGrade()) : null));
-       // entity.setStock(dto.getStock());
+        entity.setGrade(gradeMapper.toEntity(dto.getGrade()));
+        entity.setStock(dto.getStock());
+        entity.setCode(dto.getCode());
 
         return entity;
     }

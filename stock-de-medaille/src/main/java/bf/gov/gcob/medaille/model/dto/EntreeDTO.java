@@ -1,9 +1,9 @@
 package bf.gov.gcob.medaille.model.dto;
 
-import bf.gov.gcob.medaille.model.AbstractBaseDTO;
-import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+
+import bf.gov.gcob.medaille.model.AbstractBaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.Setter;
 public class EntreeDTO extends AbstractBaseDTO {
 
     private Long idEntree;
-    @NotNull
+    //@NotNull
     private Date dateEntree;
     //@NotNull
     private String numeroCmd;
@@ -32,7 +32,7 @@ public class EntreeDTO extends AbstractBaseDTO {
     private MvtStatus status;
 
     public enum MvtStatus {
-        CREATED, VALIDATED, CANCELLED, CLOSED;
+        CREATED, VALIDATED, REJECT, CLOSED;
     }
 
     public enum Acquisition {
