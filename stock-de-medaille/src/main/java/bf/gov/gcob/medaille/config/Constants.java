@@ -29,12 +29,15 @@ public final class Constants {
     public static final String EXTENSION_GIF = ".gif";
 
     //privileges du systeme
-    public static final String ADMIN = "ADMIN";
-    public static final String GEST = "GEST";
     public static final String ADD_PARAM = "ADD_PARAM";
     public static final String VIEW_PARAM = "VIEW_PARAM";
-    public static final String DELETE_PARAM = "DELETE_PARAM";
-    public static final String CONS = "CONS";
+    public static final String ADD_USER = "ADD_USER";
+    public static final String VIEW_USER = "VIEW_USER";
+
+    public static final String ADD_MVT = "ADD_MVT";
+    public static final String VIEW_MVT = "VIEW_MVT";
+
+    public static final String VIEW_STAT = "VIEW_STAT";
 
     private Constants() {
     }

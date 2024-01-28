@@ -33,7 +33,6 @@ public class DistinctionController {
         return ResponseEntity.created(new URI("/api/distinctions")).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\")")
     @GetMapping()
     public Mono<ResponseEntity<List<DistinctionDTO>>> find() {
         List<DistinctionDTO> distinctions = distinctionService.findAll();
