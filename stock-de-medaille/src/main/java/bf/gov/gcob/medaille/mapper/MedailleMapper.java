@@ -26,6 +26,7 @@ public class MedailleMapper extends AbstractBaseMapper {
         dto.setIdMedaille(entity.getIdMedaille());
         dto.setLienImage(entity.getLienImage());
         dto.setNomComplet(entity.getNomComplet());
+        dto.setCode(entity.getCode());
         dto.setStock(entity.getStock());
         dto.setCode(entity.getCode());
         setCommonFieldsFromEntity(entity, dto);

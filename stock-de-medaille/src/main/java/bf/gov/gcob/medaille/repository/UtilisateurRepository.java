@@ -12,11 +12,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author Canisius <canisiushien@gmail.com>
  */
+@Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
 
     String USERS_BY_LOGIN_CACHE = "usersByLogin";

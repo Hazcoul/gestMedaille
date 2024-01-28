@@ -36,6 +36,7 @@ public class LigneSortieMapper extends AbstractBaseMapper {
         entity.setCloseSortie(dto.isCloseSortie());
         entity.setIdLigneSortie(dto.getIdLigneSortie());
         entity.setQuantiteLigne(dto.getQuantiteLigne());
+        entity.setMedaille(medailleMapper.toEntity(dto.getMedaille()));
         //setCommonFieldsFromDTO(dto, entity);
 
         return entity;

@@ -37,7 +37,7 @@ public class EntreeMapper extends AbstractBaseMapper {
         dto.setValiderPar(entity.getValiderPar());
         dto.setFournisseur(fournisseurMapper.buildFournisseurDto(entity.getFournisseur()));
         dto.setMagasin(magasinMapper.toDTO(entity.getMagasin()));
-        dto.setLigneEntrees(entity.getLigneentrees().stream().map(ligneEntreeMapper::toDTO).toList());
+        dto.setLigneEntrees(entity.getLigneEntrees().stream().map(ligneEntreeMapper::toDTO).toList());
         dto.setStatus(MvtStatus.valueOf(entity.getStatus().toString()));
         setCommonFieldsFromEntity(entity, dto);
         return dto;

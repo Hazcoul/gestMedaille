@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -67,11 +68,11 @@ public class Sortie extends AbstractBaseEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "sortie", fetch = FetchType.EAGER)
-    private Set<LigneSortie> ligneSorties;
+    private Set<LigneSortie> ligneSorties = new HashSet<>();
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EMvtStatus status;
-    @Column(name = "numero_sortie", nullable = false, length = 20)
+    @Column(name = "numero_sortie", nullable = false, length = 100)
     private String numeroSortie;
 }

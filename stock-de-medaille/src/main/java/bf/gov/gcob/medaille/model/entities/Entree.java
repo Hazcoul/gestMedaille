@@ -75,5 +75,5 @@ public class Entree extends AbstractBaseEntity {
 
     @JsonIgnoreProperties(value = {"entree", "medaille"})
     @OneToMany(mappedBy = "entree", fetch = FetchType.EAGER)
-    private Set<LigneEntree> ligneentrees = new HashSet<>();
+    private Set<LigneEntree> ligneEntrees = new HashSet<>();
 }
