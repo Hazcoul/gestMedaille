@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import bf.gov.gcob.medaille.mapper.BeneficiaireMapper;
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
@@ -19,13 +20,8 @@ import bf.gov.gcob.medaille.repository.BeneficiaireRepository;
 import bf.gov.gcob.medaille.repository.DetenteurRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.BeneficiaireService;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  *
