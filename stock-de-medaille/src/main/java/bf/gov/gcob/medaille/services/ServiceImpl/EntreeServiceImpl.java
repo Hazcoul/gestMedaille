@@ -20,7 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import bf.gov.gcob.medaille.mapper.EntreeMapper;
 import bf.gov.gcob.medaille.mapper.LigneEntreeMapper;
@@ -65,7 +64,7 @@ public class EntreeServiceImpl implements EntreeService {
 
     public EntreeServiceImpl(EntreeRepository entreeRepository, LigneEntreeRepository ligneEntreeRepository,
             EntreeMapper entreeMapper, LigneEntreeMapper ligneEntreeMapper, ResourceLoader resourceLoader,
-            MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository, 
+            MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository,
             GCOBConfigRepository gcobConfigRepository) {
         this.entreeRepository = entreeRepository;
         this.ligneEntreeRepository = ligneEntreeRepository;
@@ -85,37 +84,37 @@ public class EntreeServiceImpl implements EntreeService {
         Entree entree = entreeMapper.toEntity(entreeDTO);
         GlobalPropertie gp = null;
         if (null == entreeDTO.getIdEntree()) {
-        	GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
-        	 gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('E', entreeDTO.getExerciceBudgetaire())
-        													.orElse(null);
+            GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
+            gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('E', entreeDTO.getExerciceBudgetaire())
+                    .orElse(null);
             Integer count = 0;
-        	if(null != gp) {
-            	count = gp.getEntreeCount() + 1;
+            if (null != gp) {
+                count = gp.getEntreeCount() + 1;
             } else {
-            	gp = new GlobalPropertie();
-            	gp.setCreatedBy("SYSTEM");
-            	gp.setExerciceBudgetaire(entreeDTO.getExerciceBudgetaire());
-            	gp.setTypeMvt('E');
-            	gp = globalPropertieRepository.save(gp);
-            	count = gp.getEntreeCount() + 1;
+                gp = new GlobalPropertie();
+                gp.setCreatedBy("SYSTEM");
+                gp.setExerciceBudgetaire(entreeDTO.getExerciceBudgetaire());
+                gp.setTypeMvt('E');
+                gp = globalPropertieRepository.save(gp);
+                count = gp.getEntreeCount() + 1;
             }
             String completedCount = "" + count;
             int nbrZero = 4 - completedCount.length();
             if (nbrZero > 0) {
                 for (int i = 0; i < nbrZero; i++) {
-                	completedCount = "0".concat(completedCount);
+                    completedCount = "0".concat(completedCount);
                 }
             }
-    		String cmdNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
+            String cmdNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
             entree.setNumeroCmd(cmdNumber);
         }
         entree = entreeRepository.save(entree);
-        if(null != gp) {
-        	gp.setEntreeCount(gp.getEntreeCount() + 1);
-        	globalPropertieRepository.save(gp);
+        if (null != gp) {
+            gp.setEntreeCount(gp.getEntreeCount() + 1);
+            globalPropertieRepository.save(gp);
         }
         Set<LigneEntree> lignesEntree = new HashSet<>();
-        if(null != entreeDTO.getLigneEntrees() && !entreeDTO.getLigneEntrees().isEmpty()) {
+        if (null != entreeDTO.getLigneEntrees() && !entreeDTO.getLigneEntrees().isEmpty()) {
             for (LigneEntreeDTO le : entreeDTO.getLigneEntrees()) {
                 LigneEntree local = ligneEntreeMapper.toEntity(le);
                 local.setEntree(entree);
@@ -155,10 +154,10 @@ public class EntreeServiceImpl implements EntreeService {
     public void delete(Long id) {
         log.debug("Request to delete Entree : {}", id);
         List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(id);
-        if (les == null || CollectionUtils.isEmpty(les)) {
-            entreeRepository.deleteById(id);
-        } else {
+        if (les.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les lignes de cette entrée... avant de poursuivre.");
+        } else {
+            entreeRepository.deleteById(id);
         }
     }
 
@@ -233,40 +232,42 @@ public class EntreeServiceImpl implements EntreeService {
     @Transactional
     public EntreeDTO validerEntree(Long idEntree, Utilisateur user) {
         log.info("Validation de l'entrée : {}", idEntree);
-        if(null == user) {
-        	throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
+        if (null == user) {
+            throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
         }
         Entree entree = entreeRepository.findById(idEntree).get();
         entree.setStatus(EMvtStatus.VALIDATED);
         entree.setValiderLe(new Date());
         entree.setValiderPar(user.getMatricule());
         entree = entreeRepository.save(entree);
-        /** On met à jour le stock de médaille dans chaque ligne après validation*/
+        /**
+         * On met à jour le stock de médaille dans chaque ligne après validation
+         */
         List<Medaille> medaillesToUpdateStock = new ArrayList<>();
         Integer newCapacite = entree.getMagasin().getCapacite();
-        if(null != entree.getLigneEntrees() && !entree.getLigneEntrees().isEmpty()) {
-        	Integer leSum = 0;
+        if (null != entree.getLigneEntrees() && !entree.getLigneEntrees().isEmpty()) {
+            Integer leSum = 0;
             for (LigneEntree le : entree.getLigneEntrees()) {
-            	Integer newStock = null != le.getMedaille().getStock() ? le.getMedaille().getStock() + le.getQuantiteLigne() : le.getQuantiteLigne();		
-            	le.getMedaille().setStock(newStock);
-            	medaillesToUpdateStock.add(le.getMedaille());
-            	leSum += le.getQuantiteLigne();
+                Integer newStock = null != le.getMedaille().getStock() ? le.getMedaille().getStock() + le.getQuantiteLigne() : le.getQuantiteLigne();
+                le.getMedaille().setStock(newStock);
+                medaillesToUpdateStock.add(le.getMedaille());
+                leSum += le.getQuantiteLigne();
             }
-            if(leSum > newCapacite) {
-            	throw new RuntimeException("La somme des quantités des lignes de l'entrée depasse la capacité du magasin.");
+            if (leSum > newCapacite) {
+                throw new RuntimeException("La somme des quantités des lignes de l'entrée depasse la capacité du magasin.");
             }
             medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
         }
         return entreeMapper.toDTO(entree);
     }
 
-	@Override
-	public EntreeDTO rejeter(Long idEntree, String comment) {
-		log.info("Rejet de l'entrée : {}", idEntree);
-		Entree entree = entreeRepository.findById(idEntree).get();
-		entree.setObservation(comment);
-		entree.setStatus(EMvtStatus.REJECT);	
-		return entreeMapper.toDTO(entreeRepository.save(entree));
-	}
+    @Override
+    public EntreeDTO rejeter(Long idEntree, String comment) {
+        log.info("Rejet de l'entrée : {}", idEntree);
+        Entree entree = entreeRepository.findById(idEntree).get();
+        entree.setObservation(comment);
+        entree.setStatus(EMvtStatus.REJECT);
+        return entreeMapper.toDTO(entreeRepository.save(entree));
+    }
 
 }

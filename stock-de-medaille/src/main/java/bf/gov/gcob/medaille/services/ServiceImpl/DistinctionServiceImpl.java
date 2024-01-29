@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -54,7 +53,7 @@ public class DistinctionServiceImpl implements DistinctionService {
     public void delete(Long idDistinction) {
         log.info("Suppression de la distinction : {}", idDistinction);
         List<Medaille> medailles = medailleRepository.findByDistinctionIdDistinction(idDistinction);
-        if (medailles != null || !CollectionUtils.isEmpty(medailles)) {
+        if (medailles.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les medailles... de cette distinction avant de poursuivre.");
         } else {
             distinctionRepository.deleteById(idDistinction);

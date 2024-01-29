@@ -5,11 +5,6 @@
  */
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import bf.gov.gcob.medaille.mapper.BeneficiaireMapper;
 import bf.gov.gcob.medaille.model.dto.BeneficiaireDTO;
 import bf.gov.gcob.medaille.model.entities.Beneficiaire;
@@ -20,12 +15,10 @@ import bf.gov.gcob.medaille.repository.DetenteurRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.BeneficiaireService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -67,8 +60,8 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
     public List<BeneficiaireDTO> findAll() {
         log.info("Liste des beneficiaires");
         return beneficiaireRepository.findAll()
-        		.stream()
-        		.map(mapper::toDTO).collect(Collectors.toList());
+                .stream()
+                .map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -76,7 +69,7 @@ public class BeneficiaireServiceImpl implements BeneficiaireService {
         log.info("Suppression du beneficiaire {} ", idBeneficiaire);
         List<Sortie> sorties = sortieRepository.findByBeneficiaireIdBeneficiaire(idBeneficiaire);
         List<Detenteur> detenteurs = detenteurRepository.findByBeneficiaireIdBeneficiaire(idBeneficiaire);
-        if ((sorties != null || !CollectionUtils.isEmpty(sorties)) || (detenteurs != null || !CollectionUtils.isEmpty(detenteurs))) {
+        if (sorties.size() != 0 || detenteurs.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les sorties/detenteurs... de cet beneficiaire avant de poursuivre.");
         } else {
             beneficiaireRepository.deleteById(idBeneficiaire);

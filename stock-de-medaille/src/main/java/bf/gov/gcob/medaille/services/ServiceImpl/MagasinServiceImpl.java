@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -57,7 +56,7 @@ public class MagasinServiceImpl implements MagasinService {
         log.info("Suppression du magasin : {}", idMagasin);
         List<Entree> entrees = entreeRepository.findByMagasinIdMagasin(idMagasin);
         List<Sortie> sorties = sortieRepository.findByMagasinIdMagasin(idMagasin);
-        if ((entrees != null || !CollectionUtils.isEmpty(entrees)) || (sorties != null || !CollectionUtils.isEmpty(sorties))) {
+        if (entrees.size() != 0 || sorties.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les entrée/sortie... de cet magasin avant de poursuivre.");
         } else {
             magasinRepository.deleteById(idMagasin);

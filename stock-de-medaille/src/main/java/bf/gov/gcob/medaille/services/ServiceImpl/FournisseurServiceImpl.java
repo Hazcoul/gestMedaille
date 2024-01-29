@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -65,7 +64,7 @@ public class FournisseurServiceImpl implements FournisseurService {
     public void delete(Long idFournisseur) {
         log.info("Suppression du fournisseur {} ", idFournisseur);
         List<Entree> entrees = entreeRepository.findByFournisseurIdFournisseur(idFournisseur);
-        if (entrees != null || !CollectionUtils.isEmpty(entrees)) {
+        if (entrees.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les entrees... de cet fournisseur avant de poursuivre.");
         } else {
             fournisseurRepository.deleteById(idFournisseur);

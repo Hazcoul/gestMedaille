@@ -21,7 +21,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
 import bf.gov.gcob.medaille.mapper.SortieMapper;
@@ -86,44 +85,44 @@ public class SortieServiceImpl implements SortieService {
     public SortieDTO save(SortieDTO sortieDTO) {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         Sortie sortie = sortieMapper.toEntity(sortieDTO);
-        
+
         GlobalPropertie gp = null;
         if (null == sortieDTO.getIdSortie()) {
-        	Integer currentYear = LocalDate.now().getYear();
-        	GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
-        	 gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('S', currentYear).orElse(null);
+            Integer currentYear = LocalDate.now().getYear();
+            GCOBConfig config = gcobConfigRepository.findByStatus(Boolean.TRUE);
+            gp = globalPropertieRepository.findByTypeMvtAndExerciceBudgetaire('S', currentYear).orElse(null);
             Integer count = 0;
-        	if(null != gp) {
-            	count = gp.getSortieCount() + 1;
+            if (null != gp) {
+                count = gp.getSortieCount() + 1;
             } else {
-            	gp = new GlobalPropertie();
-            	gp.setCreatedBy("SYSTEM");
-            	gp.setExerciceBudgetaire(currentYear);
-            	gp.setTypeMvt('S');
-            	gp = globalPropertieRepository.save(gp);
-            	count = gp.getSortieCount() + 1;
+                gp = new GlobalPropertie();
+                gp.setCreatedBy("SYSTEM");
+                gp.setExerciceBudgetaire(currentYear);
+                gp.setTypeMvt('S');
+                gp = globalPropertieRepository.save(gp);
+                count = gp.getSortieCount() + 1;
             }
             String completedCount = "" + count;
             int nbrZero = 4 - completedCount.length();
             if (nbrZero > 0) {
                 for (int i = 0; i < nbrZero; i++) {
-                	completedCount = "0".concat(completedCount);
+                    completedCount = "0".concat(completedCount);
                 }
             }
-    		String sNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
+            String sNumber = config.getCodeInstitution() + "/" + config.getCodeBudgetaire() + "/" + gp.getExerciceBudgetaire() + "/" + completedCount;
             sortie.setNumeroSortie(sNumber);
         }
         sortie = sortieRepository.save(sortie);
-        if(null != gp) {
-        	gp.setSortieCount(gp.getSortieCount() + 1);
-        	globalPropertieRepository.save(gp);
+        if (null != gp) {
+            gp.setSortieCount(gp.getSortieCount() + 1);
+            globalPropertieRepository.save(gp);
         }
         Set<LigneSortie> lignesSortie = new HashSet<>();
         if (null != sortieDTO.getLigneSorties() && !sortieDTO.getLigneSorties().isEmpty()) {
             for (LigneSortieDTO ls : sortieDTO.getLigneSorties()) {
-				LigneSortie local = ligneSortieMapper.toEntity(ls);
-				local.setSortie(sortie);
-				lignesSortie.add(local);
+                LigneSortie local = ligneSortieMapper.toEntity(ls);
+                local.setSortie(sortie);
+                lignesSortie.add(local);
             }
             ligneSortieRepository.saveAllAndFlush(lignesSortie);
         }
@@ -158,10 +157,10 @@ public class SortieServiceImpl implements SortieService {
     public void delete(Long id) {
         log.debug("Request to delete Sortie : {}", id);
         List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(id);
-        if (les == null || CollectionUtils.isEmpty(les)) {
-            sortieRepository.deleteById(id);
-        } else {
+        if (les.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les lignes de cette sortie... avant de poursuivre.");
+        } else {
+            sortieRepository.deleteById(id);
         }
     }
 
@@ -235,7 +234,6 @@ public class SortieServiceImpl implements SortieService {
         return ligneImpressionSortiePeriodeDTOS;
     }
 
-
     List<LigneImpressionSortiePeriodeDTO> getFilterListeByperiode(FilterSortieDto filterSortieDto) {
         Date datefin = new Date(filterSortieDto.getDateFin().getTime() + (1000 * 60 * 60 * 24));
         Date dateDebut = new Date(filterSortieDto.getDateDebut().getTime() - (1000 * 60 * 60 * 24));
@@ -296,38 +294,38 @@ public class SortieServiceImpl implements SortieService {
     @Transactional
     public SortieDTO validerSortie(Long idSortie, Utilisateur user) {
         log.info("Validation de la sortie : {}", idSortie);
-        if(null == user) {
-        	throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
+        if (null == user) {
+            throw new RuntimeException("Vous devez être connecté pour effectuer une validation.");
         }
         Sortie sortie = sortieRepository.findById(idSortie).get();
         sortie.setStatus(EMvtStatus.VALIDATED);
         sortie.setValiderLe(new Date());
         sortie.setValiderPar(user.getMatricule());
-        sortieRepository.save(sortie); 
+        sortieRepository.save(sortie);
         List<Medaille> medaillesToUpdateStock = new ArrayList<>();
         if (null != sortie.getLigneSorties() && !sortie.getLigneSorties().isEmpty()) {
             for (LigneSortie ls : sortie.getLigneSorties()) {
-            	Integer newStock = ls.getMedaille().getStock();
-            	if(null != newStock && newStock >= ls.getQuantiteLigne()) {
-            		newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
-            		ls.getMedaille().setStock(newStock);
-                	medaillesToUpdateStock.add(ls.getMedaille());
-            	}else {
-            		throw new RuntimeException("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
-            	}
+                Integer newStock = ls.getMedaille().getStock();
+                if (null != newStock && newStock >= ls.getQuantiteLigne()) {
+                    newStock = ls.getMedaille().getStock() - ls.getQuantiteLigne();
+                    ls.getMedaille().setStock(newStock);
+                    medaillesToUpdateStock.add(ls.getMedaille());
+                } else {
+                    throw new RuntimeException("Le stock est insuffisant pour effectuer cette sortie [" + ls.getMedaille().getNomComplet() + " : " + ls.getQuantiteLigne() + "]");
+                }
             }
             medailleRepository.saveAllAndFlush(medaillesToUpdateStock);
         }
         return sortieMapper.toDTO(sortieRepository.save(sortie));
     }
 
-	@Override
-	public SortieDTO rejeter(Long idSortie, String comment) {
-		log.info("Rejet de la sortie : {}", idSortie);
-		Sortie sortie = sortieRepository.findById(idSortie).get();
-		sortie.setDescription(comment);
-		sortie.setStatus(EMvtStatus.REJECT);	
-		return sortieMapper.toDTO(sortieRepository.save(sortie));
-	}
+    @Override
+    public SortieDTO rejeter(Long idSortie, String comment) {
+        log.info("Rejet de la sortie : {}", idSortie);
+        Sortie sortie = sortieRepository.findById(idSortie).get();
+        sortie.setDescription(comment);
+        sortie.setStatus(EMvtStatus.REJECT);
+        return sortieMapper.toDTO(sortieRepository.save(sortie));
+    }
 
 }

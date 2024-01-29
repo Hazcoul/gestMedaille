@@ -7,13 +7,11 @@ import bf.gov.gcob.medaille.model.entities.Medaille;
 import bf.gov.gcob.medaille.repository.GradeRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
 import bf.gov.gcob.medaille.services.GradeService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -54,10 +52,10 @@ public class GradeServiceImpl implements GradeService {
     public void delete(Long idGrade) {
         log.info("Suppression du grade : {}", idGrade);
         List<Medaille> medailles = medailleRepository.findByGradeIdGrade(idGrade);
-        if (medailles == null || CollectionUtils.isEmpty(medailles)) {
-            gradeRepository.deleteById(idGrade);
-        } else {
+        if (medailles.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les medailles de cet grade... avant de poursuivre.");
+        } else {
+            gradeRepository.deleteById(idGrade);
         }
     }
 }

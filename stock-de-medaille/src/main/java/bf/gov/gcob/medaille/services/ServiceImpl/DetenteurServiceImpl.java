@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -61,7 +60,7 @@ public class DetenteurServiceImpl implements DetenteurService {
     public void delete(Long idDetenteur) {
         log.info("Suppression du detenteur {} ", idDetenteur);
         List<Sortie> sorties = sortieRepository.findByDetenteurIdDetenteur(idDetenteur);
-        if (sorties != null || !CollectionUtils.isEmpty(sorties)) {
+        if (sorties.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les sorties... de cet detenteur avant de poursuivre.");
         } else {
             detenteurRepository.deleteById(idDetenteur);

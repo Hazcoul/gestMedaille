@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -65,7 +64,7 @@ public class OrdonnateurServiceImpl implements OrdonnateurService {
     public void delete(Long idOrdonnateur) {
         log.info("Suppression de l'ordonnateur {} ", idOrdonnateur);
         List<Sortie> sorties = sortieRepository.findByOrdonnateurIdOrdonnateur(idOrdonnateur);
-        if (sorties != null || !CollectionUtils.isEmpty(sorties)) {
+        if (sorties.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les sorties... de cet ordonnateur avant de poursuivre.");
         } else {
             ordonnateurRepository.deleteById(idOrdonnateur);

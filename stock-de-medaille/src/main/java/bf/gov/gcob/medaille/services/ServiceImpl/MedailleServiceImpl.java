@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -140,7 +139,7 @@ public class MedailleServiceImpl implements MedailleService {
         Medaille medaille = medailleRepository.findById(idMedaille).orElseThrow(() -> new RuntimeException("La médaille ID [" + idMedaille + "] correspondante est d'office inexistante. "));
         List<LigneEntree> les = ligneEntreeRepository.findByMedailleIdMedaille(medaille.getIdMedaille());
         List<LigneSortie> lss = ligneSortieRepository.findByMedailleIdMedaille(medaille.getIdMedaille());
-        if ((les != null || !CollectionUtils.isEmpty(les)) || (lss != null || !CollectionUtils.isEmpty(lss))) {
+        if (les.size() != 0 || lss.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les lignes entrée/sortie... de cette medaille avant de poursuivre.");
         }
         //Comme ladaite medaille est retrouvée en bd, 

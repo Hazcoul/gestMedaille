@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -53,7 +52,7 @@ public class DepotServiceImpl implements DepotService {
     public void delete(Long idDepot) {
         log.info("Suppression du depot : {}", idDepot);
         List<Magasin> magasins = magasinRepository.findByDepotIdDepot(idDepot);
-        if (magasins != null || !CollectionUtils.isEmpty(magasins)) {
+        if (magasins.size() != 0) {
             throw new RuntimeException("Veuillez supprimer les magasins... de cet depot avant de poursuivre.");
         } else {
             depotRepository.deleteById(idDepot);
