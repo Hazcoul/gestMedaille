@@ -1,7 +1,8 @@
 id;code;libelle
-1;ADMIN;Administrateur
-2;GEST;Gestionnaire
-3;ADD_PARAM;Ajouter une donnée paramètre
-4;VIEW_PARAM;Afficher une donnée paramètre
-5;DELETE_PARAM;Supprimer une donnée paramètre
-6;CONS;Consultant
+1;ADD_PARAM;Gestion parametre
+2;VIEW_PARAM;Consultation parametre
+3;ADD_USER;Gestion utilisateur
+4;VIEW_USER;Consultation utilisateur
+5;ADD_MVT;Gestion mouvement
+6;VIEW_MVT;Consultation mouvement
+7;VIEW_STAT;Statistique

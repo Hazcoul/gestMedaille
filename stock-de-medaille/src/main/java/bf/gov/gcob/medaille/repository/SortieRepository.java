@@ -1,18 +1,18 @@
 package bf.gov.gcob.medaille.repository;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.Sortie;
 import bf.gov.gcob.medaille.model.enums.EMotifSortie;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SortieRepository extends JpaRepository<Sortie, Long> {
