@@ -11,11 +11,19 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PieceJointeDTO extends AbstractBaseDTO {
 
-	private Long        idPiece;
-    private String      typePiece;
-    private String      lienPiece;
-    private String      referencePiece;
-    private String      description;
-    private EntreeDTO   entree;
-    private SortieDTO   sortie;
+	private Long           idPiece;
+    private TypePiece      typePiece;
+    private String        lienPiece;
+    private String        referencePiece;
+    private String        description;
+    private EntreeDTO     entree;
+    private SortieDTO     sortie;
+    private byte[] 		  fileBase64Content;
+    
+    public enum TypePiece {
+    	ORDRE_ENTREE,
+        ORDRE_SORTIE,
+        FACTURE,
+        PV;
+    }
 }

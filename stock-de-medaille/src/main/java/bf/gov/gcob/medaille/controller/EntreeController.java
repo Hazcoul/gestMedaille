@@ -12,7 +12,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,11 +25,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import bf.gov.gcob.medaille.model.dto.ApiResponse;
 import bf.gov.gcob.medaille.model.dto.EntreeDTO;
 import bf.gov.gcob.medaille.model.dto.FilterEntreeDto;
+import bf.gov.gcob.medaille.model.dto.PieceJointeDTO;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.services.EntreeService;
 import bf.gov.gcob.medaille.services.ReportService;
@@ -64,21 +68,21 @@ public class EntreeController {
         this.utilisateurService = utilisateurService;
     }
 
-    @PostMapping("/entrees")
-    public ResponseEntity<EntreeDTO> createEntree(@Valid @RequestBody EntreeDTO entreeDTO) throws URISyntaxException {
+    @PostMapping(value ="/entrees"/*, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data"*/)
+    public ResponseEntity<EntreeDTO> createEntree(@Valid @RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Entree : {}", entreeDTO);
         if (entreeDTO.getIdEntree() != null) {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        EntreeDTO newEntreeDTO = entreeService.save(entreeDTO);
+        EntreeDTO newEntreeDTO = entreeService.save(entreeDTO, pjDTOs, pFiles);
         return ResponseEntity
                 .created(new URI("/api/entrees/" + newEntreeDTO.getIdEntree()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME + ".created", newEntreeDTO.getIdEntree().toString()))
                 .body(newEntreeDTO);
     }
 
-    @PutMapping("/entrees")
-    public ResponseEntity<?> updateEntree(@Valid @RequestBody EntreeDTO entreeDTO) throws URISyntaxException {
+    @PutMapping(value ="/entrees", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
+    public ResponseEntity<?> updateEntree(@Valid @RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Entree : {}", entreeDTO);
         if (entreeDTO.getIdEntree() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
@@ -89,7 +93,7 @@ public class EntreeController {
         	result.setMsg("Une entrée validée n'est plus modifiable.");
         	return ResponseEntity.badRequest().body(result);
         }
-        EntreeDTO newEntreeDTO = entreeService.save(entreeDTO);
+        EntreeDTO newEntreeDTO = entreeService.save(entreeDTO, pjDTOs, pFiles);
         return ResponseEntity
                 .created(new URI("/api/entrees/" + newEntreeDTO.getIdEntree()))
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME + ".updated", newEntreeDTO.getIdEntree().toString()))

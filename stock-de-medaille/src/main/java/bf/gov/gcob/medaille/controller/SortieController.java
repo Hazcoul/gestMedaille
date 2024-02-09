@@ -13,7 +13,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,11 +26,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import bf.gov.gcob.medaille.model.dto.ApiResponse;
 import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
+import bf.gov.gcob.medaille.model.dto.PieceJointeDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.services.ReportService;
@@ -66,21 +70,21 @@ public class SortieController {
         this.utilisateurService = utilisateurService;
     }
 
-    @PostMapping("/sorties")
-    public ResponseEntity<SortieDTO> createSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
+    @PostMapping(value ="/sorties", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
+    public ResponseEntity<SortieDTO> createSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         if (sortieDTO.getIdSortie() != null) {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SortieDTO newSortieDTO = sortieService.save(sortieDTO);
+        SortieDTO newSortieDTO = sortieService.save(sortieDTO, pjDTOs, pFiles);
         return ResponseEntity
                 .created(new URI("/api/sorties/" + newSortieDTO.getIdSortie()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME + ".created", newSortieDTO.getIdSortie().toString()))
                 .body(newSortieDTO);
     }
 
-    @PutMapping("/sorties")
-    public ResponseEntity<?> updateSortie(@Valid @RequestBody SortieDTO sortieDTO) throws URISyntaxException {
+    @PutMapping(value ="/sorties", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
+    public ResponseEntity<?> updateSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         if (sortieDTO.getIdSortie() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
@@ -91,7 +95,7 @@ public class SortieController {
         	result.setMsg("Une sortie validée n'est plus modifiable.");
         	return ResponseEntity.badRequest().body(result);
         }
-        SortieDTO newSortieDTO = sortieService.save(sortieDTO);
+        SortieDTO newSortieDTO = sortieService.save(sortieDTO, pjDTOs, pFiles);
         return ResponseEntity
                 .created(new URI("/api/sorties/" + newSortieDTO.getIdSortie()))
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME + ".updated", newSortieDTO.getIdSortie().toString()))

@@ -11,19 +11,19 @@ import lombok.Getter;
 @Getter
 public enum ETypePiece {
 
-    ORDRE_ENTREE(0, "Ordre d'entrée"),
-    ORDRE_SORTIE(1, "Ordre de sortie"),
-    FACTURE(2, "Facture"),
-    PV(3, "Procès verval de reception");
+    ORDRE_ENTREE(0, "Ordre d'entrée", 'E'),
+    ORDRE_SORTIE(1, "Ordre de sortie", 'S'),
+    FACTURE(2, "Facture", 'E'),
+    PV(3, "Procès verval de reception", 'E');
 
     private Integer valeur;
     private String libelle;
+    private Character typeMvt;
 
-    ETypePiece(Integer pValeur,
-            String pLibelle
-    ) {
+    ETypePiece(Integer pValeur, String pLibelle, Character typeMvt) {
         this.valeur = pValeur;
         this.libelle = pLibelle;
+        this.typeMvt = typeMvt;
     }
 
     public static ETypePiece getByValeur(Integer value) {
@@ -48,6 +48,7 @@ public enum ETypePiece {
             Map<String, Object> local = new HashMap<>();
             local.put("valeur", val);
             local.put("libelle", val.getLibelle());
+            local.put("typeMvt", val.getTypeMvt());
             result.add(local);
         }
         return result;

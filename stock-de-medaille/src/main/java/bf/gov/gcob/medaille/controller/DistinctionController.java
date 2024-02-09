@@ -1,19 +1,26 @@
 package bf.gov.gcob.medaille.controller;
 
-import bf.gov.gcob.medaille.config.Constants;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import bf.gov.gcob.medaille.exception.CreateNewElementException;
 import bf.gov.gcob.medaille.model.dto.DistinctionDTO;
 import bf.gov.gcob.medaille.services.DistinctionService;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 //@CrossOrigin("*")
