@@ -1,7 +1,11 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,15 +23,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import bf.gov.gcob.medaille.config.Constants;
 import bf.gov.gcob.medaille.mapper.LigneSortieMapper;
+import bf.gov.gcob.medaille.mapper.PieceJointeMapper;
 import bf.gov.gcob.medaille.mapper.SortieMapper;
 import bf.gov.gcob.medaille.model.dto.FilterSortieDto;
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortieDTO;
 import bf.gov.gcob.medaille.model.dto.LigneImpressionSortiePeriodeDTO;
 import bf.gov.gcob.medaille.model.dto.LigneSortieDTO;
+import bf.gov.gcob.medaille.model.dto.PieceJointeDTO;
 import bf.gov.gcob.medaille.model.dto.SortieDTO;
 import bf.gov.gcob.medaille.model.entities.GCOBConfig;
 import bf.gov.gcob.medaille.model.entities.GlobalPropertie;
@@ -41,6 +49,7 @@ import bf.gov.gcob.medaille.repository.GCOBConfigRepository;
 import bf.gov.gcob.medaille.repository.GlabalPropertieRepository;
 import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
+import bf.gov.gcob.medaille.repository.PieceJointeRepository;
 import bf.gov.gcob.medaille.repository.SortieRepository;
 import bf.gov.gcob.medaille.services.SortieService;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -65,11 +74,14 @@ public class SortieServiceImpl implements SortieService {
     private final MedailleRepository medailleRepository;
     private final GlabalPropertieRepository globalPropertieRepository;
     private final GCOBConfigRepository gcobConfigRepository;
+    private final PieceJointeRepository pieceJointeRepository; 
+    private final PieceJointeMapper pieceJointeMapper;
 
     public SortieServiceImpl(SortieRepository sortieRepository, LigneSortieRepository ligneSortieRepository,
             SortieMapper sortieMapper, LigneSortieMapper ligneSortieMapper, ResourceLoader resourceLoader,
             MedailleRepository medailleRepository, GlabalPropertieRepository globalPropertieRepository,
-            GCOBConfigRepository gcobConfigRepository) {
+            GCOBConfigRepository gcobConfigRepository, PieceJointeRepository pieceJointeRepository,
+            PieceJointeMapper pieceJointeMapper) {
         this.sortieRepository = sortieRepository;
         this.ligneSortieRepository = ligneSortieRepository;
         this.sortieMapper = sortieMapper;
@@ -79,10 +91,12 @@ public class SortieServiceImpl implements SortieService {
         this.medailleRepository = medailleRepository;
         this.gcobConfigRepository = gcobConfigRepository;
         this.globalPropertieRepository = globalPropertieRepository;
+        this.pieceJointeRepository = pieceJointeRepository;
+        this.pieceJointeMapper = pieceJointeMapper;
     }
 
     @Override
-    public SortieDTO save(SortieDTO sortieDTO) {
+    public SortieDTO save(SortieDTO sortieDTO, List<PieceJointeDTO> pjDTOs, List<FilePart> pFiles) {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         Sortie sortie = sortieMapper.toEntity(sortieDTO);
 
@@ -125,6 +139,15 @@ public class SortieServiceImpl implements SortieService {
                 lignesSortie.add(local);
             }
             ligneSortieRepository.saveAllAndFlush(lignesSortie);
+        }
+        
+        if(null != pjDTOs && !pjDTOs.isEmpty()) {
+        	sortieDTO.setIdSortie(sortie.getIdSortie());
+        	for(PieceJointeDTO pjDTO : pjDTOs) {
+        		int idx = pjDTOs.indexOf(pjDTO);
+        		pjDTO.setSortie(sortieDTO);
+        		savePieceJointes(pjDTO, pFiles.get(idx));
+        	}
         }
         return sortieMapper.toDTO(sortie);
     }
@@ -326,6 +349,43 @@ public class SortieServiceImpl implements SortieService {
         sortie.setDescription(comment);
         sortie.setStatus(EMvtStatus.REJECT);
         return sortieMapper.toDTO(sortieRepository.save(sortie));
+    }
+    
+    private void savePieceJointes(PieceJointeDTO pjDTO, FilePart photoFile) {
+        try {
+            //on initie et crée automatiquement le repertoire de stockage s'il n'existe pas
+            Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("mvt_stock");
+            if (!Files.exists(subfolderPath)) {
+                Files.createDirectories(subfolderPath);
+            }
+            //on que le nom du fichier image est reglementaire et est au format autorisé
+            String originalFileName = photoFile.filename();//photoFile.getOriginalFilename();
+            if (originalFileName.contains("..") && !originalFileName.toLowerCase().endsWith(Constants.EXTENSION_PDF)) {
+                throw new RuntimeException(
+                        "L'extension n'est pas acceptée ou le nom du fichier contient des caractères invalides.");
+            }
+            //on renomme le fichier image a stocker sur le server
+            String newFileName = pjDTO.getSortie().getIdSortie().toString() + originalFileName.substring(originalFileName.lastIndexOf("."));
+            Path filePath = subfolderPath.resolve(newFileName);
+
+            //on verifie qu'il n'existe pas deja des fichiers de meme nom dans ce repertoire.
+            //Si existe, on supprime tous les fichiers existants
+            //Attention ! ici, tout fichier ayant l'id comme nom sur le serveur doit etre delete, peut importe l'extension
+            Path verif = subfolderPath.resolve(pjDTO.getSortie().getIdSortie().toString() + Constants.EXTENSION_PDF);
+            if (Files.exists(verif)) {
+                Files.walk(verif)
+                        .filter(Files::isRegularFile)
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            }
+
+            pjDTO.setLienPiece(newFileName);
+            pjDTO.setLastModifiedBy("default");
+            pieceJointeRepository.save(pieceJointeMapper.toEntity(pjDTO));
+            //on deplace le fichier vers notre repertoire indiqué du server
+            photoFile.transferTo(Paths.get(filePath.toUri())).subscribe();
+        } catch (IOException e) {
+        }
     }
 
 }
