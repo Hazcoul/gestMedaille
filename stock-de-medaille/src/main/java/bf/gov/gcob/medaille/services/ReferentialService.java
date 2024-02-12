@@ -89,8 +89,8 @@ public class ReferentialService {
 		} else {
 			throw new RuntimeException("Type de mouvement : " + type + " inconnu.");
 		}
+		List<PieceJointeDTO> result = new ArrayList<>();
 		if(!pjList.isEmpty()) {
-			List<PieceJointeDTO> result = new ArrayList<>();
 			Path subfolderPath = Paths.get(Constants.appStoreRootPath.toString()).resolve("mvt_stock");
 			for(PieceJointe pj : pjList) {
 				PieceJointeDTO pjDTO = pieceJointeMapper.toDTO(pj);
@@ -98,8 +98,7 @@ public class ReferentialService {
 				pjDTO.setFileBase64Content(Files.readAllBytes(path));
 				result.add(pjDTO);
 			}
-			return result;
 		}
-		return null;
+		return result;
 	}
 }

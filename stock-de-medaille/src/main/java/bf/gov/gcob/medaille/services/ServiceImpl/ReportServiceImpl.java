@@ -79,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
 
             //initalisation du titre
             String refEntree = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
-            List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntreeIdEntree(entree.getIdEntree());
+            List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntree(entree);
             List<LigneEntreeDTO> ligneEntreeDTOs = new ArrayList<>();
             List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(entree.getIdEntree());
             int i = 1;
