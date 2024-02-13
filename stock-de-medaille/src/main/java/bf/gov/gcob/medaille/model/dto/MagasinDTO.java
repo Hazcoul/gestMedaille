@@ -15,7 +15,6 @@ public class MagasinDTO extends AbstractBaseDTO {
 	private Long        idMagasin;
 	@NotNull
     private String      nomMagasin;
-	@NotNull
     private Integer     capacite;
     private String      description;
     private DepotDTO depot;

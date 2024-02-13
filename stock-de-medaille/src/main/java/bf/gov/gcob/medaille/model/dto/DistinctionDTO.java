@@ -18,6 +18,7 @@ public class DistinctionDTO extends AbstractBaseDTO {
 	@NotNull
     private String					code;
     private String					abreviation;
+    @NotNull
     private String					libelle;
     @NotNull
     private String					categoryDistinction;
