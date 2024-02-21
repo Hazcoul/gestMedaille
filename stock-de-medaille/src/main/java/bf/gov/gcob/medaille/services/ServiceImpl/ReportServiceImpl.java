@@ -138,11 +138,12 @@ public class ReportServiceImpl implements ReportService {
                     logo,
                     refSortie,
                     (sortie.getDateSortie() != null ? Constants.convertDateToShort(sortie.getDateSortie()) : null),
-                    (sortie.getMagasin() != null ? sortie.getMagasin().getNomMagasin() : null),
-                    (sortie.getDetenteur() != null ? sortie.getDetenteur().getPrenom() + " " + sortie.getDetenteur().getNom() : null),
+                    (sortie.getMagasin() != null ? sortie.getMagasin().getNomMagasin() : null), "DRPD",
+                    //(sortie.getDetenteur() != null ? sortie.getDetenteur().getPrenom() + " " + sortie.getDetenteur().getNom() : null),
+                    //(sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
                     (sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
-                    "MAG. SOMEBODY",
-                    "CPM. SOMEBODY",
+                    "COMPAORE Emmanuel",
+                    "NAMA Maïmouna",
                     (sortie.getOrdonnateur() != null ? sortie.getOrdonnateur().getPrenom() + " " + sortie.getOrdonnateur().getNom() : null),
                     ligneSortieDTOs
             );
