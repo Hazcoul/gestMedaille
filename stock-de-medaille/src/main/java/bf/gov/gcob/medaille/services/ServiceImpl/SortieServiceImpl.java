@@ -179,13 +179,30 @@ public class SortieServiceImpl implements SortieService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Sortie : {}", id);
-        List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(id);
-        if (les.size() != 0) {
-            throw new RuntimeException("Veuillez supprimer les lignes de cette sortie... avant de poursuivre.");
+        Sortie sortie = sortieRepository.findById(id).orElseThrow(() -> new RuntimeException("Sorite avec identifiant = [" +id + " ] introuvable."));
+        String msg = null;
+        if(EMvtStatus.VALIDATED.equals(sortie.getStatus())) {
+        	msg = "Une sortie validée ne peut pas être supprimée.";
+        } else if (!sortie.getLigneSorties().isEmpty()){
+        	msg = "Veuillez supprimer les lignes de cette sortie... avant de poursuivre.";
+        } 
+        if(null != msg) {
+        	throw new RuntimeException(msg);
         } else {
-            sortieRepository.deleteById(id);
+        	sortieRepository.deleteById(id);
         }
     }
+    
+    @Override
+    public void deleteLine(Long id, Long idLine) {
+        log.debug("Request to delete given line of Sortie : {}", idLine);
+        Sortie sortie = sortieRepository.findById(id).orElseThrow(() -> new RuntimeException("Sortie avec identifiant = [" +id + " ] introuvable."));
+        if(EMvtStatus.VALIDATED.equals(sortie.getStatus())) {
+        	throw new RuntimeException("Une ligne d'une sortie validée ne peut pas être supprimée.");
+        }
+        ligneSortieRepository.deleteById(idLine);
+    }
+
 
     @Override
     public Resource getLigneSortieBySortie(Long id) {

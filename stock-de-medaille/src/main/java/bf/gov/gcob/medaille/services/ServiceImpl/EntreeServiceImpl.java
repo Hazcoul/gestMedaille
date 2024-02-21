@@ -175,12 +175,28 @@ public class EntreeServiceImpl implements EntreeService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Entree : {}", id);
-        List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(id);
-        if (les.size() != 0) {
-            throw new RuntimeException("Veuillez supprimer les lignes de cette entrée... avant de poursuivre.");
+        Entree entree = entreeRepository.findById(id).orElseThrow(() -> new RuntimeException("Entrée avec identifiant = [" +id + " ] introuvable."));
+        String msg = null;
+        if(EMvtStatus.VALIDATED.equals(entree.getStatus())) {
+        	msg = "Une entrée ne peut pas être supprimée.";
+        } else if (!entree.getLigneEntrees().isEmpty()){
+        	msg = "Veuillez supprimer les lignes de cette entrée... avant de poursuivre.";
+        } 
+        if(null != msg) {
+        	throw new RuntimeException(msg);
         } else {
             entreeRepository.deleteById(id);
         }
+    }
+    
+    @Override
+    public void deleteLine(Long id, Long idLine) {
+        log.debug("Request to delete given line of Entree : {}", idLine);
+        Entree entree = entreeRepository.findById(id).orElseThrow(() -> new RuntimeException("Entrée avec identifiant = [" +id + " ] introuvable."));
+        if(EMvtStatus.VALIDATED.equals(entree.getStatus())) {
+        	throw new RuntimeException("Une ligne d'une entrée validée ne peut pas être supprimée.");
+        }
+        ligneEntreeRepository.deleteById(idLine);
     }
 
     public List<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto) {

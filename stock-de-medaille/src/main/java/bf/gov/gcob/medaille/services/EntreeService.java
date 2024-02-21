@@ -27,6 +27,8 @@ public interface EntreeService {
     EntreeDTO findOne(Long id);
 
     void delete(Long id);
+    
+    void deleteLine(Long id, Long idLine);
 
     List<EntreeDTO> findAllByCriteria(FilterEntreeDto filterEntreeDto);
 

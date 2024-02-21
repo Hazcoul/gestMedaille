@@ -28,6 +28,8 @@ public interface SortieService {
     SortieDTO findOne(Long id);
 
     void delete(Long id);
+    
+    void deleteLine(Long id, Long idLine);
 
     Resource getLigneSortieBySortie(Long id);
 

@@ -124,10 +124,33 @@ public class SortieController {
     }
 
     @DeleteMapping("/sorties/{id}")
-    public ResponseEntity<Void> deleteSortie(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteSortie(@PathVariable("id") Long id) {
         log.debug("REST request to delete Sortie: {}", id);
-        sortieService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+        try {
+        	sortieService.delete(id);
+            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+		} catch (Exception ex) {
+			ApiResponse<Object> result = new ApiResponse<>();
+        	result.setCode(ENTITY_NAME);
+        	result.setMsg(ex.getMessage());
+        	result.setData(ex.getCause());
+        	return ResponseEntity.badRequest().body(result);// TODO: handle exception
+		}
+    }
+    
+    @DeleteMapping("/sorties/{id}/lignes/{idLine}")
+    public ResponseEntity<?> deleteLineS(@PathVariable("id") Long id, @PathVariable("idLine") Long idLine) {
+        log.debug("REST request to delete line of Sortie: {}", idLine);
+        try {
+        	sortieService.delete(id);
+            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
+		} catch (Exception ex) {
+			ApiResponse<Object> result = new ApiResponse<>();
+        	result.setCode(ENTITY_NAME);
+        	result.setMsg(ex.getMessage());
+        	result.setData(ex.getCause());
+        	return ResponseEntity.badRequest().body(result);// TODO: handle exception
+		}
     }
 
     @PostMapping("/sorties/statistique/sorties")
