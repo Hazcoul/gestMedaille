@@ -93,7 +93,7 @@ public class ReportServiceImpl implements ReportService {
                     (entree.getExerciceBudgetaire() != null ? entree.getExerciceBudgetaire().toString() : null),
                     refEntree,
                     entree.getAcquisition().getLibelle(),
-                    "DEST.INCONNUE",
+                    "Direction de la Reglémentation et de la Programmation des Décorations",
                     (entree.getFournisseur() != null ? entree.getFournisseur().getSigle() : null),
                     (pieceJointes != null ? pieceJointes.get(0).getTypePiece().getLibelle() : null),
                     (pieceJointes != null ? pieceJointes.get(0).getReferencePiece() : null),
@@ -130,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
             List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(sortie.getIdSortie());
             int i = 1;
             for (LigneSortie le : les) {
-                ligneSortieDTOs.add(new LigneSortieDTO("" + i, "code" + i, (le.getMedaille() == null ? "DESIG. INCONNUE" : le.getMedaille().getNomComplet()), le.getQuantiteLigne().toString(), sortie.getMotifSortie().getLibelle(), "observation " + i));
+                ligneSortieDTOs.add(new LigneSortieDTO("" + i, le.getMedaille().getCode(), (le.getMedaille() == null ? "DESIG. INCONNUE" : le.getMedaille().getNomComplet()), le.getQuantiteLigne().toString(), sortie.getMotifSortie().getLibelle(), " "));
                 i++;
             }
             // conteneur de données de base à imprimer
