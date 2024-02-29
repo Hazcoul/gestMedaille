@@ -78,13 +78,13 @@ public class ReportServiceImpl implements ReportService {
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
             //initalisation du titre
-            String refEntree = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
+            String refEntree = "N° 50/1008000311/2021/0002 du "+entree.getDateReception();
             List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntree(entree);
             List<LigneEntreeDTO> ligneEntreeDTOs = new ArrayList<>();
             List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(entree.getIdEntree());
             int i = 1;
             for (LigneEntree le : les) {
-                ligneEntreeDTOs.add(new LigneEntreeDTO("" + i, "code" + i, "Fongible", (le.getMedaille() == null ? "DESIG. INCONNUE" : le.getMedaille().getNomComplet()), le.getQuantiteLigne().toString(), le.getPrixUnitaire().toString(), le.getMontantLigne().toString(), "observation " + i));
+                ligneEntreeDTOs.add(new LigneEntreeDTO("" + i, le.getMedaille().getCode(), "Fongible", (le.getMedaille() == null ? "DESIG. INCONNUE" : le.getMedaille().getNomComplet()), le.getQuantiteLigne().toString(), le.getPrixUnitaire().toString(), le.getMontantLigne().toString(), " "));
                 i++;
             }
             // conteneur de données de base à imprimer
@@ -125,7 +125,7 @@ public class ReportServiceImpl implements ReportService {
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
             //initalisation du titre 
-            String refSortie = "N° 50/1008000311/2021/0002 du 20 septembre 2021";
+            String refSortie = "N° 50/1008000311/2021/0002 du "+ sortie.getDateSortie();
             List<LigneSortieDTO> ligneSortieDTOs = new ArrayList<>();
             List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(sortie.getIdSortie());
             int i = 1;
