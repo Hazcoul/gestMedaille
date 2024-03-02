@@ -54,4 +54,6 @@ public interface UtilisateurService {
     Optional<Utilisateur> requestPasswordResetToDefault(String login);
 
     Utilisateur findUserInfos(ServerHttpRequest request);
+
+    MResponse disableAccount(String login);
 }
