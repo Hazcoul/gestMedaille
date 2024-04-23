@@ -245,4 +245,9 @@ public class UtilisateurController {
         return  ResponseEntity.ok().body(response);
     }
 
+    @PostMapping(path = "/disable-account")
+    public MResponse disableAccount(@RequestBody String login) {
+        return service.disableAccount(login);
+    }
+
 }
