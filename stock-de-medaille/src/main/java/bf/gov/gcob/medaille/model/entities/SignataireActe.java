@@ -37,7 +37,7 @@ public class SignataireActe extends AbstractBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_beneficiaire", nullable = false, unique = true)
+    @Column(name = "id_signataire", nullable = false, unique = true)
     private Long idSignataire;
 
     @Enumerated(EnumType.ORDINAL)
@@ -45,15 +45,11 @@ public class SignataireActe extends AbstractBaseEntity {
 
     @Enumerated(EnumType.ORDINAL)
     private EFonctionSignataire fonctionSignataire;
-
     private String nomComplet;
-
+    private String departement;
     private String titreHonorifique;
-
     private Boolean actif;
-
     private Date debutMandat;
-
     private Date finMandat;
 
 }

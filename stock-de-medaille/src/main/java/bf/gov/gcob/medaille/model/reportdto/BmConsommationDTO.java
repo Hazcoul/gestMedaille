@@ -23,22 +23,17 @@ import lombok.Setter;
 public class BmConsommationDTO {
 
     private InputStream logo;
-
     private String referenceBordereau;
-
     private String dateSortie;
-
     private String magasin;
-
     private String detenteur;
-
     private String beneficiaire;
-
     private String magasinier;
-
     private String cpm;
-
     private String ordonnateur;
+    private String fMagasinier;
+    private String fCpm;
+    private String fOrdonnateur;
 
     List<bf.gov.gcob.medaille.model.reportdto.LigneSortieDTO> lignesSorties;
 }

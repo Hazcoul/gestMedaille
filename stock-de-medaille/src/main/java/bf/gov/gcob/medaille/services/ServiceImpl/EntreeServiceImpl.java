@@ -152,7 +152,7 @@ public class EntreeServiceImpl implements EntreeService {
     @Transactional(readOnly = true)
     public List<EntreeDTO> findAll() {
         log.debug("Request to get all Entrees");
-        return entreeRepository.findAll()
+        return entreeRepository.findAllByOrderByLastModifiedDateDesc()
                 .stream()
                 .map(entreeMapper::toDTO).toList();
     }
