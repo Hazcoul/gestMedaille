@@ -542,4 +542,20 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         return this.getCurrentUser(request);
     }
 
+
+    public MResponse disableAccount(String login) {
+        Optional<Utilisateur> user = utilisateurRepository.findOneByLogin(login);
+        MResponse mResponse = new MResponse();
+        if(user.isPresent()){
+            user.get().setActif(false);
+            utilisateurRepository.save(user.get());
+            mResponse.setCode("0");
+            mResponse.setMsg("Le compte a été désactivé");
+        }else {
+            mResponse.setCode("-1");
+            mResponse.setMsg("Le compte est introuvable");
+        }
+        return mResponse;
+    }
+
 }
