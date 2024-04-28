@@ -11,10 +11,13 @@ import lombok.Getter;
 @Getter
 public enum ETypePiece {
 
-    ORDRE_ENTREE(0, "Ordre d'entrée", 'E'),
+    BL(0, "Bordereau de livraison", 'E'),
     ORDRE_SORTIE(1, "Ordre de sortie", 'S'),
     FACTURE(2, "Facture", 'E'),
-    PV(3, "Procès verval de reception", 'E');
+    PV(3, "Procès verval de reception", 'E'),
+    CONTRAT(4, "Contrat", 'E'),
+    PVC_ENTREE(5, "Procès verval de constat", 'E'),
+    PVC_SORTIE(6, "Procès verval de constat", 'S');
 
     private Integer valeur;
     private String libelle;

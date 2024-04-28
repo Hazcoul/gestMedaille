@@ -30,6 +30,7 @@ public class SignataireActeMapper extends AbstractBaseMapper {
         dto.setNatureActe(entity.getNatureActe().getLibelle());
         dto.setFonctionSignataire(entity.getFonctionSignataire().getLibelle());
         dto.setNomComplet(entity.getNomComplet());
+        dto.setDepartement(entity.getDepartement());
         dto.setTitreHonorifique(entity.getTitreHonorifique());
         setCommonFieldsFromEntity(entity, dto);
 
@@ -44,6 +45,7 @@ public class SignataireActeMapper extends AbstractBaseMapper {
         entity.setActif(dto.getActif());
         entity.setIdSignataire(dto.getIdSignataire());
         entity.setNomComplet(dto.getNomComplet());
+        entity.setDepartement(dto.getDepartement());
         entity.setTitreHonorifique(dto.getTitreHonorifique());
         entity.setNatureActe(ENatureActe.getByLibelle(dto.getNatureActe()));
         entity.setFonctionSignataire(EFonctionSignataire.getByLibelle(dto.getFonctionSignataire()));

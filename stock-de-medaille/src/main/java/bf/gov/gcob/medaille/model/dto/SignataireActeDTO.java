@@ -28,6 +28,7 @@ public class SignataireActeDTO extends AbstractBaseDTO {
     private String fonctionSignataire;
 
     private String nomComplet;
+    private String departement;
 
     private String titreHonorifique;
 

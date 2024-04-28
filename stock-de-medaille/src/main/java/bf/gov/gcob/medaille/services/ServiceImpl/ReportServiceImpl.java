@@ -6,21 +6,13 @@
 package bf.gov.gcob.medaille.services.ServiceImpl;
 
 import bf.gov.gcob.medaille.config.Constants;
-import bf.gov.gcob.medaille.model.entities.Entree;
-import bf.gov.gcob.medaille.model.entities.LigneEntree;
-import bf.gov.gcob.medaille.model.entities.LigneSortie;
-import bf.gov.gcob.medaille.model.entities.PieceJointe;
-import bf.gov.gcob.medaille.model.entities.Sortie;
+import bf.gov.gcob.medaille.model.entities.*;
 import bf.gov.gcob.medaille.model.enums.EMvtStatus;
 import bf.gov.gcob.medaille.model.reportdto.BmConsommationDTO;
 import bf.gov.gcob.medaille.model.reportdto.LigneEntreeDTO;
 import bf.gov.gcob.medaille.model.reportdto.LigneSortieDTO;
 import bf.gov.gcob.medaille.model.reportdto.OrdreEntreeMatiereDTO;
-import bf.gov.gcob.medaille.repository.EntreeRepository;
-import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
-import bf.gov.gcob.medaille.repository.LigneSortieRepository;
-import bf.gov.gcob.medaille.repository.PieceJointeRepository;
-import bf.gov.gcob.medaille.repository.SortieRepository;
+import bf.gov.gcob.medaille.repository.*;
 import bf.gov.gcob.medaille.services.ReportService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,11 +60,13 @@ public class ReportServiceImpl implements ReportService {
     private final LigneSortieRepository ligneSortieRepository;
 
     private final PieceJointeRepository pieceJointeRepository;
+    private final SignataireActeRepository signataireActeRepository;
 
     @Override
     public Resource printOrdreEntreeMatiere(Long idEntree, String format) {
         log.info("Export d'état d'ordre d'entrée : {}", idEntree);
         Entree entree = entreeRepository.findByIdEntreeAndStatus(idEntree, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("L'entrée est inexistante ou non encore validée."));
+
         try {
             // chargement du logo (armoirie du BF)
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
@@ -120,12 +114,14 @@ public class ReportServiceImpl implements ReportService {
     public Resource printBmConsommation(Long idSortie, String format) {
         log.info("Export de bordereau de mise en consommation : {}", idSortie);
         Sortie sortie = sortieRepository.findByIdSortieAndStatus(idSortie, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("La sortie est inexistante ou non encore validée."));
+        //SignataireActe signataireActeS=signataireActeRepository.findByIdSignataireAndActifTrue();
         try {
             // chargement du logo (armoirie du BF)
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
             //initalisation du titre 
-            String refSortie = "N° 50/1008000311/2021/0002 du "+ sortie.getDateSortie();
+           //String refSortie = "N° 50/1008000311/2021/0002 du "+ sortie.getDateSortie();
+            String refSortie = sortie.getNumeroSortie() + " du "+ sortie.getDateSortie();
             List<LigneSortieDTO> ligneSortieDTOs = new ArrayList<>();
             List<LigneSortie> les = ligneSortieRepository.findBySortieIdSortie(sortie.getIdSortie());
             int i = 1;
@@ -144,6 +140,9 @@ public class ReportServiceImpl implements ReportService {
                     (sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
                     "COMPAORE Emmanuel",
                     "NAMA Maïmouna",
+                    "Le magasiniert",
+                    "La cpm",
+                    "L'OP",
                     (sortie.getOrdonnateur() != null ? sortie.getOrdonnateur().getPrenom() + " " + sortie.getOrdonnateur().getNom() : null),
                     ligneSortieDTOs
             );
