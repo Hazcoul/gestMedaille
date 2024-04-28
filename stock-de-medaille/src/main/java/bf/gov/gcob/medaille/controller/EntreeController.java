@@ -12,7 +12,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -81,8 +80,8 @@ public class EntreeController {
                 .body(newEntreeDTO);
     }
 
-    @PutMapping(value ="/entrees", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
-    public ResponseEntity<?> updateEntree(@Valid @RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
+    @PutMapping(value ="/entrees"/*, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data"*/)
+    public ResponseEntity<?> updateEntree(@RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Entree : {}", entreeDTO);
         if (entreeDTO.getIdEntree() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");

@@ -156,7 +156,7 @@ public class SortieServiceImpl implements SortieService {
     @Transactional(readOnly = true)
     public List<SortieDTO> findAll() {
         log.debug("Request to get all Sorties");
-        return sortieRepository.findAll()
+        return sortieRepository.findAllByOrderByLastModifiedDateDesc()
                 .stream()
                 .map(sortieMapper::toDTO).toList();
     }
