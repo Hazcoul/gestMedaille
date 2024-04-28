@@ -1,5 +1,6 @@
 package bf.gov.gcob.medaille.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +35,6 @@ public interface EntreeRepository extends JpaRepository<Entree, Long> {
     List<Entree> findByMagasinIdMagasin(Long idMagasin);
 
     List<Entree> findByFournisseurIdFournisseur(Long idFournisseur);
+    
+    Collection<Entree> findAllByOrderByLastModifiedDateDesc();
 }
