@@ -26,14 +26,17 @@ public class BmConsommationDTO {
     private String referenceBordereau;
     private String dateSortie;
     private String magasin;
-    private String detenteur;
+    private String destination;
     private String beneficiaire;
-    private String magasinier;
-    private String cpm;
-    private String ordonnateur;
+    private String representant;
     private String fMagasinier;
+    private String fdetenteur;
     private String fCpm;
     private String fOrdonnateur;
+    private String magasinier;
+    private String detenteur;
+    private String cpm;
+    private String ordonnateur;
 
     List<bf.gov.gcob.medaille.model.reportdto.LigneSortieDTO> lignesSorties;
 }

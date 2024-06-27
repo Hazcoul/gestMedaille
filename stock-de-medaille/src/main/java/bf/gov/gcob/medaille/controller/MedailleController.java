@@ -6,8 +6,10 @@
 package bf.gov.gcob.medaille.controller;
 
 import bf.gov.gcob.medaille.exception.CreateNewElementException;
+import bf.gov.gcob.medaille.model.dto.ApiResponse;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import bf.gov.gcob.medaille.services.MedailleService;
+import bf.gov.gcob.medaille.utils.web.HeaderUtil;
 import bf.gov.gcob.medaille.utils.web.PaginationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
@@ -16,6 +18,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,6 +47,10 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "/api/medailles")
 public class MedailleController {
 
+    /*private static final String ENTITY_NAME = "entree";
+    @Value("${application.name}")
+    private String applicationName;*/
+    @Autowired
     private MedailleService service;
 
     /**
@@ -155,11 +163,17 @@ public class MedailleController {
      * @return
      */
     @DeleteMapping(path = "/{id}")
-    public Mono<ResponseEntity<Void>> delete(@PathVariable Long id) {
-        service.delete(id);
-        return Mono.just(ResponseEntity
-                .noContent()
-                .build());
+    public Mono<ResponseEntity<?>> delete(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return Mono.just(ResponseEntity.noContent().headers(HeaderUtil.createAlert("applicationName", "medaille" + ".deleted", id.toString())).build());
+        } catch (Exception ex) {
+            ApiResponse<Object> result = new ApiResponse<>();
+            result.setCode("medaille");
+            result.setMsg(ex.getMessage());
+            result.setData(ex.getCause());
+            return Mono.just(ResponseEntity.badRequest().body(result));
+        }
 
     }
 }

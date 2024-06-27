@@ -60,7 +60,7 @@ public class ReportServiceImpl implements ReportService {
     private final LigneSortieRepository ligneSortieRepository;
 
     private final PieceJointeRepository pieceJointeRepository;
-    private final SignataireActeRepository signataireActeRepository;
+    //private final SignataireActeRepository signataireActeRepository;
 
     @Override
     public Resource printOrdreEntreeMatiere(Long idEntree, String format) {
@@ -72,7 +72,7 @@ public class ReportServiceImpl implements ReportService {
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
 
             //initalisation du titre
-            String refEntree = "N° 50/1008000311/2021/0002 du "+entree.getDateReception();
+            String refEntree = "N° "+entree.getNumeroCmd() +" du "+entree.getDateReception();
             List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntree(entree);
             List<LigneEntreeDTO> ligneEntreeDTOs = new ArrayList<>();
             List<LigneEntree> les = ligneEntreeRepository.findByEntreeIdEntree(entree.getIdEntree());
@@ -87,7 +87,7 @@ public class ReportServiceImpl implements ReportService {
                     (entree.getExerciceBudgetaire() != null ? entree.getExerciceBudgetaire().toString() : null),
                     refEntree,
                     entree.getAcquisition().getLibelle(),
-                    "Direction de la Reglémentation et de la Programmation des Décorations",
+                    entree.getMagasin().getNomMagasin(),
                     (entree.getFournisseur() != null ? entree.getFournisseur().getSigle() : null),
                     (pieceJointes != null ? pieceJointes.get(0).getTypePiece().getLibelle() : null),
                     (pieceJointes != null ? pieceJointes.get(0).getReferencePiece() : null),
@@ -134,21 +134,25 @@ public class ReportServiceImpl implements ReportService {
                     logo,
                     refSortie,
                     (sortie.getDateSortie() != null ? Constants.convertDateToShort(sortie.getDateSortie()) : null),
-                    (sortie.getMagasin() != null ? sortie.getMagasin().getNomMagasin() : null), "DRPD",
+                    (sortie.getMagasin() != null ? sortie.getMagasin().getNomMagasin() : null),
+                    "DRPD",
+                    (sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getSigle() : null),
+                    sortie.getDetenteur().getMatricule()+ " "+sortie.getDetenteur().getNom()+" "+sortie.getDetenteur().getPrenom(),
+                    "Le Magasinier",
+                    "le Detenteur",
+                    "la Comptable Proincipale Matieres",
+                    "L'Ordonnateur",
+                    "Emmanuel COMPAORE",
+                    "LTN Boukari SAWADOGO",
+                    "NAMA Maïmouna",
                     //(sortie.getDetenteur() != null ? sortie.getDetenteur().getPrenom() + " " + sortie.getDetenteur().getNom() : null),
                     //(sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
-                    (sortie.getBeneficiaire() != null ? sortie.getBeneficiaire().getRaisonSociale() : null),
-                    "COMPAORE Emmanuel",
-                    "NAMA Maïmouna",
-                    "Le magasiniert",
-                    "La cpm",
-                    "L'OP",
-                    (sortie.getOrdonnateur() != null ? sortie.getOrdonnateur().getPrenom() + " " + sortie.getOrdonnateur().getNom() : null),
-                    ligneSortieDTOs
+                   (sortie.getOrdonnateur() != null ? sortie.getOrdonnateur().getPrenom() + " " + sortie.getOrdonnateur().getNom() : null),
+                   ligneSortieDTOs
             );
 
             //modeles de rapport a utiliser
-            InputStream is = this.getClass().getResourceAsStream("/BMConsommation.jasper");
+            InputStream is = this.getClass().getResourceAsStream("/BMConsommation2.jasper");
             // construction des Datasources a travers le jrbeans
             JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(data));
             // appel de la methode d'export en fonction du format souhaité
