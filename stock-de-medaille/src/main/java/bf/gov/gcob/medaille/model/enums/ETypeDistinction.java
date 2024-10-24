@@ -13,7 +13,9 @@ public enum ETypeDistinction {
 
     ORDRES_NATIONAUX(0, "Ordres nationaux"),
     ORDRES_SPECIFIQUES(1, "Ordres spécifiques"),
-    MEDAILLES(2, "Médailles");
+    MEDAILLES(2, "Médailles"),
+    AGRAFES(3, "Agrafes"),
+    AUTRES(4, "Autre insigne");
 
     private Integer valeur;
     private String libelle;

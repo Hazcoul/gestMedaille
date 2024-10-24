@@ -68,7 +68,7 @@ public class EntreeController {
     }
 
     @PostMapping(value ="/entrees"/*, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data"*/)
-    public ResponseEntity<EntreeDTO> createEntree(@Valid @RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
+    public ResponseEntity<EntreeDTO> createEntree(@Valid @RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData", required = false) List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles", required = false) List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Entree : {}", entreeDTO);
         if (entreeDTO.getIdEntree() != null) {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
@@ -81,7 +81,7 @@ public class EntreeController {
     }
 
     @PutMapping(value ="/entrees"/*, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data"*/)
-    public ResponseEntity<?> updateEntree(@RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
+    public ResponseEntity<?> updateEntree(@RequestPart(value = "data") EntreeDTO entreeDTO, @RequestPart(value = "pjData", required = false) List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles", required = false) List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Entree : {}", entreeDTO);
         if (entreeDTO.getIdEntree() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");

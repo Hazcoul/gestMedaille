@@ -58,8 +58,8 @@ public class DistinctionController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable(name = "id", required = true) Long idFournisseur) {
-        distinctionService.delete(idFournisseur);
+    public void delete(@PathVariable(name = "id", required = true) Long idDistinction) {
+        distinctionService.delete(idDistinction);
     }
 
 }

@@ -11,7 +11,7 @@
     <groupId>bf.gov.gcob</groupId>
     <artifactId>stock-de-medaille</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <!--<packaging>jar</packaging>-->
+    <packaging>jar</packaging>
     <name>stock-de-medaille</name>
     <description>APPLICATION DE GESTION DE STOCK DE MEDAILLES</description>
     <properties>
@@ -164,7 +164,7 @@
     </dependencies>
 
     <build>
-        <!--finalName>stock-medaille-core</finalName-->
+        <finalName>stock-medaille-core</finalName>
         <defaultGoal>clean spring-boot:run</defaultGoal>
         <plugins>
             <plugin>

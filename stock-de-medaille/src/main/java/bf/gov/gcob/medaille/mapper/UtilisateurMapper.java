@@ -67,7 +67,7 @@ public class UtilisateurMapper {
         
         Utilisateur entity = new Utilisateur();
         
-        entity.setId(utilisateurDTO.getId());
+        //entity.setId(utilisateurDTO.getId());
         entity.setActif(utilisateurDTO.isActif());
         entity.setActivationKey(utilisateurDTO.getActivationKey());
         entity.setConfirmationExpireDate(utilisateurDTO.getConfirmationExpireDate());

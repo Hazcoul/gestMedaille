@@ -5,6 +5,7 @@
  */
 package bf.gov.gcob.medaille.services;
 
+import bf.gov.gcob.medaille.model.dto.DistinctionDTO;
 import bf.gov.gcob.medaille.model.dto.MedailleDTO;
 import java.io.IOException;
 import java.util.List;

@@ -64,7 +64,7 @@ public class MedailleController {
      */
     //@PreAuthorize("hasAnyAuthority(\"" + Constants.ADMIN + "\",\"" + Constants.GEST + "\")")
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
-    public Mono<ResponseEntity<MedailleDTO>> create(
+    public Mono<ResponseEntity<?>> create(
             @Valid @RequestPart(value = "data", required = true) MedailleDTO medailleDTO,
             @RequestPart(value = "photo", required = true) FilePart photo) throws URISyntaxException, JsonProcessingException {
 
@@ -74,8 +74,17 @@ public class MedailleController {
         if (photo == null) {
             throw new RuntimeException("Veuillez charger une image catalogue de la médaille SVP.");
         }
-        MedailleDTO response = service.create(medailleDTO, photo);
-        return Mono.just(ResponseEntity.created(new URI("/api/medailles/" + response.getIdMedaille())).body(response));
+        try {
+            MedailleDTO response = service.create(medailleDTO, photo);
+            return Mono.just(ResponseEntity.created(new URI("/api/medailles/" + response.getIdMedaille())).body(response));
+        } catch (Exception e) {
+            ApiResponse<Object> result = new ApiResponse<>();
+            result.setCode("MEDAILLE");
+            result.setMsg(e.getMessage());
+            result.setData(e.getCause());
+            return Mono.just(ResponseEntity.badRequest().body(result));
+        }
+
     }
 
     /**

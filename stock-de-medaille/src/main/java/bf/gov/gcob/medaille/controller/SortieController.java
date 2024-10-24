@@ -71,7 +71,7 @@ public class SortieController {
     }
 
     @PostMapping(value ="/sorties", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data")
-    public ResponseEntity<SortieDTO> createSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
+    public ResponseEntity<SortieDTO> createSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData", required = false) List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles", required = false) List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         if (sortieDTO.getIdSortie() != null) {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
@@ -84,7 +84,7 @@ public class SortieController {
     }
 
     @PutMapping(value ="/sorties"/*, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "Content-Type=multipart/form-data"*/)
-    public ResponseEntity<?> updateSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData") List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles") List<FilePart> pFiles) throws URISyntaxException {
+    public ResponseEntity<?> updateSortie(@Valid @RequestPart(value = "data") SortieDTO sortieDTO, @RequestPart(value = "pjData", required = false) List<PieceJointeDTO> pjDTOs, @RequestPart(value = "pjFiles", required = false) List<FilePart> pFiles) throws URISyntaxException {
         log.debug("REST request to save Sortie : {}", sortieDTO);
         if (sortieDTO.getIdSortie() == null) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
@@ -142,7 +142,7 @@ public class SortieController {
     public ResponseEntity<?> deleteLineS(@PathVariable("id") Long id, @PathVariable("idLine") Long idLine) {
         log.debug("REST request to delete line of Sortie: {}", idLine);
         try {
-        	sortieService.delete(id);
+        	sortieService.deleteLine(id, idLine);
             return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME + ".deleted", id.toString())).build();
 		} catch (Exception ex) {
 			ApiResponse<Object> result = new ApiResponse<>();

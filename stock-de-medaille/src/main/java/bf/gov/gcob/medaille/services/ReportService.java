@@ -30,4 +30,8 @@ public interface ReportService {
      * @return
      */
     Resource printBmConsommation(Long idSortie, String format);
+    /*
+    * Imprimer le stock existant
+    */
+    Resource printStock(String format);
 }

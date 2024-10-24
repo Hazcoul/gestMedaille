@@ -48,29 +48,22 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class ReportServiceImpl implements ReportService {
-
     private final ResourceLoader resourceLoader;
-
     private final EntreeRepository entreeRepository;
-
     private final SortieRepository sortieRepository;
-
     private final LigneEntreeRepository ligneEntreeRepository;
-
     private final LigneSortieRepository ligneSortieRepository;
-
     private final PieceJointeRepository pieceJointeRepository;
     //private final SignataireActeRepository signataireActeRepository;
+    private final MedailleRepository medailleRepository;
 
     @Override
     public Resource printOrdreEntreeMatiere(Long idEntree, String format) {
         log.info("Export d'état d'ordre d'entrée : {}", idEntree);
         Entree entree = entreeRepository.findByIdEntreeAndStatus(idEntree, EMvtStatus.VALIDATED).orElseThrow(() -> new RuntimeException("L'entrée est inexistante ou non encore validée."));
-
         try {
             // chargement du logo (armoirie du BF)
             InputStream logo = resourceLoader.getResource("classpath:reports/embleme.png").getInputStream();
-
             //initalisation du titre
             String refEntree = "N° "+entree.getNumeroCmd() +" du "+entree.getDateReception();
             List<PieceJointe> pieceJointes = pieceJointeRepository.findByEntree(entree);
@@ -93,7 +86,6 @@ public class ReportServiceImpl implements ReportService {
                     (pieceJointes != null ? pieceJointes.get(0).getReferencePiece() : null),
                     ligneEntreeDTOs
             );
-
             //modeles de rapport a utiliser
             InputStream is = this.getClass().getResourceAsStream("/ordre_entree_matieres.jasper");
             // construction des Datasources a travers le jrbeans
@@ -107,9 +99,7 @@ public class ReportServiceImpl implements ReportService {
             log.error("Erreur survenue lors du chargement de l'embleme : {}", ex);
             return null;
         }
-
     }
-
     @Override
     public Resource printBmConsommation(Long idSortie, String format) {
         log.info("Export de bordereau de mise en consommation : {}", idSortie);
@@ -165,7 +155,30 @@ public class ReportServiceImpl implements ReportService {
             return null;
         }
     }
+    @Override
+    public Resource printStock(String format) {
+        /*
+    public void printCarte(OutputStream stream, Long id) throws JRException {
+    Carte carte=carteRepository.findById(id).get();
+    Assure assure = carte.getAssure();
+    Photo photo =assure.getPhoto();
+    InputStream logo= this.getClass().getResourceAsStream("/cnamu_logo.jpg");
+    InputStream photoStream = this.getClass().getResourceAsStream("/cnamu_logo.jpg");
+    InputStream signature=null;
+    Date date= new Date();
+    List<CarteAssureDTO>  dto=new CarteAssureDTO().buildCarte(assure.getNom(), "HADJA", assure.getDateNaissance(), "Kdg",
+            date,assure.getImmatriculation(), logo, photoStream, signa-ture);
+   InputStream report-Stream=this.getClass().getResourceAsStream("/carte.jasper"); //chargement du fichier jasper
+    Map<String, Object> parametre=new HashMap<>();//Definition des données paramètre
+    JRDataSource dataSource=new JRBeanCollectionDataSource(dto);//
+    JasperReport jasperReport=(JasperReport) JRLoa-der.loadObject(reportStream);//charge le fichier jasper dans le moteur
+        JasperPrint jasperPrint= JasperFillManager.fillReport(jasperReport, pa-rametre,dataSource);//Remplir les champs avec les données fournies
+    JasperExportManager.exportReportToPdfStream(jasperPrint, stream);//Exporter les données
+}
 
+    */
+        return null;
+    }
     /**
      * METHODE INTERNE D'EXPORT EN WORD ET PDF UNIQUEMENT
      *
@@ -180,8 +193,6 @@ public class ReportServiceImpl implements ReportService {
         Map<String, Object> loParameters = new HashMap<>();
         JasperReport japerReport = (JasperReport) JRLoader.loadObject(inputStream);
         JasperPrint jasperPrint = JasperFillManager.fillReport(japerReport, loParameters, datasource);
-
-        //Export des etats en fonction du format demande
         if (fileFormat.trim().toLowerCase().equals("word")) {//export to word file
             JRDocxExporter exporter = new JRDocxExporter();
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -195,5 +206,5 @@ public class ReportServiceImpl implements ReportService {
             throw new RuntimeException("Vous ne pouvez obtenir qu'un document PDF ou Word ! Veuillez réessayer SVP.");
         }
     }
-
 }
+

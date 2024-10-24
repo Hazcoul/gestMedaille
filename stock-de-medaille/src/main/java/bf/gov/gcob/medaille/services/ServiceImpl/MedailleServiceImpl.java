@@ -15,6 +15,7 @@ import bf.gov.gcob.medaille.model.entities.Grade;
 import bf.gov.gcob.medaille.model.entities.LigneEntree;
 import bf.gov.gcob.medaille.model.entities.LigneSortie;
 import bf.gov.gcob.medaille.model.entities.Medaille;
+import bf.gov.gcob.medaille.model.enums.ETypeDistinction;
 import bf.gov.gcob.medaille.repository.LigneEntreeRepository;
 import bf.gov.gcob.medaille.repository.LigneSortieRepository;
 import bf.gov.gcob.medaille.repository.MedailleRepository;
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,10 +116,10 @@ public class MedailleServiceImpl implements MedailleService {
         }
 
         medailleDTOS = medailleRepository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
-        for (MedailleDTO medailleDto : medailleDTOS) {
+        /*for (MedailleDTO medailleDto : medailleDTOS) {
             Path path = subfolderPath.resolve(medailleDto.getLienImage());
             medailleDto.setImage(Files.readAllBytes(path));
-        }
+        }*/
         return medailleDTOS;
     }
 
@@ -163,10 +165,16 @@ public class MedailleServiceImpl implements MedailleService {
 //============================ PRIVATE FUNCTIONS ==============================
     private String constructNomMedaille(Grade grade, Distinction distinction) {
         String response = "";
-        if (grade == null || distinction.getLibelle().charAt(0) == 'M') {
+        if (grade == null || ETypeDistinction.MEDAILLES.equals(distinction.getCategoryDistinction())
+                || ETypeDistinction.AUTRES.equals(distinction.getCategoryDistinction()) || ETypeDistinction.AGRAFES.equals(distinction.getCategoryDistinction())) {
             response += distinction.getLibelle();
         } else {
             response += grade.getLibelle() + " de l'" + distinction.getLibelle();
+        }
+
+        Optional<Medaille> medaille = medailleRepository.findByNomComplet(response);
+        if (medaille.isPresent()) {
+            throw new RuntimeException("Cette médaille existe déjà...");
         }
 
         return response;

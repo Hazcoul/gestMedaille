@@ -24,6 +24,7 @@ public class Medaille extends AbstractBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_medaille", nullable = false, unique = true)
     private Long idMedaille;
+    @Column(name = "nom_complet", unique = true)
     private String nomComplet; //concatenation du libelle de la distinction de celui du grade. Le champs sera grisé
     private String code;
     private Integer stock;

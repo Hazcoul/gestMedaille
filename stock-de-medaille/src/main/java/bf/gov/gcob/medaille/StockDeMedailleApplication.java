@@ -34,7 +34,7 @@ public class StockDeMedailleApplication implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        service.saveInitAuthorities();
+//        service.saveInitAuthorities();
         service.saveInitProfil();
         service.saveInitUser();
         service.initGCOBConfig();
