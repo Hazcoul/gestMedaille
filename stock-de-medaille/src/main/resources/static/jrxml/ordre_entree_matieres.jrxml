@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ordre_entree_matieres" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0" isIgnorePagination="true" uuid="7a5c9b49-9dc5-422a-ac69-e92cf61ef530">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ordre_entree_matieres" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0" uuid="7a5c9b49-9dc5-422a-ac69-e92cf61ef530">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -446,10 +446,10 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="190" splitType="Stretch">
+		<band height="25" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="802" height="25" isRemoveLineWhenBlank="true" backcolor="#99CCFF" uuid="25ae9782-a64e-4a1c-afd9-ff5e70edb221">
+				<reportElement positionType="Float" x="0" y="0" width="802" height="25" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" backcolor="#99CCFF" uuid="25ae9782-a64e-4a1c-afd9-ff5e70edb221">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
@@ -457,8 +457,13 @@
                   ($F{lignesEntrees})]]></dataSourceExpression>
 				<subreportExpression><![CDATA["lignes_entrees.jasper"]]></subreportExpression>
 			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="60" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="30" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
+				<reportElement positionType="Float" x="0" y="0" width="130" height="20" uuid="a1f36530-48fe-4351-b9d3-c3252fa52d37">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -469,10 +474,9 @@
 				<text><![CDATA[Le Magasinier]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="237" y="30" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
+				<reportElement positionType="Float" x="237" y="0" width="220" height="20" uuid="b75a514d-73ac-4af1-a9eb-cb57184cf86a">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="13" isBold="false" isUnderline="true"/>
@@ -480,10 +484,9 @@
 				<text><![CDATA[Le Comptable Principal Matières]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="582" y="30" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
+				<reportElement positionType="Float" x="582" y="0" width="220" height="20" uuid="c94131a2-1f8f-489e-abc7-1b264896cb31">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="13" isBold="false" isUnderline="true"/>
@@ -491,7 +494,7 @@
 				<text><![CDATA[L'Ordonnateur Principal]]></text>
 			</staticText>
 		</band>
-	</detail>
+	</columnFooter>
 	<pageFooter>
 		<band height="25" splitType="Stretch">
 			<frame>
